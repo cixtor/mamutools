@@ -1,7 +1,5 @@
 ![Header Image](http://www.cixtor.com/files/large/mamutools-logo.gif)
 
-# MamuTools
-
 [MamuTools](http://www.cixtor.com/mamutools) is a collection of custom scripts intended to be used through a command line to offer more utilities on things like fetch remote content, format piped output, compress and package repositories, etc. They were tested on a **Linux Debian** installation but with a few modifications you can use them in your **UNIX** based operating system.
 
 ### What's exactly?
