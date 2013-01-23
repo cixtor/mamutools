@@ -21,3 +21,36 @@
 # system, and tightly integrated unit testing support give you the tools you need
 # to build any application with which you are tasked.
 #
+IFS=$'\n'
+SEPARATOR=$(for i in {1..50}; do echo -n '-'; done; echo)
+WRITE_DIRECTORIES=(
+	'./app/storage/cache/'
+	'./app/storage/logs/'
+	'./app/storage/sessions/'
+	'./app/storage/views/'
+)
+# Create project based on the Laravel framework.
+clear
+echo -e "Laravel Application Generator"
+echo $SEPARATOR
+echo -e "\e[0;92m[+]\e[0m Creating project structure..."
+echo
+composer.phar -vv create-project laravel/laravel ./ --prefer-dist
+# Clean up project (remove useless directories).
+CURRENT_SIZE=$(du -sh ./ | awk '{print $1}')
+DIRECTORIES=()
+for DIRECTORY in $(find ./ -type d -iname ".git"); do
+	DIRECTORIES+=$DIRECTORY
+	echo -e "Removing \e[0;93m${DIRECTORY}\e[0m"
+	rm -rf "${DIRECTORY}"
+done
+FINAL_SIZE=$(du -sh ./ | awk '{print $1}')
+echo $SEPARATOR
+echo -e "\e[0;92m[+]\e[0m Cleaned up directory: \e[0;91m${CURRENT_SIZE}\e[0m => \e[0;92m${FINAL_SIZE}\e[0m"
+echo -e "\e[0;92m[+]\e[0m Granting write permissions:"
+for DIR in "${WRITE_DIRECTORIES[@]}"; do
+	echo "    ${DIR}"
+	chmod 777 "${DIR}"
+done
+echo -e "\e[0;92m    Finished.\e[0m"
+#
