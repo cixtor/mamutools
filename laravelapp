@@ -21,6 +21,7 @@
 # system, and tightly integrated unit testing support give you the tools you need
 # to build any application with which you are tasked.
 #
+PROJECT=$1
 IFS=$'\n'
 SEPARATOR=$(for i in {1..50}; do echo -n '-'; done; echo)
 WRITE_DIRECTORIES=(
@@ -29,28 +30,44 @@ WRITE_DIRECTORIES=(
 	'./app/storage/sessions/'
 	'./app/storage/views/'
 )
-# Create project based on the Laravel framework.
+# Generate application name and clean the variable.
 clear
 echo -e "Laravel Application Generator"
 echo $SEPARATOR
-echo -e "\e[0;92m[+]\e[0m Creating project structure..."
-echo
-composer.phar -vv create-project laravel/laravel ./ --prefer-dist
-# Clean up project (remove useless directories).
-CURRENT_SIZE=$(du -sh ./ | awk '{print $1}')
-DIRECTORIES=()
-for DIRECTORY in $(find ./ -type d -iname ".git"); do
-	DIRECTORIES+=$DIRECTORY
-	echo -e "Removing \e[0;93m${DIRECTORY}\e[0m"
-	rm -rf "${DIRECTORY}"
-done
-FINAL_SIZE=$(du -sh ./ | awk '{print $1}')
+if [ "${PROJECT}" == "" ]; then
+	echo -en "\e[0;94m[=]\e[0m Type the name of the application: "
+	read PROJECT_NAME
+	if [ "${PROJECT_NAME}" == "" ]; then
+		PROJECT=$(echo app-$(date +'%Y%m%d'))
+	else
+		PROJECT=$PROJECT_NAME
+	fi
+fi
+# Create project based on the latest version of the Laravel framework.
+PROJECT=$(echo "${PROJECT}" | sed 's/ /-/g')
+echo -e "\e[0;92m[+]\e[0m Creating application structure for: \e[0;93m${PROJECT}\e[0m"
 echo $SEPARATOR
-echo -e "\e[0;92m[+]\e[0m Cleaned up directory: \e[0;91m${CURRENT_SIZE}\e[0m => \e[0;92m${FINAL_SIZE}\e[0m"
-echo -e "\e[0;92m[+]\e[0m Granting write permissions:"
-for DIR in "${WRITE_DIRECTORIES[@]}"; do
-	echo "    ${DIR}"
-	chmod 777 "${DIR}"
-done
-echo -e "\e[0;92m    Finished.\e[0m"
+composer.phar -vv create-project laravel/laravel "${PROJECT}" --prefer-dist
+# Clean up project (remove useless directories).
+if [ -e "${PROJECT}" ]; then
+	cd "${PROJECT}"
+	CURRENT_SIZE=$(du -sh ./ | awk '{print $1}')
+	DIRECTORIES=()
+	for DIRECTORY in $(find ./ -type d -iname ".git"); do
+		DIRECTORIES+=$DIRECTORY
+		echo -e "Removing \e[0;93m${DIRECTORY}\e[0m"
+		rm -rf "${DIRECTORY}"
+	done
+	FINAL_SIZE=$(du -sh ./ | awk '{print $1}')
+	echo $SEPARATOR
+	echo -e "\e[0;92m[+]\e[0m Cleaned up directory: \e[0;91m${CURRENT_SIZE}\e[0m => \e[0;92m${FINAL_SIZE}\e[0m"
+	echo -e "\e[0;92m[+]\e[0m Granting write permissions:"
+	for DIR in "${WRITE_DIRECTORIES[@]}"; do
+		echo "    ${DIR}"
+		chmod 777 "${DIR}"
+	done
+	echo -e "\e[0;92m    Finished.\e[0m"
+else
+	echo -e "\e[0;91m[x] Error:\e[0m Project folder was not created."
+fi
 #
