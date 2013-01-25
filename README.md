@@ -25,8 +25,9 @@ You'll probably need **super administrator** privileges to do these things, if t
 ```
 $ cd /opt/
 $ git clone https://github.com/cixtor/mamutools.git
+$ chmod 755 ./mamutools/*.{rb,sh,php}
 $ cd /usr/local/bin/
-$ for FILE in $(ls -1 /opt/mamutools/); do ln -s /opt/mamutools/$FILE $(echo $FILE | cut -d '.' -f 1); done
+$ for i in $(ls -1 /opt/mamutools/); do ln -s /opt/mamutools/$i $(echo $i | cut -d '.' -f 1); done
 ```
 
 ### Motivation
