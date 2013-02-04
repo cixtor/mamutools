@@ -18,3 +18,34 @@
 # "s" implosive, although in Portuguese the same accent is intended to indicate
 # the degree of opening of the vowel.
 #
+import gtk
+import pango
+
+class SpanishAccent:
+    def destroy(self, widget, data=None):
+        gtk.main_quit()
+
+    def keypress(self, widget, event):
+        if event.keyval == gtk.keysyms.Escape:
+            gtk.main_quit()
+
+    def __init__(self):
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        pango_font = pango.FontDescription('Monospace 20')
+        label = gtk.Label('á é í ó ú ñ ¿ ¡\nÁ É Í Ó Ú Ñ ? !')
+
+        window.connect('destroy', self.destroy)
+        window.connect('key-press-event', self.keypress)
+
+        window.set_position(gtk.WIN_POS_CENTER)
+        window.set_title('Orthographic Accent')
+        window.set_border_width(10)
+        label.modify_font(pango_font)
+        label.set_property('selectable', True)
+        window.add(label)
+
+        window.show_all()
+        gtk.main()
+
+if __name__ == "__main__":
+    application = SpanishAccent()
