@@ -30,3 +30,11 @@
 # trying to bypass those very same blacklists. Some websites prevent short,
 # redirected URLs from being posted.
 #
+URL=$1
+if [[ $URL =~ ^http ]]; then
+	URL=$URL
+else
+	URL="http://bit.ly/${URL}"
+fi
+curl --silent -D - "${URL}" | grep '^Location: ' | head -n 1
+#
