@@ -1,0 +1,35 @@
+#!/usr/bin/env ruby
+#
+# Source Code Management to Package
+# http://www.cixtor.com/
+# https://github.com/cixtor/mamutools
+# http://en.wikipedia.org/wiki/Compression_program
+#
+# In computer science and information theory, data compression, source coding,
+# or bit-rate reduction involves encoding information using fewer bits than the
+# original representation. Compression can be either lossy or lossless. Lossless
+# compression reduces bits by identifying and eliminating statistical redundancy.
+# No information is lost in lossless compression. Lossy compression reduces bits
+# by identifying unnecessary information and removing it. The process of reducing
+# the size of a data file is popularly referred to as data compression, although
+# its formal name is source coding (coding done at the source of the data before
+# it is stored or transmitted).
+#
+# Compression is useful because it helps reduce resources usage, such as data
+# storage space or transmission capacity. Because compressed data must be
+# decompressed to use, this extra processing imposes computational or other costs
+# through decompression; this situation is far from being a free lunch. Data
+# compression is subject to a space-time complexity trade-off. For instance, a
+# compression scheme for video may require expensive hardware for the video to be
+# decompressed fast enough to be viewed as it is being decompressed, and the option
+# to decompress the video in full before watching it may be inconvenient or require
+# additional storage. The design of data compression schemes involves trade-offs
+# among various factors, including the degree of compression, the amount of
+# distortion introduced (e.g., when using lossy data compression), and the
+# computational resources required to compress and uncompress the data.
+#
+# New alternatives to traditional systems (which sample at full resolution, then
+# compress) provide efficient resource usage based on principles of compressed
+# sensing. Compressed sensing techniques circumvent the need for data compression
+# by sampling off on a cleverly selected basis.
+#
