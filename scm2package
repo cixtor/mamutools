@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/bin/bash
 #
 # Source Code Management to Package
 # http://www.cixtor.com/
@@ -33,30 +33,25 @@
 # sensing. Compressed sensing techniques circumvent the need for data compression
 # by sampling off on a cleverly selected basis.
 #
-if !ARGV[0].nil? then
-	git_path = ARGV[0]
-	git_m = git_path.match(/(http|https):\/\/github\.com\/(.*)\/(.*).git/)
-	git_m = git_path.match(/.*@(.*):(.*)\/(.*).git/) if git_m.nil?
-	if !git_m.nil? then
-		git_localname = git_m[3] + '-' + Time.now.to_s.split(' ')[0].gsub('-','')
-		git_localfile = "#{git_localname}.tar.bz2"
-		puts "\033[1;33m[+] Cloning git repository: #{git_m[2]}/#{git_m[3]} as #{git_localfile}\033[0m"
-		if File.exists?(git_localfile) then
-			print "\033[1;31m[?] The local file\033[0m \033[1;36m#{git_localfile}\033[0m \033[1;31malready exists, do you want to override it? (y/n) \033[0m"
-			override_it = $stdin.gets.to_s.gsub("\n",'')
-			if override_it=='y' or override_it=='' then
-				File.delete(git_localfile)
-			else
-				print "    Fill the filename for the compressed version of the repository #{git_localname}: "
-				git_localname = $stdin.gets.to_s.gsub("\n",'')
-				git_localfile = "#{git_localname}.tar.bz2"
-			end
-		end
-		system("git clone #{git_path} #{git_localname} && tar -c #{git_localname} | bzip2 > #{git_localname}.tar.bz2 && rm -rf #{git_localname}");
-		puts "\033[1;33m[+] Download and compression finished\033[0m"
-		system("ls -lhas #{git_localname}.tar.bz2")
-	end
+SCM=$1
+REPOSITORY=$2
+#
+if [ $(which $SCM) ]; then
+	$(which $SCM) clone "${REPOSITORY}"
+	FOLDERNAME=$(ls -1t | head -n 1)
+	if [ -e "${FOLDERNAME}" ]; then
+		PACKAGE="${FOLDERNAME}.tar.bz2"
+		tar -c "${FOLDERNAME}" | bzip2 > "${PACKAGE}"
+		if [ -e "${PACKAGE}" ]; then
+			rm -rf "${FOLDERNAME}"
+			echo -e "Package created at: \e[0;92m${PACKAGE}\e[0m"
+		else
+			echo -e "\e[0;91mError.\e[0m The package was not created, check manually to be sure."
+		fi
+	else
+		echo -e "\e[0;91mError.\e[0m The cloned repository was not detected in the current page."
+	fi
 else
-	puts "Usage: #{__FILE__} https://github.com/username/project.git"
-end
+	echo -e "\e[0;91mError.\e[0m The SCM '${SCM}' was not found in your system path."
+fi
 #
