@@ -36,22 +36,46 @@
 SCM=$1
 REPOSITORY=$2
 #
-if [ $(which $SCM) ]; then
-	$(which $SCM) clone "${REPOSITORY}"
-	FOLDERNAME=$(ls -1t | head -n 1)
-	if [ -e "${FOLDERNAME}" ]; then
-		PACKAGE="${FOLDERNAME}.tar.bz2"
-		tar -c "${FOLDERNAME}" | bzip2 > "${PACKAGE}"
-		if [ -e "${PACKAGE}" ]; then
-			rm -rf "${FOLDERNAME}"
-			echo -e "Package created at: \e[0;92m${PACKAGE}\e[0m"
+function help {
+	echo 'Source Code Management to Package'
+	echo '  http://www.cixtor.com/'
+	echo '  https://github.com/cixtor/mamutools'
+	echo '  http://en.wikipedia.org/wiki/Compression_program'
+	echo
+}
+function usage {
+	echo "Usage: $0 [git|hg|svn] [remote_repository]"
+	echo
+}
+function fail {
+	help && usage
+	echo -e "\e[0;91mError.\e[0m ${1}"
+}
+function success {
+	echo -e "\e[0;92mOK.\e[0m ${1}"
+}
+if [ "${SCM}" == 'git' ] || [ "${SCM}" == 'hg' ] || [ "${SCM}" == 'svn' ]; then
+	help
+	if [ $(which $SCM) ]; then
+		if [ "${SCM}" == 'svn' ]; then PARAMETER='co'; else PARAMETER='clone'; fi
+		$(which $SCM) $PARAMETER "${REPOSITORY}"
+		FOLDERNAME=$(ls -1t | head -n 1)
+		if [ -e "${FOLDERNAME}" ]; then
+			PACKAGE="${FOLDERNAME}.tar.bz2"
+			tar -c "${FOLDERNAME}" | bzip2 > "${PACKAGE}"
+			if [ -e "${PACKAGE}" ]; then
+				rm -rf "${FOLDERNAME}" && echo
+				success "Package created at: \e[0;93m${PACKAGE}\e[0m"
+			else
+				fail "The package was not created, check manually to be sure."
+			fi
 		else
-			echo -e "\e[0;91mError.\e[0m The package was not created, check manually to be sure."
+			fail "The cloned repository was not detected in the current page."
 		fi
 	else
-		echo -e "\e[0;91mError.\e[0m The cloned repository was not detected in the current page."
+		fail "The SCM '${SCM}' was not found in your system path."
 	fi
 else
-	echo -e "\e[0;91mError.\e[0m The SCM '${SCM}' was not found in your system path."
+	fail "The SCM '${SCM}' is not supported."
 fi
 #
