@@ -42,20 +42,32 @@ function help {
 	echo '  https://github.com/cixtor/mamutools'
 	echo '  http://en.wikipedia.org/wiki/Compression_program'
 	echo
-}
-function usage {
 	echo "Usage: $0 [git|hg|svn] [remote_repository]"
 	echo
 }
 function fail {
-	help && usage
-	echo -e "\e[0;91mError.\e[0m ${1}"
+	echo -e "\e[0;91m[x] Error.\e[0m ${1}"
+	exit
 }
 function success {
 	echo -e "\e[0;92mOK.\e[0m ${1}"
 }
-if [ "${SCM}" == 'git' ] || [ "${SCM}" == 'hg' ] || [ "${SCM}" == 'svn' ]; then
-	help
+function question {
+	echo -en "\e[0;94m[?]\e[0m ${1}"
+}
+#
+help
+if [ "${SCM}" == '' ]; then
+	question "Which SCM do you want to use? (git, hg, svn): "
+	read SCM_BINARY
+	SCM=$SCM_BINARY
+fi
+if [ "${REPOSITORY}" == '' ]; then
+	question "Specify the URL for the remote repository: "
+	read REMOTE_REPOSITORY
+	REPOSITORY=$REMOTE_REPOSITORY
+fi
+if [[ "${SCM}" =~ (git|hg|svn) ]]; then
 	if [ $(which $SCM) ]; then
 		if [ "${SCM}" == 'svn' ]; then PARAMETER='co'; else PARAMETER='clone'; fi
 		$(which $SCM) $PARAMETER "${REPOSITORY}"
@@ -73,7 +85,7 @@ if [ "${SCM}" == 'git' ] || [ "${SCM}" == 'hg' ] || [ "${SCM}" == 'svn' ]; then
 			fail "The cloned repository was not detected in the current page."
 		fi
 	else
-		fail "The SCM '${SCM}' was not found in your system path."
+		fail "The SCM '${SCM}' was not detected in your system path or it is not valid."
 	fi
 else
 	fail "The SCM '${SCM}' is not supported."
