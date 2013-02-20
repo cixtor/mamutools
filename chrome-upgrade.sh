@@ -87,9 +87,16 @@ function setup_download_package {
 function install_package {
 	setup_download_package
 	if [ -e "${TEMP_PACKAGE}" ]; then
-		echo '  Installing Google Chrome BETA...';
-		dpkg --extract "${TEMP_PACKAGE}" "${CHROME_FOLDER_PATH}";
+		echo '  Installing Google Chrome BETA...'
+		dpkg --extract "${TEMP_PACKAGE}" "${CHROME_FOLDER_PATH}"
 		if [ -e "${CHROME_FOLDER_PATH}" ]; then
+			cd "${CHROME_FOLDER_PATH}"
+			mv -i ./opt/google/chrome/* ./
+			rm -rf ./etc/ ./opt/ ./usr/
+			# Change user owner and permissions of the Chrome Sandbox file.
+			sudo chown root:root chrome-sandbox
+			sudo chmod 4755 chrome-sandbox
+			# Finishing
 			success "Package installed correctly in: \e[0;92m${CHROME_FOLDER_PATH}\e[0m"
 		else
 			fail 'Package installation failed, try again.'
