@@ -96,8 +96,26 @@ function install_package {
 			# Change user owner and permissions of the Chrome Sandbox file.
 			sudo chown root:root chrome-sandbox
 			sudo chmod 4755 chrome-sandbox
+			# Install desktop shortcut to the main menu.
+			LAUNCHER_PATH='/opt/google/chrome/google-chrome.desktop';
+			echo '[Desktop Entry]' > "${LAUNCHER_PATH}"; # Reset original file.
+			echo 'Type=Application' >> "${LAUNCHER_PATH}";
+			echo "Name=Google Chrome $(echo $VERSION | tr 'a-z' 'A-Z')" >> "${LAUNCHER_PATH}";
+			echo 'Comment=Access the Internet' >> "${LAUNCHER_PATH}";
+			echo 'Exec=/opt/google/chrome/google-chrome %U' >> "${LAUNCHER_PATH}";
+			echo 'Icon=/opt/google/chrome/product_logo_256.png' >> "${LAUNCHER_PATH}";
+			echo 'Categories=Network;' >> "${LAUNCHER_PATH}";
+			echo 'MimeType=text/html;text/xml;application/xhtml_xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;' >> "${LAUNCHER_PATH}";
+			cd /usr/share/applications/
+			sudo rm -f google-chrome.desktop
+			sudo ln -s "${LAUNCHER_PATH}";
+			# Install Google Chrome binary globally.
+			cd /usr/local/bin/
+			sudo rm -f google-chrome
+			sudo ln -s /opt/google/chrome/google-chrome
 			# Finishing
 			success "Package installed correctly in: \e[0;92m${CHROME_FOLDER_PATH}\e[0m"
+			success "Press CTRL + F2 and type \e[0;93mgoogle-chrome\e[0m"
 		else
 			fail 'Package installation failed, try again.'
 		fi
