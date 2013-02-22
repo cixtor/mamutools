@@ -55,7 +55,18 @@ function request_sudo {
 		fail 'You can not proceed without root privileges.'
 	fi
 }
-function remote_old_version {
+function stop_current_processes {
+	question 'Stop all current Google Chrome processes (Y/n) '
+	read STOP_PROCESSES
+	if [ "${STOP_PROCESSES}" == 'y' ] || [ "${STOP_PROCESSES}" == 'Y' ]; then
+		for PROCESS in $(ps -A u | grep "${CHROME_FOLDER_PATH}" | awk '{print $2}'); do
+			echo -n "    Killing Chrome process ${PROCESS}: "
+			sudo skill -kill $PROCESS;
+			echo -e "\e[0;92mOK\e[0m";
+		done
+	fi
+}
+function remove_old_version {
 	if [ -e "${CHROME_FOLDER_PATH}" ]; then
 		question 'Remove old versions of Google Chrome from your system (Y/n) '
 		read REMOVE
@@ -125,7 +136,8 @@ function install_package {
 }
 #
 request_sudo
-remote_old_version
+stop_current_processes
+remove_old_version
 goto_google_folder
 install_package
 #
