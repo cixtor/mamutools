@@ -59,6 +59,17 @@ function stop_current_processes {
 	question 'Stop all current Google Chrome processes (Y/n) '
 	read STOP_PROCESSES
 	if [ "${STOP_PROCESSES}" == 'y' ] || [ "${STOP_PROCESSES}" == 'Y' ]; then
+		STOP_PROCESSES='yes'
+	else
+		question 'Are you sure? Do you want to let those processes running? (Y/n) '
+		read LET_THEM_RUNNING
+		if [ "${LET_THEM_RUNNING}" == 'n' ] || [ "${LET_THEM_RUNNING}" == 'N' ]; then
+			STOP_PROCESSES='yes'
+		else
+			STOP_PROCESSES='no'
+		fi
+	fi
+	if [ "${STOP_PROCESSES}" == 'yes' ]; then
 		for PROCESS in $(ps -A u | grep "${CHROME_FOLDER_PATH}" | awk '{print $2}'); do
 			echo -n "    Killing Chrome process ${PROCESS}: "
 			sudo skill -kill $PROCESS;
