@@ -29,16 +29,17 @@ TEMP_PACKAGE='google-chrome-latest.deb'
 #
 function help {
 	echo 'Google Chrome Upgrade'
-	echo '  http://www.cixtor.com/'
-	echo '  https://github.com/cixtor/mamutools'
-	echo '  http://www.cixtor.com/blog/53/chrome-upgrade'
+	echo '    http://www.cixtor.com/'
+	echo '    https://github.com/cixtor/mamutools'
+	echo '    http://www.cixtor.com/blog/53/chrome-upgrade'
+	echo
 }
 function fail {
 	echo -e "\e[0;91m[x] Error.\e[0m ${1}"
 	exit
 }
 function success {
-	echo -e "\e[0;92mOK. \e[0m ${1}"
+	echo -e "\e[0;92mOK.\e[0m ${1}"
 }
 function warning {
 	echo -e "\e[0;93m[!]\e[0m ${1}"
@@ -102,14 +103,15 @@ function setup_download_package {
 	if [ "${ARCHITECTURE}" == 'i386' ] || [ "${ARCHITECTURE}" == 'amd64' ]; then ARCHITECTURE="${ARCHITECTURE}"; else ARCHITECTURE='i386'; fi
 	if [ "${VERSION}" == 'stable' ] || [ "${VERSION}" == 'beta' ]; then VERSION="${VERSION}"; else VERSION='beta'; fi
 	LATEST_CHROME="https://dl.google.com/linux/direct/google-chrome-${VERSION}_current_${ARCHITECTURE}.deb";
-	echo -e "  Downloading configured package \e[0;93m${VERSION}-${ARCHITECTURE}\e[0m ...";
+	echo -en "    Downloading configured package \e[0;93m${VERSION}-${ARCHITECTURE}\e[0m ";
 	sudo rm -f "${TEMP_PACKAGE}";
 	wget --quiet --continue "${LATEST_CHROME}" -O "${TEMP_PACKAGE}";
+	success
 }
 function install_package {
 	setup_download_package
 	if [ -e "${TEMP_PACKAGE}" ]; then
-		echo '  Installing Google Chrome BETA...'
+		echo "    Installing Google Chrome BETA..."
 		dpkg --extract "${TEMP_PACKAGE}" "${CHROME_FOLDER_PATH}"
 		if [ -e "${CHROME_FOLDER_PATH}" ]; then
 			cd "${CHROME_FOLDER_PATH}"
@@ -136,6 +138,7 @@ function install_package {
 			sudo rm -f google-chrome
 			sudo ln -s /opt/google/chrome/google-chrome
 			# Finishing
+			echo
 			success "Package installed correctly in: \e[0;92m${CHROME_FOLDER_PATH}\e[0m"
 			success "Press CTRL + F2 and type \e[0;93mgoogle-chrome\e[0m"
 		else
@@ -146,6 +149,7 @@ function install_package {
 	fi
 }
 #
+help
 request_sudo
 stop_current_processes
 remove_old_version
