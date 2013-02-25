@@ -21,19 +21,10 @@
 # Upgrades can also worsen a product subjectively. A user may prefer an older version
 # even if a newer version functions perfectly as designed.
 #
-VERSION=$2
-ARCHITECTURE=$1
 GOOGLE_FOLDER_PATH='/opt/google/'
 CHROME_FOLDER_PATH="${GOOGLE_FOLDER_PATH}chrome/"
 TEMP_PACKAGE='google-chrome-latest.deb'
 #
-function help {
-	echo 'Google Chrome Upgrade'
-	echo '    http://www.cixtor.com/'
-	echo '    https://github.com/cixtor/mamutools'
-	echo '    http://www.cixtor.com/blog/53/chrome-upgrade'
-	echo
-}
 function fail {
 	echo -e "\e[0;91m[x] Error.\e[0m ${1}"
 	exit
@@ -46,6 +37,17 @@ function warning {
 }
 function question {
 	echo -en "\e[0;94m[?]\e[0m ${1}"
+}
+function initialize {
+	echo 'Google Chrome Upgrade'
+	echo '    http://www.cixtor.com/'
+	echo '    https://github.com/cixtor/mamutools'
+	echo '    http://www.cixtor.com/blog/53/chrome-upgrade'
+	echo
+	question 'Choose the version family (beta|stable) '; read VERSION
+	if [[ "${VERSION}" =~ (beta|stable) ]]; then VERSION="${VERSION}"; else VERSION='beta'; fi
+	question 'Choose the architecture in bits (i386|amd64) '; read ARCHITECTURE
+	if [[ "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE="${ARCHITECTURE}"; else ARCHITECTURE='i386'; fi
 }
 function request_sudo {
 	warning 'Some operations will require Root provileges, type your password to continue:'
@@ -73,8 +75,8 @@ function stop_current_processes {
 	if [ "${STOP_PROCESSES}" == 'yes' ]; then
 		for PROCESS in $(ps -A u | grep "${CHROME_FOLDER_PATH}" | awk '{print $2}'); do
 			echo -n "    Killing Chrome process ${PROCESS}: "
-			sudo skill -kill $PROCESS;
-			echo -e "\e[0;92mOK\e[0m";
+			sudo skill -kill $PROCESS
+			success
 		done
 	fi
 }
@@ -100,10 +102,8 @@ function goto_google_folder {
 	fi
 }
 function setup_download_package {
-	if [ "${ARCHITECTURE}" == 'i386' ] || [ "${ARCHITECTURE}" == 'amd64' ]; then ARCHITECTURE="${ARCHITECTURE}"; else ARCHITECTURE='i386'; fi
-	if [ "${VERSION}" == 'stable' ] || [ "${VERSION}" == 'beta' ]; then VERSION="${VERSION}"; else VERSION='beta'; fi
 	LATEST_CHROME="https://dl.google.com/linux/direct/google-chrome-${VERSION}_current_${ARCHITECTURE}.deb";
-	echo -en "    Downloading configured package \e[0;93m${VERSION}-${ARCHITECTURE}\e[0m ";
+	echo -en "    Downloading configured package \e[0;93m${VERSION}/${ARCHITECTURE}\e[0m... ";
 	sudo rm -f "${TEMP_PACKAGE}";
 	wget --quiet --continue "${LATEST_CHROME}" -O "${TEMP_PACKAGE}";
 	success
@@ -139,7 +139,7 @@ function install_package {
 			sudo ln -s /opt/google/chrome/google-chrome
 			# Finishing
 			echo
-			success "Package installed correctly in: \e[0;92m${CHROME_FOLDER_PATH}\e[0m"
+			success "Package installed correctly in: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
 			success "Press CTRL + F2 and type \e[0;93mgoogle-chrome\e[0m"
 		else
 			fail 'Package installation failed, try again.'
@@ -149,7 +149,7 @@ function install_package {
 	fi
 }
 #
-help
+initialize
 request_sudo
 stop_current_processes
 remove_old_version
