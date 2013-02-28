@@ -43,34 +43,45 @@ CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FOLDER="${BACKUP_FOLDERNAME}_${CURRENT_DATE}"
 mkdir $BACKUP_FOLDER
 #
+# Count the databases
+COUNT=0
+for DATABASE in ${DATABASES[@]}; do COUNT=$(( COUNT + 1)); done
+if [ $COUNT -gt 0 ]; then
+    echo "[+] ${COUNT} databases will be backed up"
+else
+    echo '[x] Error. There are not databases to create the backup package'
+    exit
+fi
+#
 # Iterate overthe database list and dump (in SQL) the content of each one
 for DATABASE in ${DATABASE[@]}; do
     BACKUP_DATABASE_PATH="${BACKUP_FOLDER}/${DATABASE}.sql"
     echo "[+] Dumping database: ${DATABASE}"
-    echo -n "    Began...: "; date
+    echo -n '    Began...: '; date
     mysqldump -h "${DB_HOSTNAME}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DATABASE}" > "${BACKUP_DATABASE_PATH}"
-    echo -n "    Finished: "; date
+    echo -n '    Finished: '; date
     if [ -e "${BACKUP_DATABASE_PATH}" ]; then
-       echo "    Dumped successfully!"
+       echo '    Dumped successfully!'
     else
-       echo "    Error dumping this database."
+       echo '    Error dumping this database'
     fi
 done
 echo
 #
-echo '[+] Packaging and compressing the backup folder...'
+echo '[+] Package and compress the backup folder'
 tar -cv $BACKUP_FOLDER | bzip2 > ${BACKUP_FOLDER}.tar.bz2 && rm -rf $BACKUP_FOLDER
 BACKUP_FILES_MADE=$(ls -1 ${BACKUP_FOLDERNAME}*.tar.bz2 | wc -l)
 BACKUP_FILES_MADE=$(( $BACKUP_FILES_MADE - 0 )) # Convert into integer number.
 echo
-echo "[+] There are ${BACKUP_FILES_MADE} backup files actually."
+echo "[+] ${BACKUP_FILES_MADE} backup files currently exist"
 if [ $BACKUP_FILES_MADE -gt $MAXIMUN_BACKUP_FILES ]; then
     REMOVE_FILES=$(( $BACKUP_FILES_MADE - $MAXIMUN_BACKUP_FILES ))
-    echo "[+] Remove ${REMOVE_FILES} old backup files."
+    echo "[+] Remove ${REMOVE_FILES} old backup files"
     ALL_BACKUP_FILES=$(ls -t1 ${BACKUP_FOLDERNAME}*.tar.bz2)
     SAFE_BACKUP_FILES=("$(ALL_BACKUP_FILES[@]:0:${MAXIMUN_BACKUP_FILES})") # Like: [0..10] in Ruby
-    echo "[+] Safeting the newest backups files, and removing old files..."
-    FOLDER_SAFETY="_safety"
+    #
+    echo '[+] Saving newest backup files and deleting the old ones:'
+    FOLDER_SAFETY='_safety'
     mkdir $FOLDER_SAFETY
     for FILE in ${SAFE_BACKUP_FILES[@]}; do
         mv -i $FILE $FOLDER_SAFETY/
