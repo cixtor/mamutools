@@ -51,8 +51,11 @@ function warning {
 function warning_wait {
     echo -en "\e[0;93m[!]\e[0m ${1}"
 }
-function fail {
+function error {
     echo -e "\e[0;91m[x] Error.\e[0m ${1}"
+}
+function fail {
+    error $1
     exit
 }
 function initialize {
@@ -79,16 +82,18 @@ function count_databases {
 }
 function dump_databases {
     # Iterate overthe database list and dump (in SQL) the content of each one
-    for DATABASE in ${DATABASE[@]}; do
+    for DATABASE in ${DATABASES[@]}; do
         BACKUP_DATABASE_PATH="${BACKUP_FOLDER}/${DATABASE}.sql"
-        echo "[+] Dumping database: ${DATABASE}"
-        echo -n '    Began...: '; date
+        warning "Dumping database: ${DATABASE} ..."
+        DUMP_BEGIN_TIME=$(date)
         mysqldump -h "${DB_HOSTNAME}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DATABASE}" > "${BACKUP_DATABASE_PATH}"
-        echo -n '    Finished: '; date
-        if [ -e "${BACKUP_DATABASE_PATH}" ]; then
-           echo '    Dumped successfully!'
-        else
-           echo '    Error dumping this database'
+        DUMP_FINISH_TIME=$(date)
+        echo "    Began...: ${DUMP_BEGIN_TIME}"
+        echo "    Finished: ${DUMP_FINISH_TIME}"
+        echo -n "    "
+        if [ -e "${BACKUP_DATABASE_PATH}" ];
+            then success 'Dumped successfully!';
+            else error 'Database dump failed';
         fi
     done
     echo
@@ -103,18 +108,26 @@ function package_backup {
     warning "\e[0;93m${BACKUP_FILES_MADE}\e[0m backup files currently exist"
     if [ $BACKUP_FILES_MADE -gt $MAXIMUN_BACKUP_FILES ]; then
         REMOVE_FILES=$(( $BACKUP_FILES_MADE - $MAXIMUN_BACKUP_FILES ))
-        warning "Remove ${REMOVE_FILES} old backup files"
-        ALL_BACKUP_FILES=$(ls -t1 ${BACKUP_FOLDERNAME}*.tar.bz2)
+        warning "Remove \e[0;93m${REMOVE_FILES}\e[0m old backup files"
+        ALL_BACKUP_FILES=($(ls -tr1 ${BACKUP_FOLDERNAME}*.tar.bz2))
         SAFE_BACKUP_FILES=("${ALL_BACKUP_FILES[@]:0:${MAXIMUN_BACKUP_FILES}}") # Like: [0..10] in Ruby
         #
-        warning 'Saving newest backup files and deleting the old ones:'
+        warning 'Saving newest backup files and removing the old ones:'
         FOLDER_SAFETY='_safety'
         mkdir $FOLDER_SAFETY
         for FILE in ${SAFE_BACKUP_FILES[@]}; do
             mv -i $FILE $FOLDER_SAFETY/
         done
-        rm -rfv ${BACKUP_FOLDERNAME}*.tar.bz2
-        mv -i $FOLDER_SAFETY/* ./ && rm -rf $FOLDER_SAFETY
+        for FILE in $(ls -1 ${BACKUP_FOLDERNAME}*.tar.bz2); do
+            echo -n '    ' && rm -fv $FILE;
+        done
+        success 'These backup files are the newest:'
+        cd $FOLDER_SAFETY
+        for FILE in $(ls -1 *.tar.bz2); do
+            echo -n '    ' && echo $FILE
+            mv -i $FILE ../
+        done
+        cd ../ && rm -rf $FOLDER_SAFETY
     fi
 }
 initialize
