@@ -37,9 +37,9 @@ DB_HOSTNAME='localhost'
 DB_USERNAME='root'
 DB_PASSWORD='password'
 DATABASES=(
-    'dev_wordpress'
-    'dev_joomla'
-    'dev_temp'
+    'information_schema'
+    'mysql'
+    'test'
 )
 #
 function success {
@@ -64,6 +64,9 @@ function initialize {
     echo '    https://github.com/cixtor/mamutools'
     echo '    http://en.wikipedia.org/wiki/Database_dump'
     echo
+    cd $(dirname $0)
+    CWD=$(pwd)
+    success "Current working directory (CWD): \e[0;93m${CWD}\e[0m"
     CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
     BACKUP_FOLDER="${BACKUP_FOLDERNAME}_${CURRENT_DATE}"
     mkdir $BACKUP_FOLDER
@@ -87,11 +90,12 @@ function dump_databases {
         warning "Dumping database: ${DATABASE} ..."
         DUMP_BEGIN_TIME=$(date)
         mysqldump -h "${DB_HOSTNAME}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DATABASE}" > "${BACKUP_DATABASE_PATH}"
+        DBDUMP_SUCCEEDED=$?
         DUMP_FINISH_TIME=$(date)
         echo "    Began...: ${DUMP_BEGIN_TIME}"
         echo "    Finished: ${DUMP_FINISH_TIME}"
         echo -n "    "
-        if [ -e "${BACKUP_DATABASE_PATH}" ];
+        if [ "${DBDUMP_SUCCEEDED}" -eq 0 ];
             then success 'Dumped successfully!';
             else error 'Database dump failed';
         fi
