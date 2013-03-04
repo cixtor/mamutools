@@ -32,45 +32,45 @@
 #   | YottaByte | YB     | 2 ^ 80             | 10 ^ 24             | 1,208,925,819,614,629,174,706,176 | 1,024 ZB
 #
 def redirect(response)
-	response.split("\n").each do |header|
-		if match = header.match(/^Location: (.*)$/) then
-			location = match[1].chomp
-			# This concatenate with the response in the method RemoteSize
-			print "\e[0;93mRedirect:\e[0m "
-			file_size(location) and return
-		end
-	end
+    response.split("\n").each do |header|
+        if match = header.match(/^Location: (.*)$/) then
+            location = match[1].chomp
+            # This concatenate with the response in the method RemoteSize
+            print "\e[0;93mRedirect:\e[0m "
+            file_size(location) and return
+        end
+    end
 end
 def readable_size(bytes, decimals=2)
-	base = 1000 # List command in UNIX use 1000 instead of 1024
-	sizes = 'BKMGTP'
-	bytes = bytes.to_i
-	factor = (("#{bytes}".size - 1)/3).to_f
-	readable = sprintf( "%.#{decimals}f", bytes/(base**factor) )
-	return "#{readable.to_s} #{sizes[factor]}"
+    base = 1000 # List command in UNIX use 1000 instead of 1024
+    sizes = 'BKMGTP'
+    bytes = bytes.to_i
+    factor = (("#{bytes}".size - 1)/3).to_f
+    readable = sprintf( "%.#{decimals}f", bytes/(base**factor) )
+    return "#{readable.to_s} #{sizes[factor]}"
 end
 def file_size(location)
-	puts "\e[0;94m#{location}\e[0m"
-	response = %x{curl --silent --head '#{location}'}
-	response.split("\n").each do |header|
-		header = header.chomp
-		if match = header.match(/^HTTP\/([0-9]\.[0-9]) ([0-9]{3}) (.*)/) then
-			if match[2].to_i == 200 then
-				puts "\e[0;93mResponse:\e[0m \e[0;92m#{header}\e[0m"
-			elsif ['301','302'].include?(match[2]) then
-				redirect(response)
-				exit
-			else
-				puts "\e[0;91m#{header}\e[0m" and exit
-			end
-		elsif match = header.match(/^Content-Type: (.*)$/) then
-			puts "\e[0;93mContent-Type:\e[0m #{match[1]}"
-		elsif match = header.match(/^Content-Length: (\d+)$/) then
-			size = "#{match[1]}.0".to_f
-			puts "\e[0;93mContent-Length:\e[0m #{size.round}"
-			puts "\e[0;93mHuman-Size:\e[0m #{readable_size(size)}"
-		end
-	end
+    puts "\e[0;94m#{location}\e[0m"
+    response = %x{curl --silent --head '#{location}'}
+    response.split("\n").each do |header|
+        header = header.chomp
+        if match = header.match(/^HTTP\/([0-9]\.[0-9]) ([0-9]{3}) (.*)/) then
+            if match[2].to_i == 200 then
+                puts "\e[0;93mResponse:\e[0m \e[0;92m#{header}\e[0m"
+            elsif ['301','302'].include?(match[2]) then
+                redirect(response)
+                exit
+            else
+                puts "\e[0;91m#{header}\e[0m" and exit
+            end
+        elsif match = header.match(/^Content-Type: (.*)$/) then
+            puts "\e[0;93mContent-Type:\e[0m #{match[1]}"
+        elsif match = header.match(/^Content-Length: (\d+)$/) then
+            size = "#{match[1]}.0".to_f
+            puts "\e[0;93mContent-Length:\e[0m #{size.round}"
+            puts "\e[0;93mHuman-Size:\e[0m #{readable_size(size)}"
+        end
+    end
 end
 file_size( !ARGV[0].nil? ? ARGV[0] : '' )
 #
