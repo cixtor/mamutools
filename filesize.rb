@@ -51,33 +51,33 @@ def readable_size(bytes, decimals=2)
 end
 def file_size(location)
     puts "\e[0;94m#{location}\e[0m"
-	if File.exists?(location) then
-		content_type = %x{file '#{location}' | awk -F ': ' '{print $2}'}
-		file_size = File.size(location)
-		puts "\e[0;93mContent-Type:\e[0m #{content_type}"
-		puts "\e[0;93mContent-Length:\e[0m #{file_size}"
-		puts "\e[0;93mHuman-Size:\e[0m #{readable_size(file_size)}"
-	else
-	    response = %x{curl --silent --head '#{location}'}
-	    response.split("\n").each do |header|
-	        header = header.chomp
-	        if match = header.match(/^HTTP\/([0-9]\.[0-9]) ([0-9]{3}) (.*)/) then
-	            if match[2].to_i == 200 then
-	                puts "\e[0;93mResponse:\e[0m \e[0;92m#{header}\e[0m"
-	            elsif ['301','302'].include?(match[2]) then
-	                redirect(response)
-	                exit
-	            else
-	                puts "\e[0;91m#{header}\e[0m" and exit
-	            end
-	        elsif match = header.match(/^Content-Type: (.*)$/) then
-	            puts "\e[0;93mContent-Type:\e[0m #{match[1]}"
-	        elsif match = header.match(/^Content-Length: (\d+)$/) then
-	            size = "#{match[1]}.0".to_f
-	            puts "\e[0;93mContent-Length:\e[0m #{size.round}"
-	            puts "\e[0;93mHuman-Size:\e[0m #{readable_size(size)}"
-	        end
-	    end
+    if File.exists?(location) then
+        content_type = %x{file '#{location}' | awk -F ': ' '{print $2}'}
+        file_size = File.size(location)
+        puts "\e[0;93mContent-Type:\e[0m #{content_type}"
+        puts "\e[0;93mContent-Length:\e[0m #{file_size}"
+        puts "\e[0;93mHuman-Size:\e[0m #{readable_size(file_size)}"
+    else
+        response = %x{curl --silent --head '#{location}'}
+        response.split("\n").each do |header|
+            header = header.chomp
+            if match = header.match(/^HTTP\/([0-9]\.[0-9]) ([0-9]{3}) (.*)/) then
+                if match[2].to_i == 200 then
+                    puts "\e[0;93mResponse:\e[0m \e[0;92m#{header}\e[0m"
+                elsif ['301','302'].include?(match[2]) then
+                    redirect(response)
+                    exit
+                else
+                    puts "\e[0;91m#{header}\e[0m" and exit
+                end
+            elsif match = header.match(/^Content-Type: (.*)$/) then
+                puts "\e[0;93mContent-Type:\e[0m #{match[1]}"
+            elsif match = header.match(/^Content-Length: (\d+)$/) then
+                size = "#{match[1]}.0".to_f
+                puts "\e[0;93mContent-Length:\e[0m #{size.round}"
+                puts "\e[0;93mHuman-Size:\e[0m #{readable_size(size)}"
+            end
+        end
     end
 end
 file_size( !ARGV[0].nil? ? ARGV[0] : '' )
