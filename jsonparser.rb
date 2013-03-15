@@ -18,3 +18,14 @@
 # to transmit data between a server and web application, serving as an alternative
 # to XML.
 #
+require 'rubygems'
+require 'json'
+require 'open-uri'
+#
+url = !ARGV[0].nil? ? ARGV[0] : ''
+if not url.empty? then
+    response = open(url)
+    content = response.read
+    puts JSON.pretty_generate(JSON.parse(content))
+end
+#
