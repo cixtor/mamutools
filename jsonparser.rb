@@ -24,8 +24,12 @@ require 'open-uri'
 #
 url = !ARGV[0].nil? ? ARGV[0] : ''
 if not url.empty? then
-    response = open(url)
-    content = response.read
+    if File.exists?(url) then
+        content = File.open(url, 'rb'){ |f| f.read }
+    else
+        response = open(url)
+        content = response.read
+    end
     puts JSON.pretty_generate(JSON.parse(content))
 end
 #
