@@ -49,7 +49,13 @@ function strpad_fill($length=0){
 }
 $list = $argv;
 if( count($list)<=1 ){
-    echo "Usage: imageinfo image_file_path.{jpg,gif,png}\n";
+    $this_filename = basename(__FILE__);
+    echo "Image Information\n";
+    echo "  http://www.cixtor.com/\n";
+    echo "  https://github.com/cixtor/mamutools\n";
+    echo "  http://php.net/manual/en/function.getimagesize.php\n";
+    echo "\n";
+    echo "Usage: {$this_filename} image_file_path.{jpg,gif,png}\n";
     exit;
 }
 $strpad_req = count($list)>2 ? TRUE : FALSE;
