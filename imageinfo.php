@@ -47,8 +47,43 @@ function strpad_fill($length=0){
     for($i=0; $i<$length; $i++){ $fill.=chr(32); }
     return $fill;
 }
-$list = $argv;
-if( count($list)<=1 ){
+function show_image_info($filepath='', $strpad_req, $strpad_max){
+    if( $image_info = @getimagesize($filepath) ){
+        if($strpad_req){
+            echo str_pad($filepath, $strpad_max, chr(32), STR_PAD_RIGHT);
+        }else{ echo $filepath; }
+        echo ' = ';
+        //
+        $image_info['mime'] = str_pad($image_info['mime'], 10, chr(32), STR_PAD_RIGHT);
+        echo "\033[0;96m{$image_info['mime']}\033[0m";
+        if( isset($image_info['bits']) ){
+            echo " with \033[0;93m{$image_info['bits']} bits\033[0m";
+        }
+        if( isset($image_info[0]) AND isset($image_info[1]) ){
+            echo " and size: \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m";
+        }
+        echo "\n";
+    }
+}
+function process_files($files=array(), $recursive=TRUE){
+    $strpad_req = count($files)>2 ? TRUE : FALSE;
+    $strpad_max = most_large($files);
+    //
+    foreach($files as $i=>$filepath){
+        if( is_file($filepath) ){
+            show_image_info($filepath, $strpad_req, $strpad_max);
+        }elseif( $recursive==TRUE AND is_dir($filepath) ){
+            $filepath = rtrim($filepath, '/');
+            $files = glob("{$filepath}/*");
+            process_files($files, FALSE);
+        }else{
+            echo "\033[0;91mError.\033[0m This file isn't an image: \033[0;91m{$filepath}\033[0m\n";
+        }
+    }
+}
+if( count($argv)>1 ){
+    process_files($argv);
+}else{
     $this_filename = basename(__FILE__);
     echo "Image Information\n";
     echo "  http://www.cixtor.com/\n";
@@ -57,29 +92,5 @@ if( count($list)<=1 ){
     echo "\n";
     echo "Usage: {$this_filename} image_file_path.{jpg,gif,png}\n";
     exit;
-}
-$strpad_req = count($list)>2 ? TRUE : FALSE;
-$strpad_max = most_large($list);
-foreach($list as $i=>$filepath){
-    if($i>0){
-        if( $image_info = @getimagesize($filepath) ){
-            if($strpad_req){
-                echo str_pad($filepath, $strpad_max, chr(32), STR_PAD_RIGHT);
-            }else{ echo $filepath; }
-            echo ' = ';
-            //
-            $image_info['mime'] = str_pad($image_info['mime'], 10, chr(32), STR_PAD_RIGHT);
-            echo "\033[0;96m{$image_info['mime']}\033[0m";
-            if( isset($image_info['bits']) ){
-                echo " with \033[0;93m{$image_info['bits']} bits\033[0m";
-            }
-            if( isset($image_info[0]) AND isset($image_info[1]) ){
-                echo " and size: \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m";
-            }
-            echo "\n";
-        }else{
-            echo "\033[0;91mError.\033[0m This file isn't an image: \033[0;91m{$filepath}\033[0m\n";
-        }
-    }
 }
 /* EOF */
