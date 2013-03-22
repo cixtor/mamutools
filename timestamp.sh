@@ -24,3 +24,5 @@
 # every day is exactly 86400 seconds long, gradually losing synchronization with
 # the Earth's rotation at a rate of roughly one second per year.
 #
+date +%s
+#
