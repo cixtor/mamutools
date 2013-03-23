@@ -24,5 +24,9 @@
 # every day is exactly 86400 seconds long, gradually losing synchronization with
 # the Earth's rotation at a rate of roughly one second per year.
 #
-date +%s
+if [ $(which ruby) ]; then
+    $(which ruby) -e 'puts Time.now.to_i'
+else
+    date +%s
+fi
 #
