@@ -27,7 +27,17 @@ $ cd /opt/
 $ git clone https://github.com/cixtor/mamutools.git
 $ chmod 755 ./mamutools/*.{rb,sh,php}
 $ cd /usr/local/bin/
-$ for i in $(ls -1 /opt/mamutools/); do ln -s /opt/mamutools/$i $(echo $i | cut -d '.' -f 1); done
+$ for i in $(ls -1 /opt/mamutools/ | grep -vE 'LICENSE|README.md'); do ln -s /opt/mamutools/$i $(echo $i | cut -d '.' -f 1); done
+```
+
+### Uninstall
+
+```
+$ su root
+# cd /usr/local/bin/
+# for i in $(ls -1 /opt/mamutools/ | grep -vE 'LICENSE|README.md'); do rm -fv $(echo $i | cut -d '.' -f 1); done
+# exit
+$ rm -rf /opt/mamutools/
 ```
 
 ### Motivation
