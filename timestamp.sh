@@ -26,6 +26,8 @@
 #
 if [ $(which ruby) ]; then
     $(which ruby) -e 'puts Time.now.to_i'
+elif [ $(which php) ]; then
+    $(which php) -r 'echo time(); echo "\n";'
 else
     date +%s
 fi
