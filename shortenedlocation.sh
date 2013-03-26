@@ -32,7 +32,7 @@
 #
 URL=$1
 if [[ $URL =~ ^http ]]; then
-	curl --silent --head "${URL}" | grep '^Location: ' | head -n 1 | awk '{print $2}'
+	curl --silent --head "${URL}" | grep -i '^Location: ' | head -n 1 | awk '{print $2}'
 else
 	echo -e "\e[0;91mError.\e[0m Malformed URL provided, use a valid URL."
 fi
