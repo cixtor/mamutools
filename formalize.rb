@@ -31,3 +31,31 @@
 # filename, such as L"\x00C0.txt" (UTF-16, NFC) (Latin capital A with grave) and
 # L"\x0041\x0300.txt" (UTF-16, NFD) (Latin capital A, grave combining).
 #
+# Some filesystems, such as FAT, store filenames as upper-case regardless of the
+# letter case used to create them. For example, a file created with the name
+# "MyName.Txt" or "myname.txt" would be stored with the filename "MYNAME.TXT".
+# Any variation of upper and lower case can be used to refer to the same file.
+# These kinds of file systems are called case-insensitive and are not case-
+# preserving. Some filesystems prohibit the use of lower case letters in filenames
+# altogether.
+#
+# Some file systems store filenames in the form that they were originally created;
+# these are referred to as case-retentive or case-preserving. Such a file system
+# can be case-sensitive or case-insensitive. If case-sensitive, then "MyName.Txt"
+# and "myname.txt" may refer to two different files in the same directory, and each
+# file must be referenced by the exact capitalisation by which it is named. On a
+# case-insensitive, case-preserving file system, on the other hand, only one of
+# "MyName.Txt", "myname.txt" and "Myname.TXT" can be the name of a file in a given
+# directory at a given time, and a file with one of these names can be referenced
+# by any capitalisation of the name.
+#
+# From its original inception, Unix and its derivative systems were case-preserving.
+# However, not all Unix-like file systems are case-sensitive; by default, HFS+ in
+# Mac OS X is case-insensitive, and SMB servers usually provide case-insensitive
+# behavior (even when the underlying file system is case-sensitive, e.g. Samba on
+# most Unix-like systems), and SMB client file systems provide case-insensitive
+# behavior. File system case sensitivity is a considerable challenge for software
+# such as Samba and Wine, which must interoperate efficiently with both systems
+# that treat uppercase and lowercase files as different and with systems that treat
+# them the same.
+#
