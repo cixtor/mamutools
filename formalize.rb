@@ -59,3 +59,55 @@
 # that treat uppercase and lowercase files as different and with systems that treat
 # them the same.
 #
+require 'rubygems'
+require 'getoptlong'
+#
+config = {
+    :action => false,
+    :filename => nil,
+    :rename => ''
+}
+options = GetoptLong.new(
+    [ '--action', '-a', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--filename', '-f', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--help', '-h', GetoptLong::NO_ARGUMENT ]
+)
+begin
+    options.each do |option, args|
+        case option
+            when '--action'
+                config[:action] = args
+            when '--filename'
+                config[:filename] = args
+            when '--help'
+                puts "Formalize is a tool to rename files with a specific format."
+                puts "Usage:"
+                puts "  Single action: #{__FILE__} -f 'filepath.ext' -a [dash|capitalize]"
+                puts "  Batch mode...: #{__FILE__} -f 'filepath.ext' -a [dash|capitalize] -b"
+                exit
+        end
+    end
+rescue GetoptLong::InvalidOption => e
+    puts "Invalid options, use --help to get a list of available options."
+    exit
+end
+#
+case config[:action]
+    when 'capitalize'
+        config[:rename] = config[:filename].split(/ /).map{ |w| w.downcase.capitalize }.join
+    when 'dash'
+        config[:rename] = config[:filename].downcase.gsub(' ','-')
+end
+if !config[:rename].empty? then
+    puts "Rename '\e[0;94m#{config[:filename]}\e[0m' to '\e[0;93m#{config[:rename]}\e[0m'"
+    if File.exists?(config[:rename]) then
+        puts "\e[0;91mError.\e[0m The new filename already exists"
+    else
+        print "Do you want to continue? \e[0;93m(Y/n)\e[0m "
+        continue = $stdin.gets.chomp
+        File.rename(config[:filename], config[:rename]) if continue.downcase=='y'
+    end
+else
+    puts "\e[0;91mError.\e[0m the new filename is empty."
+end
+#
