@@ -65,11 +65,13 @@ require 'getoptlong'
 config = {
     :action => false,
     :filename => nil,
-    :rename => ''
+    :rename => '',
+    :batch => false
 }
 options = GetoptLong.new(
     [ '--action', '-a', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--filename', '-f', GetoptLong::REQUIRED_ARGUMENT ],
+    [ '--batch', '-b', GetoptLong::OPTIONAL_ARGUMENT ],
     [ '--help', '-h', GetoptLong::NO_ARGUMENT ]
 )
 begin
@@ -79,6 +81,8 @@ begin
                 config[:action] = args
             when '--filename'
                 config[:filename] = args
+            when '--batch'
+                config[:batch] = true
             when '--help'
                 puts "Formalize is a tool to rename files with a specific format."
                 puts "Usage:"
@@ -103,8 +107,12 @@ if !config[:rename].empty? then
     if File.exists?(config[:rename]) then
         puts "\e[0;91mError.\e[0m The new filename already exists"
     else
-        print "Do you want to continue? \e[0;93m(Y/n)\e[0m "
-        continue = $stdin.gets.chomp
+        if config[:batch] then
+            continue = 'y'
+        else
+            print "Do you want to continue? \e[0;93m(Y/n)\e[0m "
+            continue = $stdin.gets.chomp
+        end
         File.rename(config[:filename], config[:rename]) if continue.downcase=='y'
     end
 else
