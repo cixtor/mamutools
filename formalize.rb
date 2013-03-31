@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Filename Formalizer
-# http://www.cixtor.coml/
+# http://www.cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Filename
 #
@@ -68,6 +68,11 @@ config = {
     :rename => '',
     :batch => false
 }
+puts 'Filename Formalizer'
+puts '  http://www.cixtor.com/'
+puts '  https://github.com/cixtor/mamutools'
+puts '  http://en.wikipedia.org/wiki/Filename'
+puts
 options = GetoptLong.new(
     [ '--action', '-a', GetoptLong::REQUIRED_ARGUMENT ],
     [ '--filename', '-f', GetoptLong::REQUIRED_ARGUMENT ],
