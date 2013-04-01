@@ -89,7 +89,6 @@ begin
             when '--batch'
                 config[:batch] = true
             when '--help'
-                puts "Formalize is a tool to rename files with a specific format."
                 puts "Usage:"
                 puts "  Single action: #{__FILE__} -f 'filepath.ext' -a [dash|capitalize]"
                 puts "  Batch mode...: #{__FILE__} -f 'filepath.ext' -a [dash|capitalize] -b"
@@ -97,7 +96,7 @@ begin
         end
     end
 rescue GetoptLong::InvalidOption => e
-    puts "Invalid options, use --help to get a list of available options."
+    puts "\e[0;91mError.\e[0m Invalid options, use --help to get a list of available options."
     exit
 end
 #
