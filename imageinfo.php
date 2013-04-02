@@ -63,21 +63,24 @@ function show_image_info($filepath='', $strpad_req, $strpad_max){
             echo " and size: \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m";
         }
         echo "\n";
+    }else{
+        echo "\033[0;91mError.\033[0m This file isn't an image: \033[0;91m{$filepath}\033[0m\n";
     }
 }
 function process_files($files=array(), $recursive=TRUE){
+    global $argv;
     $strpad_req = count($files)>2 ? TRUE : FALSE;
     $strpad_max = most_large($files);
     //
     foreach($files as $i=>$filepath){
-        if( is_file($filepath) ){
-            show_image_info($filepath, $strpad_req, $strpad_max);
-        }elseif( $recursive==TRUE AND is_dir($filepath) ){
-            $filepath = rtrim($filepath, '/');
-            $files = glob("{$filepath}/*");
-            process_files($files, FALSE);
-        }else{
-            echo "\033[0;91mError.\033[0m This file isn't an image: \033[0;91m{$filepath}\033[0m\n";
+        if( $filepath!=$argv[0] ){
+            if( is_dir($filepath) AND $recursive==TRUE ){
+                $filepath = rtrim($filepath, '/');
+                $files = glob("{$filepath}/*");
+                process_files($files, FALSE);
+            }else{
+                show_image_info($filepath, $strpad_req, $strpad_max);
+            }
         }
     }
 }
