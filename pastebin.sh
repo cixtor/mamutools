@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Pastebin Getter
+# Pastebin Tool
 # http://www.cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Pastebin
@@ -14,4 +14,18 @@
 # A vast number of pastebin related websites exist on the Internet, suiting
 # a number of different needs and providing features tailored towards the
 # crowd they focus on most.
+#
+# It took 8 years for Pastebin.com to surpass 10 million "Active" pastes (not
+# spam or expired pastes). Less than a year later the owners of Pastebin.com
+# tweeted that they had already surpassed the 20 million active pastes mark.
+#
+# In February 2010, Pastebin.com was sold by the original owner, Paul Dixon
+# to Jeroen Vader, a Dutch serial Internet entrepreneur. Only a few weeks
+# after the transfer, Mr. Vader had launched a whole new version of the
+# website which he branded V2.0. In early 2011 V3.0 launched.
+#
+# There is some amount of controversy behind Pastebin.com due the spam like
+# nature of a lot of the posts. Among other things, account passwords, credit
+# card numbers, and other personal information is posted to Pastebin.com on
+# a daily basis.
 #
