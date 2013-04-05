@@ -29,3 +29,8 @@
 # card numbers, and other personal information is posted to Pastebin.com on
 # a daily basis.
 #
+ID=$1
+EXTENSION=$2
+if [ "${EXTENSION}" != "" ]; then EXTENSION=".${EXTENSION}"; fi
+curl --silent "http://pastebin.com/raw.php?i=${ID}" > "${ID}${EXTENSION}"
+#
