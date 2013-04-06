@@ -31,6 +31,10 @@
 #
 ID=$1
 EXTENSION=$2
-if [ "${EXTENSION}" != "" ]; then EXTENSION=".${EXTENSION}"; fi
-curl --silent "http://pastebin.com/raw.php?i=${ID}" > "${ID}${EXTENSION}"
+if [ "${EXTENSION}" == "--show" ]; then
+	curl "http://pastebin.com/raw.php?i=${ID}"
+else
+	if [ "${EXTENSION}" != "" ]; then EXTENSION=".${EXTENSION}"; fi
+	curl --silent "http://pastebin.com/raw.php?i=${ID}" > "${ID}${EXTENSION}"
+fi
 #
