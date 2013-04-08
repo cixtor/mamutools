@@ -24,3 +24,24 @@
 # * Why are my thumbnail previews square?
 #   Thumbnails on your "My Images" and "My Galleries" pages are displayed as squares to preserve the layout.
 #
+album_id = !ARGV[0].nil? ? ARGV[0].to_s : nil
+user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+#
+if !album_id.nil? then
+    album_content = %x{curl --silent 'http://imgbox.com/g/#{album_id}'}
+    album_lines = album_content.split("\n")
+    album_lines.each do |line|
+        if match = line.chomp.match(/<a href="\/(.*)" class="gallery_img"><img alt="(.*)" src="(.*)" \/><\/a>/) then
+            image_content = %x{curl --silent 'http://imgbox.com/#{match[1]}'}
+            image_lines = image_content.split("\n")
+            image_lines.each do |image_line|
+                if image_match = image_line.chomp.match(/<img alt=".*" class="box" id="img" onclick=".*" src="(.*)" title="(.*)" \/>/) then
+                    remote_image = image_match[1].gsub('&amp;', '&')
+                    puts "Downloading '#{remote_image}' as '#{image_match[2]}'"
+                    %x{wget --quiet --user-agent='#{user_agent}' '#{remote_image}' -O '#{image_match[2]}'}
+                end
+            end
+        end
+    end
+end
+#
