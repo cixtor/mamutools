@@ -27,6 +27,12 @@
 album_id = !ARGV[0].nil? ? ARGV[0].to_s : nil
 user_agent = 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
 #
+if match = album_id.match(/imgbox\.com\/g\/([a-zA-Z0-9]{10})/) then
+    album_id = match[1]
+elsif album_id.length > 10 then
+    album_id = nil
+    puts "Error. Invalid album identifier."
+end
 if !album_id.nil? then
     album_content = %x{curl --silent 'http://imgbox.com/g/#{album_id}'}
     album_lines = album_content.split("\n")
