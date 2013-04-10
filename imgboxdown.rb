@@ -34,20 +34,27 @@ elsif album_id.length > 10 then
     puts "Error. Invalid album identifier."
 end
 if !album_id.nil? then
-    album_content = %x{curl --silent 'http://imgbox.com/g/#{album_id}'}
-    album_lines = album_content.split("\n")
-    album_lines.each do |line|
-        if match = line.chomp.match(/<a href="\/(.*)" class="gallery_img"><img alt="(.*)" src="(.*)" \/><\/a>/) then
-            image_content = %x{curl --silent 'http://imgbox.com/#{match[1]}'}
-            image_lines = image_content.split("\n")
-            image_lines.each do |image_line|
-                if image_match = image_line.chomp.match(/<img alt=".*" class="box" id="img" onclick=".*" src="(.*)" title="(.*)" \/>/) then
-                    remote_image = image_match[1].gsub('&amp;', '&')
-                    puts "Downloading '#{remote_image}' as '#{image_match[2]}'"
-                    %x{wget --quiet --user-agent='#{user_agent}' '#{remote_image}' -O '#{image_match[2]}'}
+    gallery_folder = "imgbox-#{album_id}"
+    if Dir.mkdir(gallery_folder) then
+        Dir.chdir(gallery_folder)
+        album_content = %x{curl --silent 'http://imgbox.com/g/#{album_id}'}
+        album_lines = album_content.split("\n")
+        album_lines.each do |line|
+            if match = line.chomp.match(/<a href="\/(.*)" class="gallery_img"><img alt="(.*)" src="(.*)" \/><\/a>/) then
+                image_content = %x{curl --silent 'http://imgbox.com/#{match[1]}'}
+                image_lines = image_content.split("\n")
+                image_lines.each do |image_line|
+                    if image_match = image_line.chomp.match(/<img alt=".*" class="box" id="img" onclick=".*" src="(.*)" title="(.*)" \/>/) then
+                        remote_image = image_match[1].gsub('&amp;', '&')
+                        puts "Downloading '#{remote_image}' as '#{image_match[2]}'"
+                        %x{wget --quiet --user-agent='#{user_agent}' '#{remote_image}' -O '#{image_match[2]}'}
+                    end
                 end
             end
         end
+    else
+        puts "Error. Could not create gallery folder."
+        exit(1)
     end
 end
 #
