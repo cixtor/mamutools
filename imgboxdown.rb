@@ -55,11 +55,14 @@ end
 usage
 begin
     optparse.parse!
+    raise OptionParser::MissingArgument if config[:album_id].nil?
+    #
     if match = config[:album_id].match(/imgbox\.com\/g\/([a-zA-Z0-9]{10})/) then
         config[:album_id] = match[1]
     elsif album_id.length > 10 then
         fail 'Error. Invalid album identifier.'
     end
+    #
     if !config[:album_id].nil? then
         gallery_folder = "imgbox-#{config[:album_id]}"
         if File.exists?(gallery_folder) then
