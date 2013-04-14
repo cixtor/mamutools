@@ -42,29 +42,41 @@ def usage
     puts '    http://imgbox.com/'
     puts
 end
+def get_photo(photo_id, config)
+    image_content = %x{curl --silent --user-agent '#{config[:user_agent]}' 'http://imgbox.com/#{photo_id}'}
+    image_lines = image_content.split("\n")
+    image_lines.each do |image_line|
+        if image_match = image_line.chomp.match(/<img alt=".*" class="box" id="img" onclick=".*" src="(.*)" title="(.*)" \/>/) then
+            remote_image = image_match[1].gsub('&amp;', '&')
+            highlight "Downloading '#{remote_image}' as '#{image_match[2]}'"
+            %x{wget --quiet --user-agent='#{config[:user_agent]}' '#{remote_image}' -O '#{image_match[2]}'}
+        end
+    end
+end
 config = {
     :filename => __FILE__,
     :user_agent => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
-    :album_id => nil
+    :photo_id => nil,
+    :gallery_id => nil
 }
 optparse = OptionParser.new do |option|
-    option.banner = "Usage: #{config[:filename]} --id 'qqXcABLVX4'"
-    option.on('-i arg', '--id=arg', 'Specify the gallery identifier (ten characters).'){ |arg| config[:album_id] = arg }
+    option.on('-i arg', '--id=arg', 'Specify the photo identifier.'){ |arg| config[:photo_id] = arg }
+    option.on('-g arg', '--gallery=arg', 'Specify the gallery identifier.'){ |arg| config[:gallery_id] = arg }
 end
 #
 usage
 begin
     optparse.parse!
-    raise OptionParser::MissingArgument if config[:album_id].nil?
-    #
-    if match = config[:album_id].match(/imgbox\.com\/g\/([a-zA-Z0-9]{10})/) then
-        config[:album_id] = match[1]
-    elsif album_id.length > 10 then
-        fail 'Error. Invalid album identifier.'
+    if config[:photo_id].nil? and config[:gallery_id].nil? then
+        raise OptionParser::MissingArgument
     end
     #
-    if !config[:album_id].nil? then
-        gallery_folder = "imgbox-#{config[:album_id]}"
+    if !config[:photo_id].nil? then
+        get_photo(config[:photo_id], config)
+    end
+    #
+    if !config[:gallery_id].nil? then
+        gallery_folder = "imgbox-#{config[:gallery_id]}"
         if File.exists?(gallery_folder) then
             success "Gallery folder already exists: \e[0;93m#{gallery_folder}\e[0m"
         else
@@ -75,26 +87,18 @@ begin
                 fail "Could not create gallery folder: \e[0;93m#{gallery_folder}\e[0m"
             end
         end
-        album_content = %x{curl --silent 'http://imgbox.com/g/#{config[:album_id]}'}
+        #
+        album_content = %x{curl --silent 'http://imgbox.com/g/#{config[:gallery_id]}'}
         album_lines = album_content.split("\n")
         album_lines.each do |line|
             if match = line.chomp.match(/<a href="\/(.*)" class="gallery_img"><img alt="(.*)" src="(.*)" \/><\/a>/) then
-                image_content = %x{curl --silent --user-agent '#{config[:user_agent]}' 'http://imgbox.com/#{match[1]}'}
-                image_lines = image_content.split("\n")
-                image_lines.each do |image_line|
-                    if image_match = image_line.chomp.match(/<img alt=".*" class="box" id="img" onclick=".*" src="(.*)" title="(.*)" \/>/) then
-                        remote_image = image_match[1].gsub('&amp;', '&')
-                        highlight "Downloading '#{remote_image}' as '#{image_match[2]}'"
-                        %x{wget --quiet --user-agent='#{config[:user_agent]}' '#{remote_image}' -O '#{image_match[2]}'}
-                    end
-                end
+                get_photo(match[1], config)
             end
         end
-        success 'Finished'
     end
+    success 'Finished'
 rescue OptionParser::MissingArgument, OptionParser::InvalidOption
     p optparse
     fail "Process failed, #{$!.to_s}"
 end
-#
 #
