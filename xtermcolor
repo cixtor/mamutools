@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# X-Term Color
+# http://www.cixtor.com/
+# https://github.com/cixtor/mamutools
+# http://en.wikipedia.org/wiki/ANSI_escape_code
+#
+# In computing, ANSI escape code (or escape sequences) is the method of in-band
+# signaling to control formatting, color, and other output options on video text
+# terminals. To encode this formatting information, it embeds certain sequences
+# of bytes into the text, which have to be interpreted specially, not as codes of
+# characters. Although hardware text terminals become increasingly rare in the
+# 21st century, the relevance of this standard persists because most terminal
+# emulators interpret at least some of the ANSI escape sequences in the output
+# text. One notable exception is the win32 console component of Microsoft Windows.
+#
+# Most terminal emulators running on Unix-like systems (such as xterm and the OS
+# X Terminal) interpret ANSI escape sequences. The Linux console (the text seen
+# when X is not running) also interprets them. Terminal programs for Microsoft
+# Windows designed to show text from an outside source (a serial port, modem, or
+# socket) also interpret them. Some support for text from local programs on Windows
+# is offered through alternate command processors such as JP Software's TCC (formerly
+# 4NT), Michael J. Mefford's ANSI.COM, and Jason Hood's ansicon.
+#
+# Many Unix console applications (e.g., ls, grep, Vim, and Emacs) can generate them.
+# Utility programs such as tput output them, as well as in low-level programming
+# libraries, such as termcap or terminfo, or a higher-level library such as curses.
+#
