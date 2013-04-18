@@ -26,34 +26,30 @@
 # Utility programs such as tput output them, as well as in low-level programming
 # libraries, such as termcap or terminfo, or a higher-level library such as curses.
 #
-for(( i=0; i<10; i+=3 )); do
-    a=$i
-    b=$(( $i+1 ))
-    c=$(( $i+2 ))
-    echo -ne "[0;${a}m => \e[0;${a}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -ne "[0;${b}m => \e[0;${b}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -e  "[0;${c}m => \e[0;${c}mHello world\e[0m";
-done
-for(( i=30; i<50; i+=3 )); do
-    a=$i
-    b=$(( $i+1 ))
-    c=$(( $i+2 ))
-    echo -ne "[0;${a}m => \e[0;${a}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -ne "[0;${b}m => \e[0;${b}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -e  "[0;${c}m => \e[0;${c}mHello world\e[0m";
-done
-for(( i=90; i<110; i+=3 )); do
-    a=$i
-    b=$(( $i+1 ))
-    c=$(( $i+2 ))
-    echo -ne "[0;${a}m => \e[0;${a}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -ne "[0;${b}m => \e[0;${b}mHello world\e[0m";
-    for(( j=0; j<10; j++ )); do echo -n " "; done
-    echo -e  "[0;${c}m => \e[0;${c}mHello world\e[0m";
-done
+echo 'X-Term Color'
+echo '    http://www.cixtor.com/'
+echo '    https://github.com/cixtor/mamutools'
+echo '    http://en.wikipedia.org/wiki/ANSI_escape_code'
+echo
+if [ "$1" == "basic" ]; then
+    SEPARATOR=$(for(( j=0; j<10; j++ )); do echo -n "_"; done)
+    for(( i=0; i<110; i+=3 )); do
+        a=$i
+        b=$(( $i+1 ))
+        c=$(( $i+2 ))
+        echo -ne "[0;${a}m => \e[0;${a}mHello world\e[0m"; echo -n $SEPARATOR
+        echo -ne "[0;${b}m => \e[0;${b}mHello world\e[0m"; echo -n $SEPARATOR
+        echo -e  "[0;${c}m => \e[0;${c}mHello world\e[0m";
+    done
+elif [ "$1" == "palette" ]; then
+    for c in $(seq 0 255);do
+        t=5;
+        for i in $(seq $t 5); do
+            CONTENT=$(seq -s+0 $((40)) | tr -d '[0-9]')
+            echo -e "\e[0;48;$i;${c}m$i:$c $CONTENT\e[0m";
+        done;
+    done
+else
+    echo "Usage: $0 [basic|palette]";
+fi
 #
