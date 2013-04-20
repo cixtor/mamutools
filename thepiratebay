@@ -27,3 +27,27 @@
 # using the tracker. Any complaints from copyright and/or lobby organizations
 # will be ridiculed and published at the site.
 #
+SEARCH=$(
+zenity --entry --title='The Pirate Bay - Search' \
+--text='The Pirate Bay
+  http://www.cixtor.com/
+  https://github.com/cixtor/mamutools
+  http://thepiratebay.se/
+  http://thepiratebay.sx/
+
+Search in the worlds largest bittorrent tracker,
+where anyone can upload/download torrent files,
+write comments and... Of course: FREE'
+)
+if [ "${SEARCH}" != "" ]; then
+    URL=$(echo "http://thepiratebay.se/search/${SEARCH}")
+    echo "Starting the default web-browser with this URL: ${URL}"
+      if [ $(which firefox)       ]; then firefox "${URL}"
+    elif [ $(which opera)         ]; then opera "${URL}"
+    elif [ $(which konqueror)     ]; then konqueror "${URL}"
+    elif [ $(which google-chrome) ]; then google-chrome "${URL}"
+      fi
+else
+    echo "No string to search in ThePirateBay.se"
+fi
+#
