@@ -42,12 +42,13 @@ write comments and... Of course: FREE'
 if [ "${SEARCH}" != "" ]; then
     URL=$(echo "http://thepiratebay.se/search/${SEARCH}")
     echo "Starting the default web-browser with this URL: ${URL}"
-      if [ $(which firefox)       ]; then firefox "${URL}"
-    elif [ $(which opera)         ]; then opera "${URL}"
-    elif [ $(which konqueror)     ]; then konqueror "${URL}"
-    elif [ $(which google-chrome) ]; then google-chrome "${URL}"
+      if [ $(which xdg-open)      ]; then $(which xdg-open) "${URL}"
+    elif [ $(which firefox)       ]; then $(which firefox) "${URL}"
+    elif [ $(which opera)         ]; then $(which opera) "${URL}"
+    elif [ $(which konqueror)     ]; then $(which konqueror) "${URL}"
+    elif [ $(which google-chrome) ]; then $(which google-chrome) "${URL}"
       fi
 else
-    echo "No string to search in ThePirateBay.se"
+    echo 'No string to search in ThePirateBay.se'
 fi
 #
