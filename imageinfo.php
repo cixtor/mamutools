@@ -22,7 +22,8 @@
  * for compressed audio data). It is not supported in JPEG 2000, PNG, or GIF.
  */
 
-function usage(){
+function usage()
+{
     $this_filename = basename(__FILE__);
 
     echo "Image Information\n";
@@ -38,26 +39,28 @@ function usage(){
     exit(0);
 }
 
-function _valid_type( $filepath='' ){
-    if(
-        file_exists($filepath)
-        && strpos($filepath, '.') !== FALSE
+function _validType($filepath = '')
+{
+    if (is_string($filepath)
+        && file_exists($filepath)
+        && strpos($filepath, '.') !== false
         && preg_match('/.+\.(jpg|jpeg|gif|png|bmp)$/', $filepath)
-    ){
-        return TRUE;
+    ) {
+        return true;
     }
 
-    return(FALSE);
+    return false;
 }
 
-function most_large( $list=array() ){
+function mostLarge($list = array())
+{
     $max_length = 0;
 
-    foreach( (array) $list as $i => $element){
-        if( $i > 0 ){
+    foreach ((array) $list as $i => $element) {
+        if ($i > 0) {
             $element_length = strlen($element);
 
-            if( $element_length > $max_length ){
+            if ($element_length > $max_length) {
                 $max_length = $element_length;
             }
         }
@@ -66,55 +69,55 @@ function most_large( $list=array() ){
     return $max_length;
 }
 
-function show_image_info( $filepath='', $strpad_req, $strpad_max ){
-    if( $image_info = @getimagesize($filepath) ){
-        if( $strpad_req ){
-            echo str_pad( $filepath, $strpad_max, chr(32), STR_PAD_RIGHT );
+function showImageInfo($filepath = '', $strpad_req = false, $strpad_max = 0)
+{
+    if ($image_info = @getimagesize($filepath)) {
+        if ($strpad_req) {
+            echo str_pad($filepath, $strpad_max, "\x20", STR_PAD_RIGHT);
         } else {
             echo $filepath;
         }
 
-        $image_info['mime'] = str_pad( $image_info['mime'], 10, chr(32), STR_PAD_RIGHT );
+        $image_info['mime'] = str_pad($image_info['mime'], 10, "\x20", STR_PAD_RIGHT);
         echo " : \033[0;96m{$image_info['mime']}\033[0m";
 
-        if( isset($image_info['bits']) ){
+        if (isset($image_info['bits'])) {
             echo " with \033[0;93m{$image_info['bits']} bits\033[0m";
         }
 
-        if(
-            isset($image_info[0])
-            && isset($image_info[1])
-        ){
+        if (isset($image_info[0]) && isset($image_info[1])) {
             echo " and \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m pixels";
         }
 
         echo "\n";
     } else {
-        echo "\033[0;91mError.\033[0m This file is not an image: \033[0;91m{$filepath}\033[0m\n";
+        echo "\033[0;91m\xe2\x9c\x98\033[0m No image file: \033[0;91m{$filepath}\033[0m\n";
     }
 }
 
-function process_files( $files=array(), $recursive=TRUE ){
+function processFiles($files = array(), $recursive = true)
+{
     global $argv;
 
-    $strpad_req = count($files)>2 ? TRUE : FALSE;
-    $strpad_max = most_large($files);
+    $strpad_req = count($files)>2 ? true : false;
+    $strpad_max = mostLarge($files);
 
-    foreach( $files as $i => $filepath ){
-        if( $filepath != $argv[0] ){
-            if( is_dir($filepath) && $recursive === TRUE ){
+    foreach ($files as $i => $filepath) {
+        if ($filepath != $argv[0]) {
+            if (is_dir($filepath) && $recursive === true) {
                 $filepath = rtrim($filepath, '/');
-                $files = glob( $filepath . '/*' );
-                process_files($files, FALSE);
+                $files = glob($filepath . '/*');
+
+                processFiles($files, false);
             } else {
-                show_image_info( $filepath, $strpad_req, $strpad_max );
+                showImageInfo($filepath, $strpad_req, $strpad_max);
             }
         }
     }
 }
 
-if( count($argv) > 1 && $argv[1] != '-help' ){
-    process_files($argv);
+if (count($argv) > 1 && $argv[1] != '-help') {
+    processFiles($argv);
 } else {
     usage();
 }
