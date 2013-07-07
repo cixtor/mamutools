@@ -107,13 +107,15 @@ function fixApacheHttpPort() {
 
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
-		sed -i 's/8080/80/g' "$fpath" 2> /dev/null
-		grep -q "8080" "$fpath" 2> /dev/null
+		if [[ -e "$fpath" ]]; then
+			sed -i 's/8080/80/g' "$fpath" 2> /dev/null
+			grep -q "8080" "$fpath" 2> /dev/null
 
-		if [[ "$?" -eq 0 ]]; then
-			err "$fpath"
-		else
-			ok "$fpath"
+			if [[ "$?" -eq 0 ]]; then
+				err "$fpath"
+			else
+				ok "$fpath"
+			fi
 		fi
 	done
 }
@@ -130,13 +132,15 @@ function fixApacheHttpsPort() {
 
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
-		sed -i 's/8443/443/g' "$fpath"
-		grep -q "8443" "$fpath"
+		if [[ -e "$fpath" ]]; then
+			sed -i 's/8443/443/g' "$fpath"
+			grep -q "8443" "$fpath"
 
-		if [[ "$?" -eq 0 ]]; then
-			err "$fpath"
-		else
-			ok "$fpath"
+			if [[ "$?" -eq 0 ]]; then
+				err "$fpath"
+			else
+				ok "$fpath"
+			fi
 		fi
 	done
 }
@@ -276,8 +280,12 @@ function installMailCatcher() {
 	info "MailCatcher SMTP server and debugger"
 	which mailcatcher 1> /dev/null
 	if [[ "$?" -eq 1 ]]; then
-		ok "Install and configure MailCatcher"
-		$(which gem) install --no-rdoc --no-ri mailcatcher
+		if $(command -v gem 1> /dev/null); then
+			ok "Install and configure MailCatcher"
+			$(which gem) install --no-rdoc --no-ri mailcatcher
+		else
+			err "RubyGems is not installed"
+		fi
 	fi
 
 	ok "Mailcatcher: $(which mailcatcher)"
@@ -292,10 +300,14 @@ function installDeploymentTool() {
 	info "Dandelion deployment tool"
 	which dandelion 1> /dev/null
 	if [[ "$?" -eq 1 ]]; then
-		ok "Install main deployment package"
-		$(which gem) install --no-rdoc --no-ri dandelion
-		ok "Install additional SFTP package"
-		$(which gem) install --no-rdoc --no-ri net-sftp
+		if $(command -v gem 1> /dev/null); then
+			ok "Install main deployment package"
+			$(which gem) install --no-rdoc --no-ri dandelion
+			ok "Install additional SFTP package"
+			$(which gem) install --no-rdoc --no-ri net-sftp
+		else
+			err "RubyGems is not installed"
+		fi
 	fi
 	ok "Dandelion: $(which dandelion)"
 }
