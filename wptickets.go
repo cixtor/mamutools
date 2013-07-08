@@ -96,16 +96,16 @@ func analyzePageTickets(plugin string, page int) {
 		var status string
 
 		if resolved == maximumPerPage {
-			status = fmt.Sprintf("\033[0;92m%s\033[0m", "Ok")
+			status = fmt.Sprintf("\033[0;92m%s\033[0m", "\u2714")
 		} else {
 			var missing int = maximumPerPage - resolved
 
 			if missing > 5 {
-				status = fmt.Sprintf("\033[0;91m%s\033[0m", "Error\x20\x20")
+				status = fmt.Sprintf("\033[0;91m%s\033[0m", "\u2718")
 			} else if missing > 2 {
-				status = fmt.Sprintf("\033[0;93m%s\033[0m", "Warning")
+				status = fmt.Sprintf("\033[0;93m%s\033[0m", "\u2622")
 			} else {
-				status = fmt.Sprintf("\033[0;94m%s\033[0m", "Notice\x20")
+				status = fmt.Sprintf("\033[0;94m%s\033[0m", "\u2022")
 			}
 
 			status += fmt.Sprintf(" (%d missing) %s", missing, urlStr)
@@ -124,12 +124,11 @@ func main() {
 
 	var plugin string = flag.Arg(0)
 
-	fmt.Println("WordPress Tickets")
-	fmt.Println("  http://cixtor.com/")
-	fmt.Println("  https://github.com/cixtor/mamutools")
-	fmt.Println("  https://wordpress.org/support/")
-
 	if plugin == "" {
+		fmt.Println("WordPress Tickets")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  https://wordpress.org/support/")
 		fmt.Println("Usage: wptickets [plugin]\n")
 		os.Exit(2)
 	}
