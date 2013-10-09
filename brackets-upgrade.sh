@@ -23,3 +23,34 @@
 # Upgrades can also worsen a product subjectively. A user may prefer an older version
 # even if a newer version functions perfectly as designed.
 #
+user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.26 Safari/537.36"
+echo -n "Type the link to upgrade: "
+read download
+#
+echo -n "Verifying the remote upgrade file... "
+file_headers=$(curl --silent --head "${download}" --user-agent "${user_agent}")
+file_name=$(echo "${file_headers}" | grep '; filename=' | awk -F '=' '{print $2}' | tr -d "\r")
+echo "Done"
+if [ "${file_name}" != "" ]; then
+    echo "Downloading..."
+    wget -c "${download}" --user-agent "${user_agent}" -O "${file_name}"
+    echo -n "Extracting... "
+    dpkg --extract ./brackets*.deb ./upgrade-package
+    echo "Done"
+    mv upgrade-package/usr/share/doc/brackets/copyright ./
+    mv upgrade-package/usr/share/icons/hicolor/scalable/apps/brackets.svg ./
+    mv upgrade-package/opt/brackets/* ./
+    if [ -e "/usr/share/applications/" ]; then
+        cd /usr/share/applications/
+        if [ -e "brackets.desktop" ]; then rm -f brackets.desktop; fi
+        ln -s /opt/brackets/brackets.desktop
+    fi
+    echo -n "Cleaning up... "
+    rm -rf ./upgrade-package/
+    rm -f ./*.deb
+    echo "Done"
+else
+    echo "Error. Could not get the remote upgrade:"
+    echo "${file_headers}"
+fi
+#
