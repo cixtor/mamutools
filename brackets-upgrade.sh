@@ -26,6 +26,9 @@
 user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.26 Safari/537.36"
 echo -n "Type the link to upgrade: "
 read download
+if [ "${download}" == "" ]; then
+    download="http://download.brackets.io/file.cfm?platform=LINUX64&build=33"
+fi
 #
 echo -n "Verifying the remote upgrade file... "
 file_headers=$(curl --silent --head "${download}" --user-agent "${user_agent}")
