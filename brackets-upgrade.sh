@@ -24,11 +24,19 @@
 # even if a newer version functions perfectly as designed.
 #
 user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.26 Safari/537.36"
-echo -n "Type the link to upgrade: "
-read download
-if [ "${download}" == "" ]; then
-    download="http://download.brackets.io/file.cfm?platform=LINUX64&build=33"
-fi
+echo 'Brackets Upgrade'
+echo '    http://www.cixtor.com/'
+echo '    https://github.com/cixtor/mamutools'
+echo '    https://github.com/adobe/brackets'
+echo
+#
+architecture=$(uname -m)
+echo "Computer architecture detected: ${architecture}"
+if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
+echo "file\.cfm\?platform=LINUX${archi_type}"
+download_link=$(curl --silent 'http://download.brackets.io/' | grep "file\.cfm?platform=LINUX${archi_type}" | head -n 1)
+download_link=$(echo "${download_link}" | cut -d '"' -f 2 | sed 's/file\.cfm/http:\/\/download\.brackets\.io\/file\.cfm/g')
+echo "Download link: ${download_link}"
 #
 echo "Backuping current files..."
 old_files=(
@@ -59,12 +67,12 @@ for file in "${old_files[@]}"; do
 done
 #
 echo -n "Verifying the remote upgrade file... "
-file_headers=$(curl --silent --head "${download}" --user-agent "${user_agent}")
+file_headers=$(curl --silent --head "${download_link}" --user-agent "${user_agent}")
 file_name=$(echo "${file_headers}" | grep '; filename=' | awk -F '=' '{print $2}' | tr -d "\r")
 echo "Done"
 if [ "${file_name}" != "" ]; then
     echo "Downloading..."
-    wget -c "${download}" --user-agent "${user_agent}" -O "${file_name}"
+    wget -c "${download_link}" --user-agent "${user_agent}" -O "${file_name}"
     echo -n "Extracting... "
     dpkg --extract ./brackets*.deb ./upgrade-package
     echo "Done"
