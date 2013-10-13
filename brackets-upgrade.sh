@@ -30,6 +30,10 @@ echo '    https://github.com/cixtor/mamutools'
 echo '    https://github.com/adobe/brackets'
 echo
 #
+target_folder="/opt/brackets/"
+if [ ! -e "${target_folder}" ]; then mkdir -p "${target_folder}"; fi
+if [ -e "${target_folder}" ]; then cd "${target_folder}"; fi
+#
 architecture=$(uname -m)
 echo "Computer architecture detected: ${architecture}"
 if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
