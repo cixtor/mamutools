@@ -37,7 +37,6 @@ if [ -e "${target_folder}" ]; then cd "${target_folder}"; fi
 architecture=$(uname -m)
 echo "Computer architecture detected: ${architecture}"
 if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
-echo "file\.cfm\?platform=LINUX${archi_type}"
 download_link=$(curl --silent 'http://download.brackets.io/' | grep "file\.cfm?platform=LINUX${archi_type}" | head -n 1)
 download_link=$(echo "${download_link}" | cut -d '"' -f 2 | sed 's/file\.cfm/http:\/\/download\.brackets\.io\/file\.cfm/g')
 echo "Download link: ${download_link}"
@@ -62,10 +61,11 @@ old_files=(
     "samples"
     "www"
 )
-mkdir backups/
+if [ -e "./backups/" ]; then rm -rf ./backups/; fi
+mkdir ./backups
 for file in "${old_files[@]}"; do
     if [ -e "${file}" ]; then
-        echo "  '${i}' -> 'backups/${file}'"
+        echo "  '${file}' -> 'backups/${file}'"
         mv -i $file backups/
     fi
 done
@@ -75,9 +75,9 @@ file_headers=$(curl --silent --head "${download_link}" --user-agent "${user_agen
 file_name=$(echo "${file_headers}" | grep '; filename=' | awk -F '=' '{print $2}' | tr -d "\r")
 echo "Done"
 if [ "${file_name}" != "" ]; then
-    echo "Downloading..."
+    echo
     wget -c "${download_link}" --user-agent "${user_agent}" -O "${file_name}"
-    echo -n "Extracting... "
+    echo -n "Installing... "
     dpkg --extract ./brackets*.deb ./upgrade-package
     echo "Done"
     mv upgrade-package/usr/share/doc/brackets/copyright ./
@@ -87,14 +87,22 @@ if [ "${file_name}" != "" ]; then
         if [ -e "./backups/brackets.desktop" ]; then
             mv ./backups/brackets.desktop ./
         fi
+        # Change desktop shortcut icon
+        shortcut_icon=""
+        allowed_icons=("appshell32.png" "appshell48.png" "appshell128.png" "appshell256.png" "brackets.svg")
+        for icon in "${allowed_icons[@]}" ; do
+            if [ -e "./${icon}" ]; then shortcut_icon="/opt/brackets/${icon}"; fi
+        done
+        cat brackets.desktop | grep -v '^Icon=' > temp.desktop
+        echo "Icon=${shortcut_icon}" >> temp.desktop
+        cat temp.desktop > brackets.desktop && rm -f temp.desktop
+        # Install desktop shortcut
         cd /usr/share/applications/
         if [ -e "brackets.desktop" ]; then rm -f brackets.desktop; fi
         ln -s /opt/brackets/brackets.desktop
     fi
     echo -n "Cleaning up... "
-    rm -rf ./upgrade-package/
-    rm -rf ./backups/
-    rm -f ./*.deb
+    cd "${target_folder}" && rm -rf ./upgrade-package/ ./backups/ ./*.deb
     echo "Done"
 else
     echo "Error. Could not get the remote upgrade:"
