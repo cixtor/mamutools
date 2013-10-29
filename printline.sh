@@ -13,3 +13,12 @@
 # each byte is written to standard output without buffering as it is read. Many
 # operating systems do this by default and ignore the flag.
 #
+FILEPATH=$1
+LINE=$2
+LENGTH=$3
+if [ "${LENGTH}" != "" ]; then
+    head -n $(( $LINE + $LENGTH - 1 )) $FILEPATH | tail -n $LENGTH
+else
+    head -n $LINE $FILEPATH | tail -n 1
+fi
+#
