@@ -17,11 +17,19 @@ FILEPATH=$1
 if [ "${FILEPATH}" != "" ]; then
     LINE=$2
     if [ "${LINE}" != "" ]; then
-        LENGTH=$3
-        if [ "${LENGTH}" != "" ]; then
-            head -n $(( $LINE + $LENGTH - 1 )) $FILEPATH | tail -n $LENGTH
+        if [[ "${LINE}" =~ ^[0-9]+$ ]]; then
+            LENGTH=$3
+            if ! [[ "${LENGTH}" =~ ^[0-9]+$ ]]; then
+                LENGTH="";
+                echo -e "\e[0;91mError.\e[0m The number of lines to show is not valid, you will see only one:"
+            fi
+            if [ "${LENGTH}" != "" ]; then
+                head -n $(( $LINE + $LENGTH - 1 )) $FILEPATH | tail -n $LENGTH
+            else
+                head -n $LINE $FILEPATH | tail -n 1
+            fi
         else
-            head -n $LINE $FILEPATH | tail -n 1
+            echo -e "\e[0;91mError.\e[0m The line number specified is not numeric."
         fi
     else
         echo -e "\e[0;91mError.\e[0m You should specify a valid line number as the first parameter."
