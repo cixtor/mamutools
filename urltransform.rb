@@ -27,36 +27,45 @@ require 'open-uri'
 require 'optparse'
 #
 options = Hash.new
-OptionParser.new do |opt|
+optparse = OptionParser.new do |opt|
     opt.banner = "Usage: urltransform [options]"
     opt.on('-a action', '--action=action', 'Specify the action to perform with the given URL.'){ |args| options[:action] = args }
     opt.on('-u url', '--url=url', 'Specify the URL to check, when a Google URL is given, the redirection is returned.'){ |args| options[:url] = args }
-end.parse!
-#
-action = options[:action]
-string = options[:url]
-finalstr = "\e[0;92m%s\e[0m"
-#
-if ['encode','decode'].include?(action) then
-    if action == 'encode' then
-        puts sprintf( finalstr, URI::encode(string) )
-    elsif action == 'decode' then
-        decoded = CGI::unescape(string)
-        if match = decoded.match(/\.com\/url\?(.*)/) then
-            parts = match[1].split('&')
-            parts.each do |part|
-                if valid = part.match(/^url=(http.*)/) then
-                    puts sprintf( finalstr, valid[1] )
+end
+begin
+    optparse.parse!
+    if ['encode','decode'].include?(options[:action]) then
+        action = options[:action]
+        if options[:url].nil? then
+            raise OptionParser::MissingArgument, 'url'
+        else
+            string = options[:url]
+            finalstr = "\e[0;92m%s\e[0m"
+            if action == 'encode' then
+                puts sprintf( finalstr, URI::encode(string) )
+            elsif action == 'decode' then
+                decoded = CGI::unescape(string)
+                if match = decoded.match(/\.com\/url\?(.*)/) then
+                    parts = match[1].split('&')
+                    parts.each do |part|
+                        if valid = part.match(/^url=(http.*)/) then
+                            puts sprintf( finalstr, valid[1] )
+                        end
+                    end
+                elsif match = decoded.match(/\.com.*imgrefurl=(.*)/) then
+                    parts = match[1].split('?')
+                    puts sprintf( finalstr, parts[0] )
+                else
+                    puts sprintf( finalstr, decoded )
                 end
             end
-        elsif match = decoded.match(/\.com.*imgrefurl=(.*)/) then
-            parts = match[1].split('?')
-            puts sprintf( finalstr, parts[0] )
-        else
-            puts sprintf( finalstr, decoded )
         end
+    else
+        raise OptionParser::InvalidOption, 'Use --action=[encode|decode]'
     end
-else
-    puts "Error. Action invalid."
+rescue OptionParser::MissingArgument, OptionParser::InvalidOption
+    p optparse
+    puts "\e[0;91m[x]\e[0m Process failed, #{$!.to_s}"
+    exit(1)
 end
 #
