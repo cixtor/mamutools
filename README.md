@@ -20,24 +20,21 @@ As the scripts are not correlated among them, you probably will want to check th
 
 **WARNING!** This procedure refers to a Linux Debian based system, as I don't know very well other environments, I can't ensure that this will work in your machine if you use other Operating System. Most of the commands will work in a UNIX based system, maybe you'll have to change a few commands.
 
-You'll probably need **super administrator** privileges to do these things, if that's the case become `root` using this command: `su root`
-
 ```
 $ cd /opt/
 $ git clone https://github.com/cixtor/mamutools.git
 $ chmod 755 ./mamutools/*.{rb,sh,php}
-$ cd /usr/local/bin/
-$ for i in $(ls -1 /opt/mamutools/ | grep -vE 'LICENSE|README.md'); do ln -s /opt/mamutools/$i $(echo $i | cut -d '.' -f 1); done
+$ echo 'export PATH="$PATH:/opt/mamutools"' >> ~/.bashrc
+$ source ~/.bashrc
 ```
 
 ### Uninstall
 
 ```
-$ su root
-# cd /usr/local/bin/
-# for i in $(ls -1 /opt/mamutools/ | grep -vE 'LICENSE|README.md'); do rm -fv $(echo $i | cut -d '.' -f 1); done
-# exit
 $ rm -rf /opt/mamutools/
+$ REMOVE_LINE=$(cat ~/.bashrc | grep -n mamutools | awk -F ':' '{print $1}')
+$ echo -e "Remove line \e[0;91m${REMOVE_LINE}\e[0m from $HOME/.bashrc"
+$ source ~/.bashrc
 ```
 
 ### Motivation
