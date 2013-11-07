@@ -27,3 +27,8 @@
 # name. Once found, the program is executed as a child process of the command
 # shell or program that issued the command.
 #
+IFS=':'
+for path in $PATH; do
+    echo $path
+done
+#
