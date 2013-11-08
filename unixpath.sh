@@ -28,7 +28,9 @@
 # shell or program that issued the command.
 #
 IFS=':'
+echo 'UNIX Path list'
+echo 'http://en.wikipedia.org/wiki/PATH_(variable)'
 for path in $PATH; do
-    echo $path
+    echo "  ${path}"
 done
 #
