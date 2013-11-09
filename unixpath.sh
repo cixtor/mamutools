@@ -28,9 +28,19 @@
 # shell or program that issued the command.
 #
 IFS=':'
+SEARCH=$1
 echo 'UNIX Path list'
 echo 'http://en.wikipedia.org/wiki/PATH_(variable)'
+echo "Usage: $0 [search]"
 for path in $PATH; do
-    echo "  ${path}"
+    if [ "${SEARCH}" != "" ]; then
+        if [[ "${path}" =~ "${SEARCH}" ]]; then
+            echo -e "  \e[0;92m${path}\e[0m"
+        else
+            echo "  ${path}"
+        fi
+    else
+        echo "  ${path}"
+    fi
 done
 #
