@@ -72,7 +72,7 @@ def file_size(location)
                 end
             elsif match = header.match(/^Content-Type: (.*)$/) then
                 puts "\e[0;93mContent-Type:\e[0m #{match[1]}"
-            elsif match = header.match(/^Content-Length: (\d+)$/) then
+            elsif match = header.match(/^Content-Length: (\d+)$/i) then
                 size = "#{match[1]}.0".to_f
                 puts "\e[0;93mContent-Length:\e[0m #{size.round}"
                 puts "\e[0;93mHuman-Size:\e[0m #{readable_size(size)}"
