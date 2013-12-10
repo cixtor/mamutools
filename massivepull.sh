@@ -2,7 +2,7 @@
 #
 # Massive Repository Pull
 # http://www.cixtor.com/
-# https://github.com/
+# https://github.com/cixtor/mamutools
 #
 # Being an autodidact developer I'm always looking new technologies to test out
 # in my machine, counting new tools, languages and libraries. Almost sixty percent
