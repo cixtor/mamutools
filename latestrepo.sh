@@ -19,21 +19,32 @@ function help {
     echo '  http://www.cixtor.com/'
     echo '  https://github.com/cixtor/mamutools'
     echo
-    echo "Usage: $0 [remote_repository]"
+    echo "Usage: $0 [clone|pull] [dirname|remote_repository]"
     echo
 }
-function get_latest_code {
+function clone_repository {
     repository=$1
     if [ "${repository}" != "" ]; then
-        directory=$2
-        if [ "${directory}" == "" ]; then
-            directory=$(echo "${repository}" | rev | cut -d '/' -f 1 | rev)
-        fi
+        directory=$(echo "${repository}" | rev | cut -d '/' -f 1 | rev | tr 'A-Z' 'a-z')
         git clone "${repository}" "${directory}"
         mv -i "${directory}/.git/config" "${directory}/.gitconfig"
         rm -rf "${directory}/.git"
     fi
 }
 help
-get_latest_code $1 $2
+if [ "${1}" == "pull" ]; then
+    directory=$2
+    if [ -d "${directory}" ]; then
+        cd "${directory}"
+        if [ -e ".gitconfig" ]; then
+            repository=$(cat .gitconfig | grep 'url = ' | tr -d ' ' | awk -F '=' '{print $2}')
+            if [ "${repository}" != "" ]; then
+                cd ../ && rm -rf "${directory}"
+                clone_repository $repository
+            fi
+        fi
+    fi
+elif [ "${1}" == "clone" ]; then
+    clone_repository $1
+fi
 #
