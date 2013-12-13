@@ -19,16 +19,30 @@ function help {
     echo '  http://www.cixtor.com/'
     echo '  https://github.com/cixtor/mamutools'
     echo
-    echo "Usage: $0 [clone|pull] [dirname|remote_repository]"
+    echo "Usage: $0 [clone|pull] [remote_repository|dirname]"
     echo
+}
+function fail {
+    echo -e "\e[0;91m[x] Error.\e[0m ${1}"
+    exit 1
+}
+function warning {
+    echo -e "\e[0;93m[x] Warning.\e[0m ${1}"
 }
 function clone_repository {
     repository=$1
     if [ "${repository}" != "" ]; then
         directory=$(echo "${repository}" | rev | cut -d '/' -f 1 | rev | tr 'A-Z' 'a-z')
+        if [ -d "${directory}" ]; then
+            warning "The directory '\e[0;93m${directory}\e[0m' already exists, a random name will be chosen"
+            datetime=$(date +'%Y%m%d-%H%M%S')
+            directory="${directory}-${datetime}"
+        fi
         git clone "${repository}" "${directory}"
         mv -i "${directory}/.git/config" "${directory}/.gitconfig"
         rm -rf "${directory}/.git"
+    else
+        fail "You should specify the URL of the repository when cloning."
     fi
 }
 help
@@ -45,6 +59,6 @@ if [ "${1}" == "pull" ]; then
         fi
     fi
 elif [ "${1}" == "clone" ]; then
-    clone_repository $1
+    clone_repository $2
 fi
 #
