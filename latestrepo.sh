@@ -55,8 +55,14 @@ if [ "${1}" == "pull" ]; then
             if [ "${repository}" != "" ]; then
                 cd ../ && rm -rf "${directory}"
                 clone_repository $repository
+            else
+                fail "The repository URL was not detected in file '\e[0;93m.gitconfig\e[0m'"
             fi
+        else
+            fail "The file '\e[0;93m.gitconfig\e[0m' was not found in that directory"
         fi
+    else
+        fail "The directory name specified does not exists: '\e[0;91m${directory}\e[0m'"
     fi
 elif [ "${1}" == "clone" ]; then
     clone_repository $2
