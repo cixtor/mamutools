@@ -29,6 +29,9 @@ function fail {
 function warning {
     echo -e "\e[0;93m[x] Warning.\e[0m ${1}"
 }
+function success {
+    echo -e "\e[0;92mOK.\e[0m ${1}"
+}
 function clone_repository {
     repository=$1
     if [ "${repository}" != "" ]; then
@@ -41,6 +44,7 @@ function clone_repository {
         git clone "${repository}" "${directory}"
         mv -i "${directory}/.git/config" "${directory}/.gitconfig"
         rm -rf "${directory}/.git"
+        echo && success "Process finished"
     else
         fail "You should specify the URL of the repository when cloning."
     fi
