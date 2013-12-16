@@ -35,7 +35,7 @@ function success {
 function clone_repository {
     repository=$1
     if [ "${repository}" != "" ]; then
-        directory=$(echo "${repository}" | rev | cut -d '/' -f 1 | rev | tr 'A-Z' 'a-z')
+        directory=$(echo "${repository}" | rev | cut -d '/' -f 1 | rev | tr 'A-Z' 'a-z' | sed 's/\.git//')
         if [ -d "${directory}" ]; then
             warning "The directory '\e[0;93m${directory}\e[0m' already exists, a random name will be chosen"
             datetime=$(date +'%Y%m%d-%H%M%S')
