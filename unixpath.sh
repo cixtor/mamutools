@@ -28,19 +28,27 @@
 # shell or program that issued the command.
 #
 IFS=':'
-SEARCH=$1
-echo 'UNIX Path list'
-echo 'http://en.wikipedia.org/wiki/PATH_(variable)'
-echo "Usage: $0 [search]"
-for path in $PATH; do
-    if [ "${SEARCH}" != "" ]; then
-        if [[ "${path}" =~ "${SEARCH}" ]]; then
-            echo -e "  \e[0;92m${path}\e[0m"
-        else
-            echo "  ${path}"
-        fi
-    else
-        echo "  ${path}"
-    fi
-done
+action=$1
+function help {
+    echo 'UNIX Path list'
+    echo 'http://cixtor.com/'
+    echo 'http://en.wikipedia.org/wiki/PATH_(variable)'
+    echo
+    echo "Usage: $0 [action] [path]"
+    echo '  -h | --help        Show this message with a list of allowed actions and options'
+    echo '  -l | --list        Action to list all the paths registered in this session'
+    echo '  -s | --search      Action to search a specific path among the registered locations'
+    echo '  -a | --add         Action to add a new path to the user profile settings'
+    exit 0
+}
+case "${action}" in
+    -l|--list)
+        echo 'Listing paths';;
+    -s|--search)
+        echo 'Search path';;
+    -a|--add)
+        echo 'Adding path';;
+    *)
+        help;;
+esac
 #
