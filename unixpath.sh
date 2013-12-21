@@ -29,11 +29,14 @@
 #
 IFS=':'
 action=$1
-function help {
+function slogan {
     echo 'UNIX Path list'
     echo 'http://cixtor.com/'
     echo 'http://en.wikipedia.org/wiki/PATH_(variable)'
     echo
+}
+function help {
+    slogan
     echo "Usage: $0 [action] [path]"
     echo '  -h | --help        Show this message with a list of allowed actions and options'
     echo '  -l | --list        Action to list all the paths registered in this session'
@@ -43,7 +46,10 @@ function help {
 }
 case "${action}" in
     -l|--list)
-        echo 'Listing paths';;
+        slogan
+        echo 'Listing paths'
+        for path in $PATH; do echo "  ${path}"; done
+        ;;
     -s|--search)
         echo 'Search path';;
     -a|--add)
