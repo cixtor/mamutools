@@ -51,7 +51,17 @@ case "${action}" in
         for path in $PATH; do echo "  ${path}"; done
         ;;
     -s|--search)
-        echo 'Search path';;
+        search=$2
+        slogan
+        echo -e "Searching path: \e[0;93m${search}\e[0m"
+        for path in $PATH; do
+            if [[ "${path}" =~ "${search}" ]]; then
+                echo -e "  \e[0;92m${path}\e[0m"
+            else
+                echo "  ${path}"
+            fi
+        done
+        ;;
     -a|--add)
         echo 'Adding path';;
     *)
