@@ -44,6 +44,17 @@ function help {
     echo '  -a | --add         Action to add a new path to the user profile settings'
     exit 0
 }
+function search {
+    search=$1
+    echo -e "Searching path: \e[0;93m${search}\e[0m"
+    for path in $PATH; do
+        if [[ "${path}" =~ "${search}" ]]; then
+            echo -e "  \e[0;92m${path}\e[0m"
+        else
+            echo "  ${path}"
+        fi
+    done
+}
 case "${action}" in
     -l|--list)
         slogan
@@ -51,19 +62,14 @@ case "${action}" in
         for path in $PATH; do echo "  ${path}"; done
         ;;
     -s|--search)
-        search=$2
-        slogan
-        echo -e "Searching path: \e[0;93m${search}\e[0m"
-        for path in $PATH; do
-            if [[ "${path}" =~ "${search}" ]]; then
-                echo -e "  \e[0;92m${path}\e[0m"
-            else
-                echo "  ${path}"
-            fi
-        done
+        slogan && search $2
         ;;
     -a|--add)
-        echo 'Adding path';;
+        path=$2
+        slogan && echo -e "Adding path '\e[0;92m${path}\e[0m' to the system"
+        echo 'export PATH="$PATH:'$path'"' >> $HOME/.bashrc && source $HOME/.bashrc
+        echo -e "Type this command to enable this new path: \e[0;92msource ~/.bashrc\e[0m"
+        ;;
     *)
         help;;
 esac
