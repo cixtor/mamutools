@@ -2,7 +2,7 @@
 <?php
 /**
  * Gravatar Information Gatherer
- * http://www.cixtor.com/
+ * http://cixtor.com/
  * https://github.com/cixtor/mamutools
  *
  * An avatar is an image that represents a person online, basically a little
@@ -46,7 +46,7 @@ function print_array($array=array(), $tabs=0){
     }
 }
 echo "Gravatar Information Gatherer\n";
-echo "  http://www.cixtor.com/\n";
+echo "  http://cixtor.com/\n";
 echo "  https://github.com/cixtor/mamutools\n";
 echo "\n";
 if( isset($argv[1]) ){

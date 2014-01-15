@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Brackets Upgrade
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # https://github.com/adobe/brackets
 #
@@ -25,7 +25,7 @@
 #
 user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.26 Safari/537.36"
 echo 'Brackets Upgrade'
-echo '    http://www.cixtor.com/'
+echo '    http://cixtor.com/'
 echo '    https://github.com/cixtor/mamutools'
 echo '    https://github.com/adobe/brackets'
 echo

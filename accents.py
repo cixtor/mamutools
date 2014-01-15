@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Orthographic Accent
-# http://www.cixtor.com/
+# http://cixtor.com/
 # http://es.wikipedia.org/wiki/Acento_ortogr%C3%A1fico
 #
 # The orthographic accent or 'tilde' is a sign used in Spanish generally over a

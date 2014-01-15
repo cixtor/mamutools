@@ -1,10 +1,9 @@
 #!/bin/bash
 #
 # The Pirate Bay
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
-# http://www.cixtor.com/blog/14/the-pirate-bay-search
-# http://thepiratebay.se/
+# http://cixtor.com/blog/the-pirate-bay-search
 # http://thepiratebay.sx/
 #
 # The Pirate Bay is the worlds largest bittorrent tracker. Bittorrent is a file-
@@ -30,9 +29,8 @@
 SEARCH=$(
 zenity --entry --title='The Pirate Bay - Search' \
 --text='The Pirate Bay
-  http://www.cixtor.com/
+  http://cixtor.com/
   https://github.com/cixtor/mamutools
-  http://thepiratebay.se/
   http://thepiratebay.sx/
 
 Search in the worlds largest bittorrent tracker,

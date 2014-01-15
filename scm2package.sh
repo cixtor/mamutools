@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Source Code Management to Package
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Compression_program
 #
@@ -38,7 +38,7 @@ REPOSITORY=$2
 #
 function help {
 	echo 'Source Code Management to Package'
-	echo '  http://www.cixtor.com/'
+	echo '  http://cixtor.com/'
 	echo '  https://github.com/cixtor/mamutools'
 	echo '  http://en.wikipedia.org/wiki/Compression_program'
 	echo

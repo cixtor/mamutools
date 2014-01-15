@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Imgbox Downloader
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://imgbox.com/
 #
@@ -53,7 +53,7 @@ class Imgboxdown
     end
     def usage
         puts 'Imgbox Downloader'
-        puts '    http://www.cixtor.com/'
+        puts '    http://cixtor.com/'
         puts '    https://github.com/cixtor/mamutools'
         puts '    http://imgbox.com/'
         puts

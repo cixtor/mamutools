@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Massive Repository Pull
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 #
 # Being an autodidact developer I'm always looking new technologies to test out

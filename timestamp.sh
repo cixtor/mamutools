@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # UNIX Timestamp
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Unix_time
 #

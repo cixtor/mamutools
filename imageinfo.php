@@ -2,7 +2,7 @@
 <?php
 /**
  * Image Information
- * http://www.cixtor.com/
+ * http://cixtor.com/
  * https://github.com/cixtor/mamutools
  * http://php.net/manual/en/function.getimagesize.php
  *
@@ -89,7 +89,7 @@ if( count($argv)>1 ){
 }else{
     $this_filename = basename(__FILE__);
     echo "Image Information\n";
-    echo "  http://www.cixtor.com/\n";
+    echo "  http://cixtor.com/\n";
     echo "  https://github.com/cixtor/mamutools\n";
     echo "  http://php.net/manual/en/function.getimagesize.php\n";
     echo "\n";

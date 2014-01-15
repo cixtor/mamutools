@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Remote Assets
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 #
 # List all the resources (assets) loaded in a specific page on a website.

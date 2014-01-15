@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # Google Chrome Upgrade
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
-# http://www.cixtor.com/blog/53/chrome-upgrade
+# http://cixtor.com/blog/chrome-upgrade
 #
 # Upgrading is the process of replacing a product with a newer version of the same
 # product. In computing and consumer electronics an upgrade is generally a replacement
@@ -40,9 +40,9 @@ function question {
 }
 function initialize {
 	echo 'Google Chrome Upgrade'
-	echo '    http://www.cixtor.com/'
+	echo '    http://cixtor.com/'
 	echo '    https://github.com/cixtor/mamutools'
-	echo '    http://www.cixtor.com/blog/53/chrome-upgrade'
+	echo '    http://cixtor.com/blog/chrome-upgrade'
 	echo
 	question 'Choose the version family (beta|stable) '; read VERSION
 	if [[ "${VERSION}" =~ (beta|stable) ]]; then VERSION="${VERSION}"; else VERSION='beta'; fi

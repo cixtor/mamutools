@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Latest Repository Downloader
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 #
 # Sometime ago I wrote a Script to fetch dynamically multiple GIT repositories at
@@ -16,7 +16,7 @@
 #
 function help {
     echo 'Latest Repository Downloader'
-    echo '  http://www.cixtor.com/'
+    echo '  http://cixtor.com/'
     echo '  https://github.com/cixtor/mamutools'
     echo
     echo "Usage: $0 [clone|pull] [remote_repository|dirname]"

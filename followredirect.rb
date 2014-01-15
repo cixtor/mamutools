@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Follow Redirects
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 #
 # The HTTP response status code '301 Moved Permanently' and '302 Moved Temporarily'

@@ -2,8 +2,8 @@
 #
 # Debian Brightness Control
 # @reference:
-#   http://www.cixtor.com/
-#   http://www.cixtor.com/blog/41/brightness-control
+#   http://cixtor.com/
+#   http://cixtor.com/blog/brightness-control
 # @usage: This script solves these issues:
 #   http://forums.linuxmint.com/viewtopic.php?f=18&t=138760
 #   http://forums.linuxmint.com/viewtopic.php?f=59&t=135019

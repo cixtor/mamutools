@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # X-Term Color
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/ANSI_escape_code
 #
@@ -27,7 +27,7 @@
 # libraries, such as termcap or terminfo, or a higher-level library such as curses.
 #
 echo 'X-Term Color'
-echo '    http://www.cixtor.com/'
+echo '    http://cixtor.com/'
 echo '    https://github.com/cixtor/mamutools'
 echo '    http://en.wikipedia.org/wiki/ANSI_escape_code'
 echo

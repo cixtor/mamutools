@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Filename Formalizer
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Filename
 #
@@ -69,7 +69,7 @@ config = {
     :batch => false
 }
 puts 'Filename Formalizer'
-puts '  http://www.cixtor.com/'
+puts '  http://cixtor.com/'
 puts '  https://github.com/cixtor/mamutools'
 puts '  http://en.wikipedia.org/wiki/Filename'
 puts

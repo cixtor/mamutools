@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 #
 # Password Generator
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://www.youtube.com/watch?v=BIKV3fYmzRQ
 #
@@ -48,7 +48,7 @@ config = {
 }
 def usage
     puts 'Password Generator'
-    puts '  http://www.cixtor.com/'
+    puts '  http://cixtor.com/'
     puts '  https://github.com/cixtor/mamutools'
     puts '  http://www.youtube.com/watch?v=BIKV3fYmzRQ'
     puts

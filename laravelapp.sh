@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Laravel Application Generator
-# http://www.cixtor.com/
+# http://cixtor.com/
 # http://laravel.com/
 #
 # Laravel is a web application framework with expressive, elegant syntax. We

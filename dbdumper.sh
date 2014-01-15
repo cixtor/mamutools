@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Database Dumper
-# http://www.cixtor.com/
+# http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Database_dump
 #
@@ -60,7 +60,7 @@ function fail {
 }
 function initialize {
     echo 'Database Dumper'
-    echo '    http://www.cixtor.com/'
+    echo '    http://cixtor.com/'
     echo '    https://github.com/cixtor/mamutools'
     echo '    http://en.wikipedia.org/wiki/Database_dump'
     echo
