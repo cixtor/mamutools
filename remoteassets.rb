@@ -3,6 +3,7 @@
 # Remote Assets
 # http://cixtor.com/
 # https://github.com/cixtor/mamutools
+# http://en.wikipedia.org/wiki/Digital_asset
 #
 # List all the resources (assets) loaded in a specific page on a website.
 #
