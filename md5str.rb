@@ -12,3 +12,7 @@
 # as a 32 digit hexadecimal number. MD5 has been utilized in a wide variety of
 # cryptographic applications, and is also commonly used to verify data integrity.
 #
+require 'digest'
+string = ARGV.join(' ')
+md5str = Digest::MD5.hexdigest(string)
+puts "'#{string}' => #{md5str}"
