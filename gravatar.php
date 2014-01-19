@@ -15,20 +15,42 @@
  * automatically included in every WordPress account and is run and supported
  * by Automattic.
  */
+
+/**
+ * Retrieve the HTML content from a specific URL.
+ *
+ * @param  string $url The remote address of that webpage that will be retrieved.
+ * @return array       Hash with two indexes: headers and content.
+ */
 function get_url($url=''){
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.81 Safari/537.1');
+    curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (KHTML, like Gecko)');
     $output = curl_exec($curl);
     $headers = curl_getinfo($curl);
     curl_close($curl);
     return array( 'headers'=>$headers, 'content'=>$output );
 }
+
+/**
+ * Check whether a text string is a valid email address.
+ *
+ * @param  string  $address The supposed email address.
+ * @return boolean          TRUE if the text string passed is a valid email address.
+ */
 function is_email($address=''){
     $address = htmlspecialchars(trim($address));
     return (bool) preg_match('/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/ix', $address);
 }
+
+/**
+ * Display humanly the content of a multi-array.
+ *
+ * @param  array   $array The multi-array that will be explained.
+ * @param  integer $tabs  Number of spaces representing each tabulation.
+ * @return void
+ */
 function print_array($array=array(), $tabs=0){
     if( is_array($array) ){
         foreach($array as $key=>$value){
@@ -45,10 +67,12 @@ function print_array($array=array(), $tabs=0){
         echo "{$array}\n";
     }
 }
+
 echo "Gravatar Information Gatherer\n";
 echo "  http://cixtor.com/\n";
 echo "  https://github.com/cixtor/mamutools\n";
 echo "\n";
+
 if( isset($argv[1]) ){
     $email = $argv[1];
     echo "Identifier: \033[0;93m{$email}\033[0m\n";
