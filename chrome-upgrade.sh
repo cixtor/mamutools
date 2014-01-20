@@ -94,28 +94,32 @@ function remove_old_version {
 function goto_google_folder {
 	if [ ! -e "${GOOGLE_FOLDER_PATH}" ]; then sudo mkdir "${GOOGLE_FOLDER_PATH}"; fi
 	if [ -e "${GOOGLE_FOLDER_PATH}" ]; then
-		CWD=$(pwd)
 		cd "${GOOGLE_FOLDER_PATH}"
+		CWD=$(pwd)
 		success "Current working directory: ${CWD}"
 	else
-		fail 'Was impossible to continue, Google folder directory was not created.'
+		fail 'Impossible to continue, Google folder was not created.'
 	fi
 }
 function setup_download_package {
-	LATEST_CHROME="https://dl.google.com/linux/direct/google-chrome-${VERSION}_current_${ARCHITECTURE}.deb";
-	echo -en "    Downloading configured package \e[0;93m${VERSION}/${ARCHITECTURE}\e[0m... ";
-	sudo rm -f "${TEMP_PACKAGE}";
-	wget --quiet --continue "${LATEST_CHROME}" -O "${TEMP_PACKAGE}";
+	LATEST_CHROME="https://dl.google.com/linux/direct/google-chrome-${VERSION}_current_${ARCHITECTURE}.deb"
+	echo -en "    Downloading configured package \e[0;93m${VERSION}/${ARCHITECTURE}\e[0m... "
+	sudo rm -f "${TEMP_PACKAGE}"
+	wget --quiet --continue "${LATEST_CHROME}" -O "${TEMP_PACKAGE}"
 	success
 }
 function install_package {
 	setup_download_package
 	if [ -e "${TEMP_PACKAGE}" ]; then
-		echo "    Installing Google Chrome BETA..."
+		echo "    Installing Google Chrome..."
 		dpkg --extract "${TEMP_PACKAGE}" "${CHROME_FOLDER_PATH}"
 		if [ -e "${CHROME_FOLDER_PATH}" ]; then
 			cd "${CHROME_FOLDER_PATH}"
-			mv -i ./opt/google/chrome/* ./
+			if [ -e "./opt/google/chrome-beta" ]; then
+				mv -i ./opt/google/chrome-beta/* ./
+			else
+				mv -i ./opt/google/chrome/* ./
+			fi
 			rm -rf ./etc/ ./opt/ ./usr/
 			# Change user owner and permissions of the Chrome Sandbox file.
 			sudo chown root:root chrome-sandbox
@@ -139,8 +143,8 @@ function install_package {
 			sudo ln -s /opt/google/chrome/google-chrome
 			# Finishing
 			echo
-			success "Package installed correctly in: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
-			success "Press CTRL + F2 and type \e[0;93mgoogle-chrome\e[0m"
+			success "Package installed in: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
+			success "Press ALT + F2 and type \e[0;93mgoogle-chrome\e[0m"
 		else
 			fail 'Package installation failed, try again.'
 		fi
