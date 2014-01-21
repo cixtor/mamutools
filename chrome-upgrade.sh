@@ -90,6 +90,15 @@ function remove_old_version {
 			fail 'You need to remove all the old versions of Google Chrome to continue.'
 		fi
 	fi
+
+	CONFIG_FILES_PATH="${HOME}/.config/google-chrome"
+	if [ -e "${CONFIG_FILES_PATH}" ]; then
+		question 'Remove old configuration files (Y/n)'
+		read REMOVE
+		if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
+			sudo rm -rf "${CONFIG_FILES_PATH}"
+		fi
+	fi
 }
 function goto_google_folder {
 	if [ ! -e "${GOOGLE_FOLDER_PATH}" ]; then sudo mkdir "${GOOGLE_FOLDER_PATH}"; fi
