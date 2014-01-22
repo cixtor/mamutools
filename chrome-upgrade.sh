@@ -93,10 +93,19 @@ function remove_old_version {
 
 	CONFIG_FILES_PATH="${HOME}/.config/google-chrome"
 	if [ -e "${CONFIG_FILES_PATH}" ]; then
-		question 'Remove old configuration files (Y/n)'
+		question 'Remove old configuration files (stable edition) (Y/n)'
 		read REMOVE
 		if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
 			sudo rm -rf "${CONFIG_FILES_PATH}"
+		fi
+	fi
+
+	BETA_CONFIG_FILES_PATH="${HOME}/.config/google-chrome-beta"
+	if [ -e "${BETA_CONFIG_FILES_PATH}" ]; then
+		question 'Remove old configuration files (beta edition) (Y/n)'
+		read REMOVE
+		if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
+			sudo rm -rf "${BETA_CONFIG_FILES_PATH}"
 		fi
 	fi
 }
