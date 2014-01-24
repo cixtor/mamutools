@@ -108,6 +108,15 @@ function remove_old_version {
             sudo rm -rf "${BETA_CONFIG_FILES_PATH}"
         fi
     fi
+
+    CACHE_FILES_PATH="${HOME}/.cache/google-chrome"
+    if [ -e "${CACHE_FILES_PATH}" ]; then
+        question 'Remove old cache files (stable edition) (Y/n)'
+        read REMOVE
+        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
+            sudo rm -rf "${CACHE_FILES_PATH}"
+        fi
+    fi
 }
 function goto_google_folder {
     if [ ! -e "${GOOGLE_FOLDER_PATH}" ]; then sudo mkdir "${GOOGLE_FOLDER_PATH}"; fi
