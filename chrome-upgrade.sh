@@ -111,20 +111,16 @@ function remove_old_version {
 
     CACHE_FILES_PATH="${HOME}/.cache/google-chrome"
     if [ -e "${CACHE_FILES_PATH}" ]; then
-        question 'Remove old cache files (stable edition) (Y/n)'
-        read REMOVE
-        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
-            sudo rm -rf "${CACHE_FILES_PATH}"
-        fi
+        echo -en "    Removing old cache files (stable edition)... "
+        sudo rm -rf "${CACHE_FILES_PATH}"
+        success
     fi
 
     BETA_CACHE_FILES_PATH="${HOME}/.cache/google-chrome-beta"
     if [ -e "${BETA_CACHE_FILES_PATH}" ]; then
-        question 'Remove old cache files (stable edition) (Y/n)'
-        read REMOVE
-        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
-            sudo rm -rf "${BETA_CACHE_FILES_PATH}"
-        fi
+        echo -en "    Removing old cache files (beta edition)... "
+        sudo rm -rf "${BETA_CACHE_FILES_PATH}"
+        success
     fi
 }
 function goto_google_folder {
