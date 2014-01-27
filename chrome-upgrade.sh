@@ -175,8 +175,16 @@ function install_package {
             sudo ln -s /opt/google/chrome/google-chrome
             # Finishing
             echo
-            success "Package installed in: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
+            success "Package installed at: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
             success "Press ALT + F2 and type \e[0;93mgoogle-chrome\e[0m"
+            # Send desktop notification
+            notify_send=$(which notify-send)
+            if [ $notify_send ]; then
+                $notify_send \
+                    -i /opt/google/chrome/product_logo_256.png \
+                    "Google Chrome Upgrade" \
+                    "Package installed at: ${CHROME_FOLDER_PATH}\nPress ALT + F2 and type 'google-chrome'"
+            fi
         else
             fail 'Package installation failed, try again.'
         fi
