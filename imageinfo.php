@@ -60,7 +60,7 @@ function show_image_info($filepath='', $strpad_req, $strpad_max){
             echo " with \033[0;93m{$image_info['bits']} bits\033[0m";
         }
         if( isset($image_info[0]) AND isset($image_info[1]) ){
-            echo " and size: \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m";
+            echo " and \033[0;92m{$image_info[0]}x{$image_info[1]}\033[0m pixels";
         }
         echo "\n";
     }else{
@@ -93,7 +93,9 @@ if( count($argv)>1 ){
     echo "  https://github.com/cixtor/mamutools\n";
     echo "  http://php.net/manual/en/function.getimagesize.php\n";
     echo "\n";
-    echo "Usage: {$this_filename} image_file_path.{jpg,gif,png}\n";
+    echo "Usage:\n";
+    echo "  {$this_filename} image_file_path.{jpg,gif,png}\n";
+    echo "  {$this_filename} /image/folder/\n";
     exit;
 }
 /* EOF */
