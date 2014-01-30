@@ -46,7 +46,7 @@ func main(){
     flag.Parse()
     location := flag.Arg(0)
 
-    if( location == "" ){
+    if location == "" {
         fmt.Println("File Size")
         fmt.Println("  http://cixtor.com/")
         fmt.Println("  https://github.com/cixtor/mamutools")
@@ -63,11 +63,11 @@ func main(){
 func file_size(location string){
     finfo, err := os.Stat(location)
 
-    if( err == nil ){
+    if err == nil {
         fmt.Printf("Location: %s\n", location)
 
         mm, err := magicmime.New()
-        if( err != nil ){ fmt.Printf("Error ocurred") }
+        if err != nil { fmt.Printf("Error ocurred") }
         mimetype, err := mm.TypeByFile(location)
         fmt.Printf("Mimetype: %s\n", mimetype)
 
@@ -81,16 +81,16 @@ func file_size(location string){
 
 func remote_file_size(location string){
     match_scheme, _ := regexp.MatchString("^(http|https)://", location)
-    if( ! match_scheme ){ location = fmt.Sprintf("http://%s", location) }
+    if ! match_scheme { location = fmt.Sprintf("http://%s", location) }
 
     client := &http.Client{}
     req, err := http.NewRequest("HEAD", location, nil)
 
-    if( err == nil ){
+    if err == nil {
         req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
         resp, err := client.Do(req)
 
-        if( err == nil ){
+        if err == nil {
             fmt.Printf("Location: %s\n", location)
             fmt.Printf("Mimetype: %s\n", resp.Header.Get("Content-Type"))
             fmt.Printf("Filesize: %d bytes\n", resp.ContentLength)
@@ -112,7 +112,7 @@ func readable_size(bytes int64) string {
     var base float64 = 1000 // List command in UNIX use 1000 instead of 1024
     sizes := []string{ "B", "KB", "MB", "GB", "TB", "PB", "EB" }
 
-    if( bytes < 10 ){
+    if bytes < 10 {
         return fmt.Sprintf("%dB", bytes)
     }
 
@@ -120,7 +120,7 @@ func readable_size(bytes int64) string {
     suffix := sizes[int(e)]
     val := float64(bytes) / math.Pow(base, math.Floor(e))
     f := "%.0f"
-    if( val < 10 ){ f = "%.1f" }
+    if val < 10 { f = "%.1f" }
 
     return fmt.Sprintf(f+"%s", val, suffix)
 }
