@@ -33,6 +33,7 @@ import (
     "strings"
     "math/rand"
     "time"
+    "os"
 )
 
 var length    = flag.Int("length", 10, "Set the length of each password. Default: 10")
@@ -60,6 +61,11 @@ func main() {
     }
 
     flag.Parse()
+
+    if *count == 0 || *length == 0 {
+        flag.Usage()
+        os.Exit(1)
+    }
 
     if *all_types {
         for _, key_values := range dictionary {
