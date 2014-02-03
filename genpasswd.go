@@ -33,7 +33,6 @@ import (
     "strings"
     "math/rand"
     "time"
-    "os"
 )
 
 var length    = flag.Int("length", 10, "Set the length of each password. Default: 10")
@@ -62,47 +61,46 @@ func main() {
 
     flag.Parse()
 
-    if *count == 0 || *length == 0 {
-        flag.Usage()
-        os.Exit(1)
-    }
-
-    if *all_types {
-        for _, key_values := range dictionary {
-            user_dict += key_values
-        }
-    }
-
-    if *type_dict != "" && user_dict == "" {
-        if len(*type_dict) == 1 {
+    if *count > 0 && *length > 0 {
+        if *all_types {
             for _, key_values := range dictionary {
-                if strings.Contains(key_values, *type_dict) {
-                    user_dict = key_values
-                    break
-                }
+                user_dict += key_values
             }
-        }else{
-            for _, c := range *type_dict {
+        }
+
+        if *type_dict != "" && user_dict == "" {
+            if len(*type_dict) == 1 {
                 for _, key_values := range dictionary {
-                    if strings.Contains(key_values, string(c)) {
-                        user_dict += key_values
+                    if strings.Contains(key_values, *type_dict) {
+                        user_dict = key_values
+                        break
+                    }
+                }
+            }else{
+                for _, c := range *type_dict {
+                    for _, key_values := range dictionary {
+                        if strings.Contains(key_values, string(c)) {
+                            user_dict += key_values
+                        }
                     }
                 }
             }
         }
-    }
 
-    rand.Seed( time.Now().UnixNano())
+        rand.Seed( time.Now().UnixNano())
 
-    for i := 0; i < *count; i++ {
-        var password string
-        var dict_length int = len(user_dict)
+        for i := 0; i < *count; i++ {
+            var password string
+            var dict_length int = len(user_dict)
 
-        for j := 0; j < *length; j++ {
-            var char_pos int = rand.Intn(dict_length)
-            password += string(user_dict[char_pos])
+            for j := 0; j < *length; j++ {
+                var char_pos int = rand.Intn(dict_length)
+                password += string(user_dict[char_pos])
+            }
+
+            fmt.Printf("%s\n", password)
         }
-
-        fmt.Printf("%s\n", password)
+    }else{
+        flag.Usage()
     }
 }
