@@ -67,7 +67,7 @@ import "flag"
 import "strings"
 import "os"
 
-var action = flag.String("action", "", "Action to perform, either 'capitalize' or 'dash'")
+var action = flag.String("action", "", "Action to perform, either 'camel' or 'dash'")
 var filename = flag.String("filename", "", "Full absolute or relative path of the file")
 var batch = flag.Bool("batch", false, "Whether the user should confirm the execution or not")
 
@@ -95,17 +95,18 @@ func main() {
     }
 
     var new_filename string
+    var filename_lower string = strings.ToLower(*filename)
 
-    if *action == "capitalize" {
-        new_filename_arr := strings.Split(*filename, " ")
+    if *action == "camel" {
+        new_filename_arr := strings.Split(filename_lower, " ")
         for i, word := range new_filename_arr {
             new_filename_arr[i] = strings.ToUpper(string(word[0])) + word[1:len(word)]
         }
         new_filename = strings.Join(new_filename_arr, "")
     } else if *action == "dash" {
-        new_filename = strings.Replace(*filename, " ", "-", -1)
+        new_filename = strings.Replace(filename_lower, " ", "-", -1)
     } else {
-        fmt.Println("Action not allowed, use one of these: capitalize, dash")
+        fmt.Println("Action not allowed, use one of these: camel, dash")
         flag.Usage()
         os.Exit(1)
     }
