@@ -67,7 +67,7 @@ import "flag"
 import "strings"
 import "os"
 
-var action = flag.String("action", "", "Action to perform, either 'camel' or 'dash'")
+var action = flag.String("action", "", "Action to perform with the filename: camel, dash, snake")
 var filename = flag.String("filename", "", "Full absolute or relative path of the file")
 var batch = flag.Bool("batch", false, "Whether the user should confirm the execution or not")
 
@@ -105,8 +105,10 @@ func main() {
         new_filename = strings.Join(new_filename_arr, "")
     } else if *action == "dash" {
         new_filename = strings.Replace(filename_lower, " ", "-", -1)
+    } else if *action == "snake" {
+        new_filename = strings.Replace(filename_lower, " ", "_", -1)
     } else {
-        fmt.Println("Action not allowed, use one of these: camel, dash")
+        fmt.Println("Action not allowed, use one of these: camel, dash, snake")
         flag.Usage()
         os.Exit(1)
     }
