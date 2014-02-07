@@ -20,17 +20,22 @@ As the scripts are not correlated among them, you probably will want to check th
 
 **WARNING!** This procedure refers to a Linux Debian based system, as I don't know very well other environments, I can't ensure that this will work in your machine if you use other Operating System. Most of the commands will work in a UNIX based system, maybe you'll have to change a few commands.
 
-```
+```shell
 $ cd /opt/
 $ git clone https://github.com/cixtor/mamutools.git
 $ chmod 755 ./mamutools/*.{rb,sh,php}
+$ for file in $(ls -1 /opt/mamutools/*.go); do \
+    echo -n "Compiling '${file}'... "; \
+    go build $file && rm -f $file; \
+    echo 'Done'; \
+  done
 $ echo 'export PATH="$PATH:/opt/mamutools"' >> ~/.bashrc
 $ source ~/.bashrc
 ```
 
 ### Uninstall
 
-```
+```shell
 $ rm -rf /opt/mamutools/
 $ REMOVE_LINE=$(cat ~/.bashrc | grep -n mamutools | awk -F ':' '{print $1}')
 $ echo -e "Remove line \e[0;91m${REMOVE_LINE}\e[0m from $HOME/.bashrc"
