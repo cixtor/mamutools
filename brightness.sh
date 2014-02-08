@@ -28,26 +28,26 @@ FILEPATH="/sys/class/backlight/acpi_video0/brightness"
 #
 echo "Setting brightness to: ${LEVEL}"
 if [ -w "${FILEPATH}" ]; then
-	echo "The brightness file is writable"
+    echo "The brightness file is writable"
 else
-	echo "Granting permissions to write on the brightness file to the current user"
-	gksu chmod 777 "${FILEPATH}"
-	if [ -w "${FILEPATH}" ]; then
-		echo "Permission to write on the brightness file granted successfully"
-	else
-		echo "Error granting permission to write on the brightness file"
-		zenity --error --title='Set brightness level' --text='Set brightness level\nThe brightness file is not writable.'
-	fi
+    echo "Granting permissions to write on the brightness file to the current user"
+    gksu chmod 777 "${FILEPATH}"
+    if [ -w "${FILEPATH}" ]; then
+        echo "Permission to write on the brightness file granted successfully"
+    else
+        echo "Error granting permission to write on the brightness file"
+        zenity --error --title='Set brightness level' --text='Set brightness level\nThe brightness file is not writable.'
+    fi
 fi
 if [ "${LEVEL}" != "" ]; then
-	if [ $LEVEL -gt -1 -a $LEVEL -lt 10 ]; then
-		echo "${LEVEL}" > "${FILEPATH}"
-	else
-		echo "Invalid value, use a number in range 0-9"
-		zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, use a number in range 0-9'
-	fi
+    if [ $LEVEL -gt -1 -a $LEVEL -lt 10 ]; then
+        echo "${LEVEL}" > "${FILEPATH}"
+    else
+        echo "Invalid value, use a number in range 0-9"
+        zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, use a number in range 0-9'
+    fi
 else
-	echo "Invalid value, type a number as argument"
-	zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, type a number as argument'
+    echo "Invalid value, type a number as argument"
+    zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, type a number as argument'
 fi
 #

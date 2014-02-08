@@ -37,57 +37,57 @@ SCM=$1
 REPOSITORY=$2
 #
 function help {
-	echo 'Source Code Management to Package'
-	echo '  http://cixtor.com/'
-	echo '  https://github.com/cixtor/mamutools'
-	echo '  http://en.wikipedia.org/wiki/Compression_program'
-	echo
-	echo "Usage: $0 [git|hg|svn] [remote_repository]"
-	echo
+    echo 'Source Code Management to Package'
+    echo '  http://cixtor.com/'
+    echo '  https://github.com/cixtor/mamutools'
+    echo '  http://en.wikipedia.org/wiki/Compression_program'
+    echo
+    echo "Usage: $0 [git|hg|svn] [remote_repository]"
+    echo
 }
 function fail {
-	echo -e "\e[0;91m[x] Error.\e[0m ${1}"
-	exit
+    echo -e "\e[0;91m[x] Error.\e[0m ${1}"
+    exit
 }
 function success {
-	echo -e "\e[0;92mOK.\e[0m ${1}"
+    echo -e "\e[0;92mOK.\e[0m ${1}"
 }
 function question {
-	echo -en "\e[0;94m[?]\e[0m ${1}"
+    echo -en "\e[0;94m[?]\e[0m ${1}"
 }
 #
 help
 if [ "${SCM}" == '' ]; then
-	question "Which SCM do you want to use? (git, hg, svn): "
-	read SCM_BINARY
-	SCM=$SCM_BINARY
+    question "Which SCM do you want to use? (git, hg, svn): "
+    read SCM_BINARY
+    SCM=$SCM_BINARY
 fi
 if [ "${REPOSITORY}" == '' ]; then
-	question "Specify the URL for the remote repository: "
-	read REMOTE_REPOSITORY
-	REPOSITORY=$REMOTE_REPOSITORY
+    question "Specify the URL for the remote repository: "
+    read REMOTE_REPOSITORY
+    REPOSITORY=$REMOTE_REPOSITORY
 fi
 if [[ "${SCM}" =~ (git|hg|svn) ]]; then
-	if [ $(which $SCM) ]; then
-		if [ "${SCM}" == 'svn' ]; then PARAMETER='co'; else PARAMETER='clone'; fi
-		$(which $SCM) $PARAMETER "${REPOSITORY}"
-		FOLDERNAME=$(ls -1t | head -n 1)
-		if [ -e "${FOLDERNAME}" ]; then
-			PACKAGE="${FOLDERNAME}.tar.bz2"
-			tar -c "${FOLDERNAME}" | bzip2 > "${PACKAGE}"
-			if [ -e "${PACKAGE}" ]; then
-				rm -rf "${FOLDERNAME}" && echo
-				success "Package created at: \e[0;93m${PACKAGE}\e[0m"
-			else
-				fail "The package was not created, check manually to be sure."
-			fi
-		else
-			fail "The cloned repository was not detected in the current page."
-		fi
-	else
-		fail "The SCM '${SCM}' was not detected in your system path or it is not valid."
-	fi
+    if [ $(which $SCM) ]; then
+        if [ "${SCM}" == 'svn' ]; then PARAMETER='co'; else PARAMETER='clone'; fi
+        $(which $SCM) $PARAMETER "${REPOSITORY}"
+        FOLDERNAME=$(ls -1t | head -n 1)
+        if [ -e "${FOLDERNAME}" ]; then
+            PACKAGE="${FOLDERNAME}.tar.bz2"
+            tar -c "${FOLDERNAME}" | bzip2 > "${PACKAGE}"
+            if [ -e "${PACKAGE}" ]; then
+                rm -rf "${FOLDERNAME}" && echo
+                success "Package created at: \e[0;93m${PACKAGE}\e[0m"
+            else
+                fail "The package was not created, check manually to be sure."
+            fi
+        else
+            fail "The cloned repository was not detected in the current page."
+        fi
+    else
+        fail "The SCM '${SCM}' was not detected in your system path or it is not valid."
+    fi
 else
-	fail "The SCM '${SCM}' is not supported."
+    fail "The SCM '${SCM}' is not supported."
 fi
 #
