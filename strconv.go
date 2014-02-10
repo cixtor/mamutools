@@ -25,3 +25,29 @@
  * functions. However such languages may implement a subset of explicit string-
  * specific functions as well.
  */
+
+package main
+
+import (
+    "fmt"
+    "flag"
+)
+
+var action = flag.String("action", "none", "String convertion that will be executed")
+var text = flag.String("text", "", "Text string that will be processed")
+
+func main() {
+    flag.Usage = func(){
+        fmt.Println("String Conversion")
+        fmt.Println("  http://cixtor.com/")
+        fmt.Println("  https://github.com/cixtor/mamutools")
+        fmt.Println("  http://en.wikipedia.org/wiki/String_(computer_science)")
+        fmt.Println("  http://en.wikipedia.org/wiki/String_functions")
+        fmt.Println("Usage:")
+        flag.PrintDefaults()
+    }
+
+    flag.Parse()
+
+    fmt.Printf("%s( %s )\n", *action, *text)
+}
