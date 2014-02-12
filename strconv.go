@@ -31,10 +31,15 @@ package main
 import (
     "fmt"
     "flag"
+    "strings"
 )
 
 var action = flag.String("action", "none", "String convertion that will be executed")
 var text = flag.String("text", "", "Text string that will be processed")
+var old_str = flag.String("old", "", "Text string that will be replaced")
+var new_str = flag.String("new", "", "Text string that will replace the old one")
+
+var replace = flag.Bool("replace", false, "Replace a text string with another")
 
 func main() {
     flag.Usage = func(){
@@ -49,5 +54,12 @@ func main() {
 
     flag.Parse()
 
-    fmt.Printf("%s( %s )\n", *action, *text)
+    if *replace == true {
+        *action = "replace"
+    }
+
+    switch *action {
+    case "replace":
+        fmt.Printf( "%s\n", strings.Replace(*text, *old_str, *new_str, -1) )
+    }
 }
