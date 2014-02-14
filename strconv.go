@@ -41,6 +41,7 @@ var new_str = flag.String("new", "", "Text string that will replace the old one"
 
 var replace = flag.Bool("replace", false, "Replace a text string with another")
 var capitalize = flag.Bool("capitalize", false, "Convert a text string into a capitalized version of its words")
+var uppercase = flag.Bool("uppercase", false, "Convert all the characters in a text string into their capital form")
 
 func main() {
     flag.Usage = func(){
@@ -63,10 +64,16 @@ func main() {
         *action = "capitalize"
     }
 
+    if *uppercase == true {
+        *action = "uppercase"
+    }
+
     switch *action {
     case "replace":
         fmt.Printf( "%s\n", strings.Replace(*text, *old_str, *new_str, -1) )
     case "capitalize":
         fmt.Printf( "%s\n", strings.Title(*text) )
+    case "uppercase":
+        fmt.Printf( "%s\n", strings.ToUpper(*text) )
     }
 }
