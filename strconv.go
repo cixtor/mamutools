@@ -29,6 +29,7 @@
 package main
 
 import (
+    "os"
     "fmt"
     "flag"
     "strings"
@@ -82,5 +83,9 @@ func main() {
         fmt.Printf( "%s\n", strings.ToUpper(*text) )
     case "lowercase":
         fmt.Printf( "%s\n", strings.ToLower(*text) )
+    default:
+        flag.Usage()
+        fmt.Printf("Error. Action specified is not allowed\n")
+        os.Exit(1)
     }
 }
