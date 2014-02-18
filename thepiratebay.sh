@@ -4,7 +4,7 @@
 # http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://cixtor.com/blog/the-pirate-bay-search
-# http://thepiratebay.sx/
+# http://thepiratebay.se/
 #
 # The Pirate Bay is the worlds largest bittorrent tracker. Bittorrent is a file-
 # sharing protocol that in a reliable way enables big and fast file transfers.
@@ -31,14 +31,14 @@ zenity --entry --title='The Pirate Bay - Search' \
 --text='The Pirate Bay
   http://cixtor.com/
   https://github.com/cixtor/mamutools
-  http://thepiratebay.sx/
+  http://thepiratebay.se/
 
 Search in the worlds largest bittorrent tracker,
 where anyone can upload/download torrent files,
 write comments and... Of course: FREE'
 )
 if [ "${SEARCH}" != "" ]; then
-    URL=$(echo "http://thepiratebay.sx/search/${SEARCH}/0/7" | sed 's/ /+/g')
+    URL=$(echo "http://thepiratebay.se/search/${SEARCH}/0/7" | sed 's/ /+/g')
     echo "Starting the default web-browser with this URL: ${URL}"
       if [ $(which xdg-open)      ]; then $(which xdg-open) "${URL}"
     elif [ $(which firefox)       ]; then $(which firefox) "${URL}"
