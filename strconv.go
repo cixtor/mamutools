@@ -33,6 +33,8 @@ import (
     "fmt"
     "flag"
     "strings"
+    "crypto/md5"
+    "io"
 )
 
 var action = flag.String("action", "none", "String convertion that will be executed")
@@ -44,6 +46,7 @@ var replace = flag.Bool("replace", false, "Replace a text string with another")
 var capitalize = flag.Bool("capitalize", false, "Convert a text string into a capitalized version of its words")
 var uppercase = flag.Bool("uppercase", false, "Convert all the characters in a text string into their capital form")
 var lowercase = flag.Bool("lowercase", false, "Convert all the characters in a text string into their lower form")
+var hash_md5 = flag.Bool("md5", false, "Calculate the md5 hash of the string specified")
 
 func main() {
     flag.Usage = func(){
@@ -74,6 +77,10 @@ func main() {
         *action = "lowercase"
     }
 
+    if *hash_md5 == true {
+        *action = "md5"
+    }
+
     switch *action {
     case "replace":
         fmt.Printf( "%s\n", strings.Replace(*text, *old_str, *new_str, -1) )
@@ -83,6 +90,10 @@ func main() {
         fmt.Printf( "%s\n", strings.ToUpper(*text) )
     case "lowercase":
         fmt.Printf( "%s\n", strings.ToLower(*text) )
+    case "md5":
+        hash := md5.New()
+        io.WriteString(hash, *text)
+        fmt.Printf("%x\n", hash.Sum(nil))
     default:
         flag.Usage()
         fmt.Printf("Error. Action specified is not allowed\n")
