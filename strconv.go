@@ -34,6 +34,7 @@ import (
     "flag"
     "strings"
     "crypto/md5"
+    "crypto/sha1"
     "io"
 )
 
@@ -47,6 +48,7 @@ var capitalize = flag.Bool("capitalize", false, "Convert a text string into a ca
 var uppercase = flag.Bool("uppercase", false, "Convert all the characters in a text string into their capital form")
 var lowercase = flag.Bool("lowercase", false, "Convert all the characters in a text string into their lower form")
 var hash_md5 = flag.Bool("md5", false, "Calculate the md5 hash of the string specified")
+var hash_sha1 = flag.Bool("sha1", false, "Calculate the sha1 hash of the string specified")
 
 func main() {
     flag.Usage = func(){
@@ -61,42 +63,41 @@ func main() {
 
     flag.Parse()
 
-    if *replace == true {
-        *action = "replace"
-    }
-
-    if *capitalize == true {
-        *action = "capitalize"
-    }
-
-    if *uppercase == true {
-        *action = "uppercase"
-    }
-
-    if *lowercase == true {
-        *action = "lowercase"
-    }
-
-    if *hash_md5 == true {
-        *action = "md5"
-    }
-
-    switch *action {
-    case "replace":
+    if *action == "replace" || *replace == true {
         fmt.Printf( "%s\n", strings.Replace(*text, *old_str, *new_str, -1) )
-    case "capitalize":
+        os.Exit(0)
+    }
+
+    if *action == "capitalize" || *capitalize == true {
         fmt.Printf( "%s\n", strings.Title(*text) )
-    case "uppercase":
+        os.Exit(0)
+    }
+
+    if *action == "uppercase" || *uppercase == true {
         fmt.Printf( "%s\n", strings.ToUpper(*text) )
-    case "lowercase":
+        os.Exit(0)
+    }
+
+    if *action == "lowercase" || *lowercase == true {
         fmt.Printf( "%s\n", strings.ToLower(*text) )
-    case "md5":
+        os.Exit(0)
+    }
+
+    if *action == "md5" || *hash_md5 == true {
         hash := md5.New()
         io.WriteString(hash, *text)
         fmt.Printf("%x\n", hash.Sum(nil))
-    default:
-        flag.Usage()
-        fmt.Printf("Error. Action specified is not allowed\n")
-        os.Exit(1)
+        os.Exit(0)
     }
+
+    if *action == "sha1" || *hash_sha1 == true {
+        hash := sha1.New()
+        io.WriteString(hash, *text)
+        fmt.Printf("%x\n", hash.Sum(nil))
+        os.Exit(0)
+    }
+
+    flag.Usage()
+    fmt.Printf("Error. Action specified is not allowed\n")
+    os.Exit(1)
 }
