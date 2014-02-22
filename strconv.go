@@ -49,6 +49,7 @@ var uppercase = flag.Bool("uppercase", false, "Convert all the characters in a t
 var lowercase = flag.Bool("lowercase", false, "Convert all the characters in a text string into their lower form")
 var hash_md5 = flag.Bool("md5", false, "Calculate the md5 hash of the string specified")
 var hash_sha1 = flag.Bool("sha1", false, "Calculate the sha1 hash of the string specified")
+var length = flag.Bool("length", false, "Returns the length of the string specified")
 
 func main() {
     flag.Usage = func(){
@@ -94,6 +95,11 @@ func main() {
         hash := sha1.New()
         io.WriteString(hash, *text)
         fmt.Printf("%x\n", hash.Sum(nil))
+        os.Exit(0)
+    }
+
+    if *action == "length" || *length == true {
+        fmt.Printf("%d\n", len(*text))
         os.Exit(0)
     }
 
