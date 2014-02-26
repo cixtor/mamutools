@@ -35,6 +35,7 @@ import (
     "strings"
     "crypto/md5"
     "crypto/sha1"
+    "encoding/base64"
     "io"
 )
 
@@ -50,6 +51,7 @@ var lowercase = flag.Bool("lowercase", false, "Convert all the characters in a t
 var hash_md5 = flag.Bool("md5", false, "Calculate the md5 hash of the string specified")
 var hash_sha1 = flag.Bool("sha1", false, "Calculate the sha1 hash of the string specified")
 var length = flag.Bool("length", false, "Returns the length of the string specified")
+var base64_enc = flag.Bool("b64enc", false, "Encodes data with MIME base64")
 
 func main() {
     flag.Usage = func(){
@@ -100,6 +102,11 @@ func main() {
 
     if *action == "length" || *length == true {
         fmt.Printf("%d\n", len(*text))
+        os.Exit(0)
+    }
+
+    if *action == "b64enc" || *base64_enc == true {
+        fmt.Printf("%s\n", base64.StdEncoding.EncodeToString([]byte(*text)))
         os.Exit(0)
     }
 
