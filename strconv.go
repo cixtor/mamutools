@@ -52,6 +52,7 @@ var hash_md5 = flag.Bool("md5", false, "Calculate the md5 hash of the string spe
 var hash_sha1 = flag.Bool("sha1", false, "Calculate the sha1 hash of the string specified")
 var length = flag.Bool("length", false, "Returns the length of the string specified")
 var base64_enc = flag.Bool("b64enc", false, "Encodes data with MIME base64")
+var base64_dec = flag.Bool("b64dec", false, "Decodes data encoded with MIME base64")
 
 func main() {
     flag.Usage = func(){
@@ -107,6 +108,16 @@ func main() {
 
     if *action == "b64enc" || *base64_enc == true {
         fmt.Printf("%s\n", base64.StdEncoding.EncodeToString([]byte(*text)))
+        os.Exit(0)
+    }
+
+    if *action == "b64dec" || *base64_dec == true {
+        data, err := base64.StdEncoding.DecodeString(*text)
+        if err != nil {
+            fmt.Println("Error:", err)
+            os.Exit(1)
+        }
+        fmt.Printf("%q\n", data)
         os.Exit(0)
     }
 
