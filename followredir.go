@@ -65,21 +65,22 @@ func main() {
     if len(os.Args) == 2 {
         var location string = os.Args[1]
 
-        var r = regexp.MustCompile(`^([a-zA-Z]+)://(.*)`)
+        var r = regexp.MustCompile(`^([f|ht]+tp+s?):\/\/(.+)`)
         var scheme []string = r.FindStringSubmatch(location)
 
         if len(scheme) == 3 {
-            if scheme[1] == "http" || scheme[1] == "https" {
-                fmt.Printf("Original: %s\n", location)
-                follow_redir(location)
-            } else {
+            if scheme[1] == "ftp" || scheme[1] == "ftps" {
                 fmt.Printf("URL protocol not allowed, use only HTTP or HTTPS\n")
                 os.Exit(1)
+            } else {
+                fmt.Printf("Original: %s\n", location)
+                follow_redir(location)
             }
         } else {
-            fmt.Printf("Malformed URL, it must be like this: (http|https)://example.com/\n")
-            os.Exit(1)
+            location = "http://" + location
+            fmt.Printf("%s\n", location)
         }
+        os.Exit(0)
     } else {
         fmt.Printf("Usage: %s <URL>\n", os.Args[0])
         os.Exit(1)
