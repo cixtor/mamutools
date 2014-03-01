@@ -23,9 +23,10 @@ import (
     "fmt"
     "regexp"
     "net/http"
+    "io/ioutil"
 )
 
-func follow_redir(location string) {
+func follow_redirect(location string) {
     req, err1 := http.NewRequest("HEAD", location, nil)
     req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
     if err1 != nil {
@@ -42,23 +43,53 @@ func follow_redir(location string) {
     var redirection string = resp.Header.Get("Location")
     if redirection != "" {
         fmt.Printf("Redirect (%s): %s\n", resp.Status, redirection)
-        follow_redir(redirection)
+        follow_redirect(redirection)
     } else {
-        fmt.Printf("%s\n", "---------")
-        fmt.Printf("%s %s\n", resp.Proto, resp.Status)
-        for header_key, header_value := range resp.Header {
-            var values int = len(header_value)
-            if values == 1 {
-                fmt.Printf("%s: %s\n", header_key, header_value[0])
-            } else if values > 1 {
-                fmt.Printf("%s:\n", header_key)
-                for _, value := range header_value {
-                    fmt.Printf("  %s\n", value)
+        meta_redirect, meta_location := follow_meta_redirect(location)
+
+        if meta_redirect {
+            fmt.Printf("Redirect (%s): %s\n", "303 See Other", meta_location)
+            follow_redirect(meta_location)
+        } else {
+            fmt.Printf("%s\n", "---------")
+            fmt.Printf("%s %s\n", resp.Proto, resp.Status)
+            for header_key, header_value := range resp.Header {
+                var values int = len(header_value)
+                if values == 1 {
+                    fmt.Printf("%s: %s\n", header_key, header_value[0])
+                } else if values > 1 {
+                    fmt.Printf("%s:\n", header_key)
+                    for _, value := range header_value {
+                        fmt.Printf("  %s\n", value)
+                    }
                 }
             }
+            os.Exit(0)
         }
-        os.Exit(0)
     }
+}
+
+func follow_meta_redirect(location string) (bool, string) {
+    client := &http.Client{ }
+    req, err3 := http.NewRequest("GET", location, nil)
+
+    if err3 == nil {
+        req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
+        resp, err4 := client.Do(req)
+
+        if err4 == nil {
+            defer resp.Body.Close()
+            body, _ := ioutil.ReadAll(resp.Body)
+            var r = regexp.MustCompile(`content=.[0-9]+;[ ]+?URL=(.+)"`)
+            var results []string = r.FindStringSubmatch( string(body) )
+
+            if len(results) == 2 {
+                return true, results[1]
+            }
+        }
+    }
+
+    return false, ""
 }
 
 func main() {
@@ -68,18 +99,17 @@ func main() {
         var r = regexp.MustCompile(`^([f|ht]+tp+s?):\/\/(.+)`)
         var scheme []string = r.FindStringSubmatch(location)
 
-        if len(scheme) == 3 {
+        if len(scheme) == 2 {
             if scheme[1] == "ftp" || scheme[1] == "ftps" {
                 fmt.Printf("URL protocol not allowed, use only HTTP or HTTPS\n")
                 os.Exit(1)
-            } else {
-                fmt.Printf("Original: %s\n", location)
-                follow_redir(location)
             }
         } else {
             location = "http://" + location
-            fmt.Printf("%s\n", location)
         }
+
+        fmt.Printf("Original: %s\n", location)
+        follow_redirect(location)
         os.Exit(0)
     } else {
         fmt.Printf("Usage: %s <URL>\n", os.Args[0])
