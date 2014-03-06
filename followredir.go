@@ -99,7 +99,7 @@ func main() {
         var r = regexp.MustCompile(`^([f|ht]+tp+s?):\/\/(.+)`)
         var scheme []string = r.FindStringSubmatch(location)
 
-        if len(scheme) == 2 {
+        if len(scheme) == 3 {
             if scheme[1] == "ftp" || scheme[1] == "ftps" {
                 fmt.Printf("URL protocol not allowed, use only HTTP or HTTPS\n")
                 os.Exit(1)
