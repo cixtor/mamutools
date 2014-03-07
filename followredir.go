@@ -42,6 +42,17 @@ func follow_redirect(location string) {
 
     var redirection string = resp.Header.Get("Location")
     if redirection != "" {
+        fix_location, _ := regexp.MatchString(`^\/`, redirection)
+
+        if fix_location {
+            r := regexp.MustCompile(`^(http|https):\/\/([^\/]+)`)
+            var loc_scheme []string = r.FindStringSubmatch(location)
+            var full_redirection string = loc_scheme[1] + "://" + loc_scheme[2] + redirection
+
+            fmt.Printf("Relative (%s): %s\n", redirection, full_redirection)
+            redirection = full_redirection
+        }
+
         fmt.Printf("Redirect (%s): %s\n", resp.Status, redirection)
         follow_redirect(redirection)
     } else {
