@@ -31,19 +31,6 @@ var gallery_id = flag.String("gallery", "", "Specify the gallery identifier to d
 
 const user_agent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 
-func success(message string){
-    fmt.Printf("\033[0;92mOK.\033[0m %s\n", message)
-}
-
-func highlight(message string){
-    fmt.Printf("\033[0;93m[>]\033[0m %s\n", message)
-}
-
-func fail(message string){
-    fmt.Printf("\033[0;91m[x]\033[0m %s\n", message)
-    os.Exit(1)
-}
-
 func get_remote_content(url string) ([]byte) {
     client := &http.Client{ }
     req, err1 := http.NewRequest("GET", url, nil)
@@ -78,7 +65,7 @@ func get_photo(photo_id string) {
         var results []string = r.FindStringSubmatch(line)
 
         if len(results) > 0 {
-            highlight(fmt.Sprintf( "Downloading '%s' as '%s'", results[1], results[2] ))
+            fmt.Printf( "--> Downloading '%s' as '%s'\n", results[1], results[2] )
             var filedata []byte = get_remote_content(results[1])
             ioutil.WriteFile( results[2], filedata, 0644 )
         }
@@ -90,14 +77,15 @@ func get_gallery(gallery_id string) {
     _, err1 := os.Stat(gallery_folder)
 
     if err1 == nil {
-        success(fmt.Sprintf( "Gallery folder already exists: %s", gallery_folder ))
+        fmt.Printf( "OK. Gallery folder already exists: %s\n", gallery_folder )
     } else {
         err2 := os.Mkdir(gallery_folder, 0755)
 
         if err2 == nil {
-            success(fmt.Sprintf( "Gallery folder created: %s", gallery_folder ))
+            fmt.Printf( "OK. Gallery folder created: %s\n", gallery_folder )
         } else {
-            fail(fmt.Sprintf( "Could not create gallery folder: %s", gallery_folder ))
+            fmt.Printf( "[x] Could not create gallery folder: %s\n", gallery_folder )
+            os.Exit(1)
         }
     }
 
@@ -115,7 +103,7 @@ func get_gallery(gallery_id string) {
         }
     }
 
-    success(fmt.Sprintf( "Finished" ))
+    fmt.Printf( "OK. Finished\n" )
 }
 
 func download(photo_id string, gallery_id string) {
