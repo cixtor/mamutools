@@ -102,14 +102,14 @@ func get_gallery(gallery_id string) {
             get_photo(results[1])
         }
     }
-
-    fmt.Printf( "OK. Finished\n" )
 }
 
 func download(photo_id string, gallery_id string) {
     if photo_id != "" {
+        fmt.Printf( "OK. Download photo: %s\n", photo_id )
         get_photo(photo_id)
     } else if ( gallery_id != "" ){
+        fmt.Printf( "OK. Download gallery: %s\n", gallery_id )
         get_gallery(gallery_id)
     } else {
         fmt.Printf("Missing argument: -photo or -gallery\n")
@@ -131,4 +131,5 @@ func main() {
     flag.Parse()
 
     download( *photo_id, *gallery_id )
+    fmt.Printf( "OK. Finished\n" )
 }
