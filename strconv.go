@@ -36,6 +36,7 @@ import (
     "crypto/md5"
     "crypto/sha1"
     "encoding/base64"
+    "net/url"
     "io"
 )
 
@@ -53,6 +54,7 @@ var hash_sha1 = flag.Bool("sha1", false, "Calculate the sha1 hash of the string 
 var length = flag.Bool("length", false, "Returns the length of the string specified")
 var base64_enc = flag.Bool("b64enc", false, "Encodes data with MIME base64")
 var base64_dec = flag.Bool("b64dec", false, "Decodes data encoded with MIME base64")
+var url_decode = flag.Bool("urldec", false, "Decodes URL-encoded string")
 
 func main() {
     flag.Usage = func(){
@@ -119,6 +121,17 @@ func main() {
         }
         fmt.Printf("%q\n", data)
         os.Exit(0)
+    }
+
+    if *action == "urldec" || *url_decode == true {
+        result, err := url.QueryUnescape(*text)
+        if err == nil {
+            fmt.Printf("%s\n", result)
+            os.Exit(0)
+        } else {
+            fmt.Printf("Error decoding url: %s\n", err)
+            os.Exit(1)
+        }
     }
 
     flag.Usage()
