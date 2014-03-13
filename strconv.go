@@ -55,6 +55,7 @@ var length = flag.Bool("length", false, "Returns the length of the string specif
 var base64_enc = flag.Bool("b64enc", false, "Encodes data with MIME base64")
 var base64_dec = flag.Bool("b64dec", false, "Decodes data encoded with MIME base64")
 var url_decode = flag.Bool("urldec", false, "Decodes URL-encoded string")
+var url_encode = flag.Bool("urlenc", false, "Encodes URL string with their correspondent hex digits")
 
 func main() {
     flag.Usage = func(){
@@ -132,6 +133,11 @@ func main() {
             fmt.Printf("Error decoding url: %s\n", err)
             os.Exit(1)
         }
+    }
+
+    if *action == "urlenc" || *url_encode == true {
+        fmt.Printf("%s\n", url.QueryEscape(*text))
+        os.Exit(0)
     }
 
     flag.Usage()
