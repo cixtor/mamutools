@@ -41,6 +41,16 @@ func follow_redirect(location string) {
     }
 
     var redirection string = resp.Header.Get("Location")
+
+    if redirection == "" {
+        meta_redirect, meta_location := follow_meta_redirect(location)
+
+        if meta_redirect {
+            redirection = meta_location
+            resp.Status = "303 See Other"
+        }
+    }
+
     if redirection != "" {
         fix_location, _ := regexp.MatchString(`^\/`, redirection)
 
@@ -56,27 +66,20 @@ func follow_redirect(location string) {
         fmt.Printf("Redirect (%s): %s\n", resp.Status, redirection)
         follow_redirect(redirection)
     } else {
-        meta_redirect, meta_location := follow_meta_redirect(location)
-
-        if meta_redirect {
-            fmt.Printf("Redirect (%s): %s\n", "303 See Other", meta_location)
-            follow_redirect(meta_location)
-        } else {
-            fmt.Printf("%s\n", "---------")
-            fmt.Printf("%s %s\n", resp.Proto, resp.Status)
-            for header_key, header_value := range resp.Header {
-                var values int = len(header_value)
-                if values == 1 {
-                    fmt.Printf("%s: %s\n", header_key, header_value[0])
-                } else if values > 1 {
-                    fmt.Printf("%s:\n", header_key)
-                    for _, value := range header_value {
-                        fmt.Printf("  %s\n", value)
-                    }
+        fmt.Printf("%s\n", "---------")
+        fmt.Printf("%s %s\n", resp.Proto, resp.Status)
+        for header_key, header_value := range resp.Header {
+            var values int = len(header_value)
+            if values == 1 {
+                fmt.Printf("%s: %s\n", header_key, header_value[0])
+            } else if values > 1 {
+                fmt.Printf("%s:\n", header_key)
+                for _, value := range header_value {
+                    fmt.Printf("  %s\n", value)
                 }
             }
-            os.Exit(0)
         }
+        os.Exit(0)
     }
 }
 
@@ -91,7 +94,7 @@ func follow_meta_redirect(location string) (bool, string) {
         if err4 == nil {
             defer resp.Body.Close()
             body, _ := ioutil.ReadAll(resp.Body)
-            var r = regexp.MustCompile(`content=.[0-9]+;[ ]+?URL=(.+)"`)
+            var r = regexp.MustCompile(`content=.[0-9]+;[ ]+?URL=([a-zA-Z0-9\/\.\_\-\?\&\=]+)"`)
             var results []string = r.FindStringSubmatch( string(body) )
 
             if len(results) == 2 {
