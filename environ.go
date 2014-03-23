@@ -35,6 +35,7 @@ import "os"
 import "fmt"
 import "flag"
 import "regexp"
+import "strings"
 
 var display_all = flag.Bool("all", false, "Display all the environment variables as a list")
 
@@ -64,7 +65,19 @@ func main() {
         }
 
         for envvar_name, envvar_value := range envvar_array {
-            fmt.Printf( "%*s = %s\n", longest_name, envvar_name, envvar_value )
+            if envvar_name == "PATH" {
+                var bin_paths []string = strings.Split(envvar_value, ":")
+                var indent_spaces string = ""
+                for i:=0; i<longest_name; i++ { indent_spaces += " " }
+
+                fmt.Printf( "%*s = %s\n", longest_name, envvar_name, bin_paths[0] )
+                for j, bin_path := range bin_paths {
+                    if j == 0 { continue }
+                    fmt.Printf( "%s   %s\n", indent_spaces, bin_path )
+                }
+            } else {
+                fmt.Printf( "%*s = %s\n", longest_name, envvar_name, envvar_value )
+            }
         }
     }
 }
