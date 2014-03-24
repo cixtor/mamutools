@@ -38,32 +38,32 @@ import "regexp"
 import "strings"
 
 var display_all = flag.Bool("all", false, "Display all the environment variables as a list")
+var filter_var = flag.String("var", "", "Display the value for a specific environment variable")
 
 func main() {
     flag.Parse()
 
+    r := regexp.MustCompile(`^([a-zA-Z_]+)=(.*)`)
     var envvars []string = os.Environ();
+    var envvar_array = make(map[string]string)
+    var longest_name int = 0
 
-    if *display_all {
-        r := regexp.MustCompile(`^([a-zA-Z_]+)=(.*)`)
-        var envvar_array = make(map[string]string)
-        var longest_name int = 0
+    for _, envvar_str := range envvars {
+        var envvar_parts []string = r.FindStringSubmatch(envvar_str)
 
-        for _, envvar_str := range envvars {
-            var envvar_parts []string = r.FindStringSubmatch(envvar_str)
+        if envvar_parts != nil {
+            var envvar_name string = envvar_parts[1]
+            var envvar_value string = envvar_parts[2]
+            var envvar_length int = len(envvar_parts[1])
 
-            if envvar_parts != nil {
-                var envvar_name string = envvar_parts[1]
-                var envvar_value string = envvar_parts[2]
-                var envvar_length int = len(envvar_parts[1])
-
-                envvar_array[envvar_name] = envvar_value
-                if envvar_length > longest_name {
-                    longest_name = envvar_length
-                }
+            envvar_array[envvar_name] = envvar_value
+            if envvar_length > longest_name {
+                longest_name = envvar_length
             }
         }
+    }
 
+    if *display_all {
         for envvar_name, envvar_value := range envvar_array {
             if envvar_name == "PATH" {
                 var bin_paths []string = strings.Split(envvar_value, ":")
@@ -79,5 +79,12 @@ func main() {
                 fmt.Printf( "%*s = %s\n", longest_name, envvar_name, envvar_value )
             }
         }
+    } else if *filter_var != "" {
+        var envvar_name string = strings.ToUpper(*filter_var)
+        if envvar_value, ok := envvar_array[envvar_name]; ok {
+            fmt.Printf("%s\n", envvar_value)
+        }
+    } else {
+        flag.Usage()
     }
 }
