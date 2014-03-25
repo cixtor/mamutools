@@ -41,6 +41,15 @@ var display_all = flag.Bool("all", false, "Display all the environment variables
 var filter_var = flag.String("var", "", "Display the value for a specific environment variable")
 
 func main() {
+    flag.Usage = func(){
+        fmt.Println("Environment")
+        fmt.Println("  http://cixtor.com/")
+        fmt.Println("  https://github.com/cixtor/mamutools")
+        fmt.Println("  http://en.wikipedia.org/wiki/Environment_variable")
+        fmt.Println("Usage:")
+        flag.PrintDefaults()
+    }
+
     flag.Parse()
 
     r := regexp.MustCompile(`^([a-zA-Z_]+)=(.*)`)
