@@ -39,6 +39,7 @@ import "strings"
 
 var display_all = flag.Bool("all", false, "Display all the environment variables as a list")
 var filter_var = flag.String("var", "", "Display the value for a specific environment variable")
+var verbose = flag.Bool("verbose", false, "Display extra information")
 
 func main() {
     flag.Usage = func(){
@@ -91,7 +92,11 @@ func main() {
     } else if *filter_var != "" {
         var envvar_name string = strings.ToUpper(*filter_var)
         if envvar_value, ok := envvar_array[envvar_name]; ok {
-            fmt.Printf("%s\n", envvar_value)
+            if *verbose {
+                fmt.Printf("%s=%s\n", envvar_name, envvar_value)
+            } else {
+                fmt.Printf("%s\n", envvar_value)
+            }
         }
     } else {
         flag.Usage()
