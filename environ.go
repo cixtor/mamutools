@@ -93,10 +93,12 @@ func main() {
         var envvar_name string = strings.ToUpper(*filter_var)
         if envvar_value, ok := envvar_array[envvar_name]; ok {
             if *verbose {
-                if envvar_name == "PATH" {
+                if envvar_name == "PATH" || envvar_name == "LS_COLORS" {
                     var bin_paths []string = strings.Split(envvar_value, ":")
                     for _, bin_path := range bin_paths {
-                        fmt.Printf( "%s\n", bin_path )
+                        if bin_path != "" {
+                            fmt.Printf( "%s\n", bin_path )
+                        }
                     }
                 } else {
                     fmt.Printf("%s=%s\n", envvar_name, envvar_value)
