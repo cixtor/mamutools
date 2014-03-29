@@ -37,8 +37,8 @@ import "flag"
 import "regexp"
 import "strings"
 
-var display_all = flag.Bool("all", false, "Display all the environment variables as a list")
-var filter_var = flag.String("var", "", "Display the value for a specific environment variable")
+var display_all = flag.Bool("list", false, "Display all the environment variables as a list")
+var filter_var = flag.String("search", "", "Display the value for a specific environment variable")
 var verbose = flag.Bool("verbose", false, "Display extra information")
 
 func main() {
