@@ -40,6 +40,7 @@ import "strings"
 var display_all = flag.Bool("list", false, "Display all the environment variables as a list")
 var filter_var = flag.String("search", "", "Display the value for a specific environment variable")
 var verbose = flag.Bool("verbose", false, "Display extra information")
+var append_path = flag.String("newpath", "", "Add a new binary path to the global environment variable")
 
 func main() {
     flag.Usage = func(){
@@ -106,6 +107,22 @@ func main() {
             } else {
                 fmt.Printf("%s\n", envvar_value)
             }
+        }
+    } else if *append_path != "" {
+        var bashrc_path string = os.Getenv("HOME") + "/.bashrc"
+        var new_path string = fmt.Sprintf("export PATH=\"$PATH:'%s'\"\n", *append_path)
+
+        f, err := os.OpenFile(bashrc_path, os.O_APPEND|os.O_WRONLY, 0600)
+        if err != nil {
+            panic(err)
+        }
+
+        defer f.Close()
+        if _, err = f.WriteString(new_path); err == nil {
+            fmt.Printf("Path added: %s\n", *append_path)
+            fmt.Printf("Update session: source ~/.bashrc\n")
+        } else {
+            panic(err)
         }
     } else {
         flag.Usage()
