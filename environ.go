@@ -110,7 +110,7 @@ func main() {
         }
     } else if *append_path != "" {
         var bashrc_path string = os.Getenv("HOME") + "/.bashrc"
-        var new_path string = fmt.Sprintf("export PATH=\"$PATH:'%s'\"\n", *append_path)
+        var new_path string = fmt.Sprintf("export PATH=\"$PATH:%s\"\n", *append_path)
 
         f, err := os.OpenFile(bashrc_path, os.O_APPEND|os.O_WRONLY, 0600)
         if err != nil {
