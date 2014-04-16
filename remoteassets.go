@@ -20,6 +20,7 @@ import (
     "flag"
     "net/url"
     "regexp"
+    "strings"
 )
 
 var remote_loc = flag.String("url", "", "Specify the remote location to scan")
@@ -50,8 +51,23 @@ func main() {
     	panic(err)
     }
 
+    var filetypes []string
+    if *filetype != "" {
+        filetypes = append(filetypes, *filetype)
+    } else if *resource != "" {
+        switch *resource {
+        case "images":
+            filetypes = []string{ "gif", "jpg", "jpeg", "png", "svg" }
+        case "javascript":
+            filetypes = []string{ "js", "coffee" }
+        case "styles":
+            filetypes = []string{ "css", "sass", "less" }
+        }
+    }
+
     fmt.Printf("Hostname: %s\n", location.Host)
     fmt.Printf("Target: %s\n", *remote_loc)
     fmt.Printf("Scan-by: %s\n", *scanby)
+    fmt.Printf("Extensions: %s\n", strings.Join(filetypes, ", "))
     fmt.Printf("-----------\n" )
 }
