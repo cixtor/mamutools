@@ -16,11 +16,12 @@
 package main
 
 import (
+    "os"
     "fmt"
     "flag"
     "net/url"
-    "regexp"
     "strings"
+    "regexp"
 )
 
 var remote_loc = flag.String("url", "", "Specify the remote location to scan")
@@ -39,6 +40,13 @@ func main() {
     }
 
     flag.Parse()
+
+    *remote_loc = strings.TrimSpace(*remote_loc)
+    if *remote_loc == "" {
+        flag.Usage()
+        fmt.Printf("\nError: Remote location not specified\n")
+        os.Exit(1)
+    }
 
     re := regexp.MustCompile(`^(http|https):\/\/$`)
     var url_scheme []string = re.FindStringSubmatch(*remote_loc)
