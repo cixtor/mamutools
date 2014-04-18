@@ -59,6 +59,12 @@ func main() {
     	panic(err)
     }
 
+    if *scanby == "extension" {
+        /* This value is allowed. */
+    } else {
+        *scanby = "tag"
+    }
+
     var filetypes []string
     if *filetype != "" {
         filetypes = append(filetypes, *filetype)
