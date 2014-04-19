@@ -28,6 +28,13 @@ var remote_loc = flag.String("url", "", "Specify the remote location to scan")
 var filetype = flag.String("filetype", "", "Specify the filetype to look in the remote location specified")
 var resource = flag.String("resource", "", "Specify a group of filestypes to include in the scanning: images, javascript, styles")
 var scanby = flag.String("scanby", "", "Specify the type of scanning: tag, extension")
+var get_all = flag.Bool("all", false, "Show all the resources found in the site")
+
+func fail(message string) {
+    flag.Usage()
+    fmt.Printf("\nError: %s\n", message)
+    os.Exit(1)
+}
 
 func main() {
     flag.Usage = func(){
@@ -43,20 +50,18 @@ func main() {
 
     *remote_loc = strings.TrimSpace(*remote_loc)
     if *remote_loc == "" {
-        flag.Usage()
-        fmt.Printf("\nError: Remote location not specified\n")
-        os.Exit(1)
+        fail("Remote location not specified")
     }
 
     re := regexp.MustCompile(`^(http|https):\/\/$`)
     var url_scheme []string = re.FindStringSubmatch(*remote_loc)
     if url_scheme == nil {
-    	*remote_loc = fmt.Sprintf("http://%s", *remote_loc)
+        *remote_loc = fmt.Sprintf("http://%s", *remote_loc)
     }
 
     location, err := url.Parse(*remote_loc)
     if err != nil {
-    	panic(err)
+        fail("URL malformation detected")
     }
 
     if *scanby == "extension" {
@@ -66,17 +71,33 @@ func main() {
     }
 
     var filetypes []string
-    if *filetype != "" {
+    var filetype_options = map[string][]string {
+        "images": []string{ "gif", "jpg", "jpeg", "png", "svg" },
+        "javascript": []string{ "js", "coffee" },
+        "styles": []string{ "css", "sass", "less" },
+    }
+
+    if *get_all == true {
+        for _, exts := range(filetype_options) {
+            for _, ext := range(exts) {
+                filetypes = append(filetypes, ext)
+            }
+        }
+    } else if *filetype != "" {
         filetypes = append(filetypes, *filetype)
     } else if *resource != "" {
         switch *resource {
         case "images":
-            filetypes = []string{ "gif", "jpg", "jpeg", "png", "svg" }
+            filetypes = filetype_options[*resource]
         case "javascript":
-            filetypes = []string{ "js", "coffee" }
+            filetypes = filetype_options[*resource]
         case "styles":
-            filetypes = []string{ "css", "sass", "less" }
+            filetypes = filetype_options[*resource]
         }
+    }
+
+    if len(filetypes) == 0 {
+        fail("Filetype list is empty")
     }
 
     fmt.Printf("Hostname: %s\n", location.Host)
