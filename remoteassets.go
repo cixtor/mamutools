@@ -20,8 +20,10 @@ import (
     "fmt"
     "flag"
     "net/url"
-    "strings"
     "regexp"
+    "strings"
+    "net/http"
+    "io/ioutil"
 )
 
 var remote_loc = flag.String("url", "", "Specify the remote location to scan")
@@ -105,4 +107,20 @@ func main() {
     fmt.Printf("Scan-by: %s\n", *scanby)
     fmt.Printf("Extensions: %s\n", strings.Join(filetypes, ", "))
     fmt.Printf("-----------\n" )
+
+    resp, err := http.Get(*remote_loc)
+    if err != nil {
+        fail("The site could not be scanned")
+    }
+
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+
+    var content_clean string = strings.Replace( string(body), "\n", "", -1 )
+    var lines []string = strings.Split(content_clean, ">")
+
+    for _, line := range(lines) {
+        line = line + ">"
+        fmt.Printf("%s\n", line)
+    }
 }
