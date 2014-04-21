@@ -121,6 +121,11 @@ func main() {
 
     for _, line := range(lines) {
         line = line + ">"
-        fmt.Printf("%s\n", line)
+
+        base_re := regexp.MustCompile(`<base href=['"]([a-zA-Z0-9:\.\-\/_ ]+)['"]`)
+        var base_match []string = base_re.FindStringSubmatch(line)
+        if base_match != nil {
+            fmt.Printf("Base path: %s\n", base_match[1])
+        }
     }
 }
