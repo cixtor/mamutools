@@ -116,16 +116,21 @@ func main() {
     defer resp.Body.Close()
     body, err := ioutil.ReadAll(resp.Body)
 
+    var find_base_path bool = true
     var content_clean string = strings.Replace( string(body), "\n", "", -1 )
     var lines []string = strings.Split(content_clean, ">")
 
     for _, line := range(lines) {
         line = line + ">"
 
-        base_re := regexp.MustCompile(`<base href=['"]([a-zA-Z0-9:\.\-\/_ ]+)['"]`)
-        var base_match []string = base_re.FindStringSubmatch(line)
-        if base_match != nil {
-            fmt.Printf("Base path: %s\n", base_match[1])
+        if find_base_path {
+            base_re := regexp.MustCompile(`<base href=['"]([a-zA-Z0-9:\.\-\/_ ]+)['"]`)
+            var base_match []string = base_re.FindStringSubmatch(line)
+            if base_match != nil {
+                find_base_path = false
+                fmt.Printf("Base path: %s\n", base_match[1])
+                continue
+            }
         }
     }
 }
