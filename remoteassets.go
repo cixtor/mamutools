@@ -120,16 +120,26 @@ func main() {
     var content_clean string = strings.Replace( string(body), "\n", "", -1 )
     var lines []string = strings.Split(content_clean, ">")
 
+    var file_ext_str string = strings.Join(filetypes, "|")
+    file_ext_re := regexp.MustCompile(`(href|src)=['"]([a-zA-Z0-9=:\?\.\-\/_ ]+)\.(`+file_ext_str+`)['"]`)
+    base_re := regexp.MustCompile(`<base href=['"]([a-zA-Z0-9:\.\-\/_ ]+)['"]`)
+
     for _, line := range(lines) {
         line = line + ">"
 
         if find_base_path {
-            base_re := regexp.MustCompile(`<base href=['"]([a-zA-Z0-9:\.\-\/_ ]+)['"]`)
             var base_match []string = base_re.FindStringSubmatch(line)
             if base_match != nil {
                 find_base_path = false
                 fmt.Printf("Base path: %s\n", base_match[1])
                 continue
+            }
+        }
+
+        if *scanby == "extension" {
+            var file_match []string = file_ext_re.FindStringSubmatch(line)
+            if file_match != nil {
+                fmt.Printf("%s.%s\n", file_match[2], file_match[3])
             }
         }
     }
