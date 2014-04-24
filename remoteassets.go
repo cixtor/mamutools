@@ -29,7 +29,6 @@ import (
 var remote_loc = flag.String("url", "", "Specify the remote location to scan")
 var filetype = flag.String("filetype", "", "Specify the filetype to look in the remote location specified")
 var resource = flag.String("resource", "", "Specify a group of filestypes to include in the scanning: images, javascript, styles")
-var scanby = flag.String("scanby", "", "Specify the type of scanning: tag, extension")
 var get_all = flag.Bool("all", false, "Show all the resources found in the site")
 
 func fail(message string) {
@@ -66,12 +65,6 @@ func main() {
         fail("URL malformation detected")
     }
 
-    if *scanby == "extension" {
-        /* This value is allowed. */
-    } else {
-        *scanby = "tag"
-    }
-
     var filetypes []string
     var filetype_options = map[string][]string {
         "images": []string{ "gif", "jpg", "jpeg", "png", "svg" },
@@ -104,7 +97,6 @@ func main() {
 
     fmt.Printf("Hostname: %s\n", location.Host)
     fmt.Printf("Target: %s\n", *remote_loc)
-    fmt.Printf("Scan-by: %s\n", *scanby)
     fmt.Printf("Extensions: %s\n", strings.Join(filetypes, ", "))
     fmt.Printf("-----------\n" )
 
@@ -136,11 +128,9 @@ func main() {
             }
         }
 
-        if *scanby == "extension" {
-            var file_match []string = file_ext_re.FindStringSubmatch(line)
-            if file_match != nil {
-                fmt.Printf("%s.%s\n", file_match[2], file_match[3])
-            }
+        var file_match []string = file_ext_re.FindStringSubmatch(line)
+        if file_match != nil {
+            fmt.Printf("%s.%s\n", file_match[2], file_match[3])
         }
     }
 }
