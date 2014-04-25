@@ -30,11 +30,20 @@ var remote_loc = flag.String("url", "", "Specify the remote location to scan")
 var filetype = flag.String("filetype", "", "Specify the filetype to look in the remote location specified")
 var resource = flag.String("resource", "", "Specify a group of filestypes to include in the scanning: images, javascript, styles")
 var get_all = flag.Bool("all", false, "Show all the resources found in the site")
+var colored = flag.Bool("colored", false, "Whether the information must be highlighted or not")
 
 func fail(message string) {
     flag.Usage()
     fmt.Printf("\nError: %s\n", message)
     os.Exit(1)
+}
+
+func print_colored(var_title string, var_value string) {
+    if *colored {
+        fmt.Printf( "\033[1;34m%s\033[0m: %s\n", var_title, var_value )
+    } else {
+        fmt.Printf( "%s: %s\n", var_title, var_value )
+    }
 }
 
 func main() {
@@ -95,10 +104,9 @@ func main() {
         fail("Filetype list is empty")
     }
 
-    fmt.Printf("Hostname: %s\n", location.Host)
-    fmt.Printf("Target: %s\n", *remote_loc)
-    fmt.Printf("Extensions: %s\n", strings.Join(filetypes, ", "))
-    fmt.Printf("-----------\n" )
+    print_colored( "Hostname", location.Host )
+    print_colored( "Target", *remote_loc )
+    print_colored( "Extensions", strings.Join(filetypes, ", ") )
 
     resp, err := http.Get(*remote_loc)
     if err != nil {
@@ -123,7 +131,7 @@ func main() {
             var base_match []string = base_re.FindStringSubmatch(line)
             if base_match != nil {
                 find_base_path = false
-                fmt.Printf("Base path: %s\n", base_match[1])
+                print_colored( "Base path", base_match[1] )
                 continue
             }
         }
