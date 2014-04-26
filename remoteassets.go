@@ -31,6 +31,7 @@ var filetype = flag.String("filetype", "", "Specify the filetype to look in the 
 var resource = flag.String("resource", "", "Specify a group of filestypes to include in the scanning: images, javascript, styles")
 var get_all = flag.Bool("all", false, "Show all the resources found in the site")
 var colored = flag.Bool("colored", false, "Whether the information must be highlighted or not")
+var verbose = flag.Bool("verbose", false, "Whether the request details must be printed or not")
 
 func fail(message string) {
     flag.Usage()
@@ -104,9 +105,13 @@ func main() {
         fail("Filetype list is empty")
     }
 
-    print_colored( "Hostname", location.Host )
-    print_colored( "Target", *remote_loc )
-    print_colored( "Extensions", strings.Join(filetypes, ", ") )
+    var indentation string = ""
+    if *verbose {
+        indentation = "- "
+        print_colored( "Hostname", location.Host )
+        print_colored( "Target", *remote_loc )
+        print_colored( "Extensions", strings.Join(filetypes, ", ") )
+    }
 
     resp, err := http.Get(*remote_loc)
     if err != nil {
@@ -127,7 +132,7 @@ func main() {
     for _, line := range(lines) {
         line = line + ">"
 
-        if find_base_path {
+        if find_base_path && *verbose {
             var base_match []string = base_re.FindStringSubmatch(line)
             if base_match != nil {
                 find_base_path = false
@@ -138,7 +143,7 @@ func main() {
 
         var file_match []string = file_ext_re.FindStringSubmatch(line)
         if file_match != nil {
-            fmt.Printf("%s.%s\n", file_match[2], file_match[3])
+            fmt.Printf("%s%s.%s\n", indentation, file_match[2], file_match[3])
         }
     }
 }
