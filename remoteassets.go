@@ -32,6 +32,7 @@ var resource = flag.String("resource", "", "Specify a group of filestypes to inc
 var get_all = flag.Bool("all", false, "Show all the resources found in the site")
 var colored = flag.Bool("colored", false, "Whether the information must be highlighted or not")
 var verbose = flag.Bool("verbose", false, "Whether the request details must be printed or not")
+var unique = flag.Bool("unique", false, "Whether the duplicated files will be counted or not")
 
 func fail(message string) {
     flag.Usage()
@@ -124,6 +125,7 @@ func main() {
     var find_base_path bool = true
     var content_clean string = strings.Replace( string(body), "\n", "", -1 )
     var lines []string = strings.Split(content_clean, ">")
+    var unique_files = make(map[string]int)
 
     var file_ext_str string = strings.Join(filetypes, "|")
     file_ext_re := regexp.MustCompile(`(href|src)=['"]([a-zA-Z0-9=:\?\.\-\/_ ]+)\.(`+file_ext_str+`)['"]`)
@@ -143,7 +145,22 @@ func main() {
 
         var file_match []string = file_ext_re.FindStringSubmatch(line)
         if file_match != nil {
-            fmt.Printf("%s%s.%s\n", indentation, file_match[2], file_match[3])
+            var file_path string = file_match[2] + "." + file_match[3]
+            if count, ok := unique_files[file_path]; ok {
+                unique_files[file_path] = count + 1
+            } else {
+                unique_files[file_path] = 1
+            }
+
+            if *unique != true {
+                fmt.Printf("%s%s\n", indentation, file_path)
+            }
+        }
+    }
+
+    if *unique {
+        for file_url, file_count := range(unique_files) {
+            fmt.Printf( "(%d) %s\n", file_count, file_url )
         }
     }
 }
