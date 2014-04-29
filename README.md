@@ -8,7 +8,6 @@ Considering that these scripts are not correlated among them, you'll need to che
 
 * Go >= 1.0 (tested on `go1.2rc3`)
 * Bash >= 3.0 (Change the [Shebang](http://en.wikipedia.org/wiki/Shebang_(Unix)) to use another shell)
-* Ruby >= 1.8 and RubyGems
 * PHP >= 5.2 (with `gd` and `curl` modules)
 
 ### Installation
@@ -16,7 +15,7 @@ Considering that these scripts are not correlated among them, you'll need to che
 ```shell
 $ cd /opt/
 $ git clone https://github.com/cixtor/mamutools.git
-$ chmod 755 ./mamutools/*.{rb,sh,php}
+$ chmod 755 ./mamutools/*.{sh,php}
 $ for file in $(ls -1 /opt/mamutools/*.go); do \
     echo -n "Compiling '${file}'... "; \
     go build $file && rm -f $file; \
