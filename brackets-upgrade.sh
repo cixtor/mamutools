@@ -23,7 +23,7 @@
 # Upgrades can also worsen a product subjectively. A user may prefer an older version
 # even if a newer version functions perfectly as designed.
 #
-user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.26 Safari/537.36"
+user_agent='Mozilla/5.0 (KHTML, like Gecko)'
 echo 'Brackets Upgrade'
 echo '    http://cixtor.com/'
 echo '    https://github.com/cixtor/mamutools'
@@ -39,7 +39,9 @@ echo "Computer architecture detected: ${architecture}"
 if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
 download_link=$(curl --silent 'http://download.brackets.io/' | grep "file\.cfm?platform=LINUX${archi_type}" | head -n 1)
 download_link=$(echo "${download_link}" | cut -d '"' -f 2 | sed 's/file\.cfm/http:\/\/download\.brackets\.io\/file\.cfm/g')
+build_number=$(echo "${download_link}" | awk -F '=' '{print $3'})
 echo "Download link: ${download_link}"
+echo "Build number: ${build_number}"
 #
 echo "Backuping current files..."
 old_files=(
@@ -93,8 +95,13 @@ if [ "${file_name}" != "" ]; then
         for icon in "${allowed_icons[@]}" ; do
             if [ -e "./${icon}" ]; then shortcut_icon="/opt/brackets/${icon}"; fi
         done
-        cat brackets.desktop | grep -v '^Icon=' > temp.desktop
+        echo '[Desktop Entry]' > temp.desktop
+        echo 'Type=Application' >> temp.desktop
+        echo "Name=Brackets (build ${build_number})" >> temp.desktop
+        echo 'Exec=/opt/brackets/brackets %U' >> temp.desktop
         echo "Icon=${shortcut_icon}" >> temp.desktop
+        echo 'Categories=Development' >> temp.desktop
+        echo 'MimeType=text/html;' >> temp.desktop
         cat temp.desktop > brackets.desktop && rm -f temp.desktop
         # Install desktop shortcut
         cd /usr/share/applications/
