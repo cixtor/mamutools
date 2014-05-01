@@ -43,35 +43,6 @@ build_number=$(echo "${download_link}" | awk -F '=' '{print $3'})
 echo "Download link: ${download_link}"
 echo "Build number: ${build_number}"
 #
-echo "Backuping current files..."
-old_files=(
-    "appshell128.png"
-    "appshell256.png"
-    "appshell32.png"
-    "appshell48.png"
-    "brackets"
-    "Brackets"
-    "brackets.desktop"
-    "Brackets-node"
-    "brackets.svg"
-    "cef.pak"
-    "copyright"
-    "devtools_resources.pak"
-    "lib"
-    "locales"
-    "node-core"
-    "samples"
-    "www"
-)
-if [ -e "./backups/" ]; then rm -rf ./backups/; fi
-mkdir ./backups
-for file in "${old_files[@]}"; do
-    if [ -e "${file}" ]; then
-        echo "  '${file}' -> 'backups/${file}'"
-        mv -i $file backups/
-    fi
-done
-#
 echo -n "Verifying the remote upgrade file... "
 file_headers=$(curl --silent --head "${download_link}" --user-agent "${user_agent}")
 file_name=$(echo "${file_headers}" | grep '; filename=' | awk -F '=' '{print $2}' | tr -d "\r")
@@ -86,9 +57,6 @@ if [ "${file_name}" != "" ]; then
     mv upgrade-package/usr/share/icons/hicolor/scalable/apps/brackets.svg ./
     mv upgrade-package/opt/brackets/* ./
     if [ -e "/usr/share/applications/" ]; then
-        if [ -e "./backups/brackets.desktop" ]; then
-            mv ./backups/brackets.desktop ./
-        fi
         # Change desktop shortcut icon
         shortcut_icon=""
         allowed_icons=("appshell32.png" "appshell48.png" "appshell128.png" "appshell256.png" "brackets.svg")
@@ -109,7 +77,7 @@ if [ "${file_name}" != "" ]; then
         ln -s /opt/brackets/brackets.desktop
     fi
     echo -n "Cleaning up... "
-    cd "${target_folder}" && rm -rf ./upgrade-package/ ./backups/ ./*.deb
+    cd "${target_folder}" && rm -rf ./upgrade-package/ ./*.deb
     echo "Done"
 else
     echo "Error. Could not get the remote upgrade:"
