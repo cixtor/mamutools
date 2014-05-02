@@ -23,39 +23,61 @@
 # Upgrades can also worsen a product subjectively. A user may prefer an older version
 # even if a newer version functions perfectly as designed.
 #
+url_target='http://brackets.io/'
 user_agent='Mozilla/5.0 (KHTML, like Gecko)'
+github_releases='https://github.com/adobe/brackets/releases/download'
+local_filename='brackets.deb'
+
 echo 'Brackets Upgrade'
-echo '    http://cixtor.com/'
-echo '    https://github.com/cixtor/mamutools'
-echo '    https://github.com/adobe/brackets'
+echo '  http://cixtor.com/'
+echo '  https://github.com/cixtor/mamutools'
+echo '  https://github.com/adobe/brackets'
 echo
-#
+
+# Check target folder existence.
 target_folder="/opt/brackets/"
 if [ ! -e "${target_folder}" ]; then mkdir -p "${target_folder}"; fi
 if [ -e "${target_folder}" ]; then cd "${target_folder}"; fi
-#
+
+# Detect system architecture.
 architecture=$(uname -m)
 echo "Computer architecture detected: ${architecture}"
 if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
-download_link=$(curl --silent 'http://download.brackets.io/' | grep "file\.cfm?platform=LINUX${archi_type}" | head -n 1)
-download_link=$(echo "${download_link}" | cut -d '"' -f 2 | sed 's/file\.cfm/http:\/\/download\.brackets\.io\/file\.cfm/g')
-build_number=$(echo "${download_link}" | awk -F '=' '{print $3'})
+
+# Retrieve the URL to download.
+counter=0
+build_number=''
+while [ "${build_number}" == "" ]; do
+    build_number=$(curl --silent "${url_target}" --user-agent "${user_agent}" | grep 'var buildNum =')
+    build_number=$(echo "${build_number}" | sed 's/ //g' | awk -F '"' '{print $2}')
+    counter=$(( $counter + 1 ))
+    if [ $counter -gt 5 ]; then
+        echo "Can not get the download link, try again."
+        exit 1
+    fi
+done
+download_link="${github_releases}/sprint-${build_number}/Brackets.Sprint.${build_number}.${archi_type}-bit.deb"
 echo "Download link: ${download_link}"
 echo "Build number: ${build_number}"
-#
-echo -n "Verifying the remote upgrade file... "
-file_headers=$(curl --silent --head "${download_link}" --user-agent "${user_agent}")
-file_name=$(echo "${file_headers}" | grep '; filename=' | awk -F '=' '{print $2}' | tr -d "\r")
-echo "Done"
-if [ "${file_name}" != "" ]; then
-    echo
-    wget -c "${download_link}" --user-agent "${user_agent}" -O "${file_name}"
-    echo -n "Installing... "
+
+# Download package.
+rm -rf ./*
+echo 'Downloading package...'
+wget -c "${download_link}" --user-agent "${user_agent}" -O "${local_filename}"
+
+# Check whether the package was downloaded or not.
+if [ -e "${local_filename}" ]; then
+    # Extracting package content.
+    echo -n 'Installing... '
     dpkg --extract ./brackets*.deb ./upgrade-package
-    echo "Done"
+    echo 'Done'
+
+    # Moving around the package files.
     mv upgrade-package/usr/share/doc/brackets/copyright ./
     mv upgrade-package/usr/share/icons/hicolor/scalable/apps/brackets.svg ./
     mv upgrade-package/opt/brackets/* ./
+
+    # Install the desktop shortcut icon.
     if [ -e "/usr/share/applications/" ]; then
         # Change desktop shortcut icon
         shortcut_icon=""
@@ -76,11 +98,13 @@ if [ "${file_name}" != "" ]; then
         if [ -e "brackets.desktop" ]; then rm -f brackets.desktop; fi
         ln -s /opt/brackets/brackets.desktop
     fi
-    echo -n "Cleaning up... "
+
+    # Cleaning the application directory.
+    echo -n 'Cleaning up... '
     cd "${target_folder}" && rm -rf ./upgrade-package/ ./*.deb
-    echo "Done"
+    echo 'Done'
+    exit 0
 else
-    echo "Error. Could not get the remote upgrade:"
-    echo "${file_headers}"
+    echo 'Error. Could not download the remote file, try again.'
+    exit 1
 fi
-#
