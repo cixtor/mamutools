@@ -65,7 +65,7 @@ func main() {
         fail("Remote location not specified")
     }
 
-    re := regexp.MustCompile(`^(http|https):\/\/$`)
+    re := regexp.MustCompile(`^(http|https):\/\/`)
     var url_scheme []string = re.FindStringSubmatch(*remote_loc)
     if url_scheme == nil {
         *remote_loc = fmt.Sprintf("http://%s", *remote_loc)
