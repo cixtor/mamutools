@@ -17,3 +17,14 @@
  * storage and retrieval of data while the computation is carried out by the
  * workstations.
  */
+
+package main
+
+import (
+    "net/http"
+)
+
+func main() {
+    http.Handle("/", http.FileServer(http.Dir("./")))
+    http.ListenAndServe(":8123", nil)
+}
