@@ -21,10 +21,17 @@
 package main
 
 import (
+    "os"
+    "fmt"
+    "flag"
     "net/http"
 )
 
+var dir_path = flag.String("path", "./", "Set the directory path where the server will run")
+
 func main() {
-    http.Handle("/", http.FileServer(http.Dir("./")))
+    flag.Parse()
+
+    http.Handle("/", http.FileServer(http.Dir(*dir_path)))
     http.ListenAndServe(":8123", nil)
 }
