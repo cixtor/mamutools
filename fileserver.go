@@ -21,17 +21,16 @@
 package main
 
 import (
-    "os"
-    "fmt"
     "flag"
     "net/http"
 )
 
 var dir_path = flag.String("path", "./", "Set the directory path where the server will run")
+var server_port = flag.String("port", "8080", "Set the port number where the server will run")
 
 func main() {
     flag.Parse()
 
     http.Handle("/", http.FileServer(http.Dir(*dir_path)))
-    http.ListenAndServe(":8123", nil)
+    http.ListenAndServe( ":" + *server_port, nil )
 }
