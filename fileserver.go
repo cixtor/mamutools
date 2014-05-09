@@ -26,6 +26,7 @@ import (
     "flag"
     "net/http"
     "regexp"
+    "log"
 )
 
 var dir_path = flag.String("path", "./", "Set the directory path where the server will run")
@@ -53,5 +54,11 @@ func main() {
     }
 
     http.Handle("/", http.FileServer(http.Dir(*dir_path)))
-    http.ListenAndServe( ":" + *server_port, nil )
+    err := http.ListenAndServe( ":" + *server_port, nil )
+
+    if err != nil {
+        flag.Usage()
+        fmt.Println()
+        log.Fatal(err)
+    }
 }
