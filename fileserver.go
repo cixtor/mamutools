@@ -44,6 +44,13 @@ func main() {
 
     flag.Parse()
 
+    _, err := os.Stat(*dir_path)
+    if err != nil {
+        flag.Usage()
+        fmt.Printf("\nDirectory does not exists: %s\n", *dir_path)
+        os.Exit(1)
+    }
+
     port_re := regexp.MustCompile(`^[0-9]{2,4}$`)
     var port_match []string = port_re.FindStringSubmatch(*server_port)
 
@@ -54,7 +61,7 @@ func main() {
     }
 
     http.Handle("/", http.FileServer(http.Dir(*dir_path)))
-    err := http.ListenAndServe( ":" + *server_port, nil )
+    err = http.ListenAndServe( ":" + *server_port, nil )
 
     if err != nil {
         flag.Usage()
