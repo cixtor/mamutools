@@ -44,10 +44,16 @@ func main() {
 
     flag.Parse()
 
-    _, err := os.Stat(*dir_path)
+    finfo, err := os.Stat(*dir_path)
     if err != nil {
         flag.Usage()
         fmt.Printf("\nDirectory does not exists: %s\n", *dir_path)
+        os.Exit(1)
+    }
+
+    if !finfo.IsDir() {
+        flag.Usage()
+        fmt.Printf("\nServing individual files is not allowed\n")
         os.Exit(1)
     }
 
@@ -56,7 +62,7 @@ func main() {
 
     if port_match == nil {
         flag.Usage()
-        fmt.Printf("\nError. Invalid port number.\n")
+        fmt.Printf("\nError. Invalid port number\n")
         os.Exit(1)
     }
 
