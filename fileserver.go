@@ -26,6 +26,7 @@ import (
     "flag"
     "net/http"
     "regexp"
+    "time"
     "log"
 )
 
@@ -65,6 +66,12 @@ func main() {
         fmt.Printf("\nError. Invalid port number\n")
         os.Exit(1)
     }
+
+    fmt.Printf("File Server\n")
+    fmt.Printf("Directory path: %s\n", *dir_path)
+    fmt.Printf("Started at: %s\n", time.Now().Format(time.RFC850))
+    fmt.Printf("Stop execution with ^C\n")
+    fmt.Printf("...\n")
 
     http.Handle("/", http.FileServer(http.Dir(*dir_path)))
     err = http.ListenAndServe( ":" + *server_port, nil )
