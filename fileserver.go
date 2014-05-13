@@ -25,6 +25,7 @@ import (
     "fmt"
     "flag"
     "net/http"
+    "os/signal"
     "regexp"
     "time"
     "log"
@@ -72,6 +73,15 @@ func main() {
     fmt.Printf("Started at: %s\n", time.Now().Format(time.RFC850))
     fmt.Printf("Stop execution with ^C\n")
     fmt.Printf("...\n")
+
+    c := make( chan os.Signal, 1 )
+    signal.Notify( c, os.Interrupt )
+    go func() {
+        for _ = range c {
+            fmt.Printf("\nServer stopped\n")
+            os.Exit(0)
+        }
+    }()
 
     http.Handle("/", http.FileServer(http.Dir(*dir_path)))
     err = http.ListenAndServe( ":" + *server_port, nil )
