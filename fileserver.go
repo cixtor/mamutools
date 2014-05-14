@@ -69,10 +69,10 @@ func main() {
     }
 
     fmt.Printf("File Server\n")
-    fmt.Printf("Directory path: %s\n", *dir_path)
-    fmt.Printf("Started at: %s\n", time.Now().Format(time.RFC850))
-    fmt.Printf("Stop execution with ^C\n")
-    fmt.Printf("...\n")
+    fmt.Printf("Document root: %s\n", *dir_path)
+    fmt.Printf("Listening on.: http://localhost:%s/\n", *server_port)
+    fmt.Printf("Started at...: %s\n", time.Now().Format(time.RFC850))
+    fmt.Printf("Press Ctrl-C to quit\n")
 
     c := make( chan os.Signal, 1 )
     signal.Notify( c, os.Interrupt )
@@ -83,7 +83,7 @@ func main() {
         }
     }()
 
-    http.Handle("/", http.FileServer(http.Dir(*dir_path)))
+    http.Handle( "/", http.FileServer(http.Dir(*dir_path)) )
     err = http.ListenAndServe( ":" + *server_port, nil )
 
     if err != nil {
