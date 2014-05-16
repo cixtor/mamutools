@@ -21,3 +21,37 @@
  * operating systems. Another example of a flat file is a name-and-address list
  * with the fields Name, Address, and Phone Number.
  */
+
+package main
+
+import (
+    "os"
+    "fmt"
+    "flag"
+)
+
+var database = flag.String("db", ".", "Directory name where the flat files are stored")
+
+func main() {
+    flag.Parse()
+
+    use_database(*database)
+
+    fmt.Printf( "Database name: %s\n", *database )
+}
+
+func use_database( database string ) {
+    _, err := os.Stat(database)
+
+    if err == nil {
+        err = os.Chdir(database)
+
+        if err != nil {
+            fmt.Printf("Error using the database specified\n")
+            os.Exit(1)
+        }
+    } else {
+        fmt.Printf("The database specified does not exists\n")
+        os.Exit(1)
+    }
+}
