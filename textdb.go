@@ -31,13 +31,16 @@ import (
 )
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
+var table_name = flag.String("table", "", "Table name where the data will be stored")
 
 func main() {
     flag.Parse()
 
     use_database(*database)
+    check_table(*table_name)
 
     fmt.Printf( "Database name: %s\n", *database )
+    fmt.Printf( "Table name: %s\n", *table_name )
 }
 
 func use_database( database string ) {
@@ -52,6 +55,20 @@ func use_database( database string ) {
         }
     } else {
         fmt.Printf("The database specified does not exists\n")
+        os.Exit(1)
+    }
+}
+
+func check_table( table_name string ) {
+    finfo, err := os.Stat(table_name)
+
+    if err == nil {
+        if finfo.IsDir() {
+            fmt.Printf("Can not use a directory as a file\n")
+            os.Exit(1)
+        }
+    } else {
+        fmt.Printf("The table specified does not exists\n")
         os.Exit(1)
     }
 }
