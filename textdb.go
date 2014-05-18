@@ -32,29 +32,39 @@ import (
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
 var table_name = flag.String("table", "", "Table name where the data will be stored")
+var force_creation = flag.Bool("force", false, "Force the creation of the database and table")
 
 func main() {
     flag.Parse()
 
-    use_database(*database)
+    use_database(*database, *force_creation)
     check_table(*table_name)
 
     fmt.Printf( "Database name: %s\n", *database )
     fmt.Printf( "Table name: %s\n", *table_name )
 }
 
-func use_database( database string ) {
+func use_database( database string, force_creation bool ) {
     _, err := os.Stat(database)
 
-    if err == nil {
-        err = os.Chdir(database)
+    if err != nil {
+        if force_creation {
+            err = os.Mkdir(database, 0755)
 
-        if err != nil {
-            fmt.Printf("Error using the database specified\n")
+            if err != nil {
+                fmt.Printf("Can not create the database")
+                os.Exit(1)
+            }
+        } else {
+            fmt.Printf("The database specified does not exists\n")
             os.Exit(1)
         }
-    } else {
-        fmt.Printf("The database specified does not exists\n")
+    }
+
+    err = os.Chdir(database)
+
+    if err != nil {
+        fmt.Printf("Error using the database specified\n")
         os.Exit(1)
     }
 }
