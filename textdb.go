@@ -70,15 +70,20 @@ func use_database( database string, force_creation bool ) {
 }
 
 func check_table( table_name string ) {
-    finfo, err := os.Stat(table_name)
+    if table_name != "" {
+        finfo, err := os.Stat(table_name)
 
-    if err == nil {
-        if finfo.IsDir() {
-            fmt.Printf("Can not use a directory as a file\n")
+        if err == nil {
+            if finfo.IsDir() {
+                fmt.Printf("Can not use a directory as a file\n")
+                os.Exit(1)
+            }
+        } else {
+            fmt.Printf("The table specified does not exists\n")
             os.Exit(1)
         }
     } else {
-        fmt.Printf("The table specified does not exists\n")
+        fmt.Printf("The table name was not specified\n")
         os.Exit(1)
     }
 }
