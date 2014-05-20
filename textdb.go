@@ -38,7 +38,7 @@ func main() {
     flag.Parse()
 
     use_database(*database, *force_creation)
-    check_table(*table_name)
+    check_table(*table_name, *force_creation)
 
     fmt.Printf( "Database name: %s\n", *database )
     fmt.Printf( "Table name: %s\n", *table_name )
@@ -69,13 +69,21 @@ func use_database( database string, force_creation bool ) {
     }
 }
 
-func check_table( table_name string ) {
+func check_table( table_name string, force_creation bool ) {
     if table_name != "" {
         finfo, err := os.Stat(table_name)
 
         if err == nil {
             if finfo.IsDir() {
                 fmt.Printf("Can not use a directory as a file\n")
+                os.Exit(1)
+            }
+        } else if force_creation {
+            f, err2 := os.Create(table_name)
+            defer f.Close()
+
+            if err2 != nil {
+                fmt.Printf("Error creating the table")
                 os.Exit(1)
             }
         } else {
