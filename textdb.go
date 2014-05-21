@@ -28,6 +28,7 @@ import (
     "os"
     "fmt"
     "flag"
+    "time"
 )
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
@@ -38,7 +39,7 @@ func main() {
     flag.Parse()
 
     use_database(*database, *force_creation)
-    check_table(*table_name, *force_creation)
+    check_table(*database, *table_name, *force_creation)
 
     fmt.Printf( "Database name: %s\n", *database )
     fmt.Printf( "Table name: %s\n", *table_name )
@@ -52,7 +53,7 @@ func use_database( database string, force_creation bool ) {
             err = os.Mkdir(database, 0755)
 
             if err != nil {
-                fmt.Printf("Can not create the database")
+                fmt.Printf("Can not create the database\n")
                 os.Exit(1)
             }
         } else {
@@ -69,7 +70,7 @@ func use_database( database string, force_creation bool ) {
     }
 }
 
-func check_table( table_name string, force_creation bool ) {
+func check_table( database string, table_name string, force_creation bool ) {
     if table_name != "" {
         finfo, err := os.Stat(table_name)
 
@@ -79,19 +80,41 @@ func check_table( table_name string, force_creation bool ) {
                 os.Exit(1)
             }
         } else if force_creation {
-            f, err2 := os.Create(table_name)
-            defer f.Close()
-
-            if err2 != nil {
-                fmt.Printf("Error creating the table")
-                os.Exit(1)
-            }
+            create_db_table(database, table_name)
         } else {
             fmt.Printf("The table specified does not exists\n")
             os.Exit(1)
         }
     } else {
         fmt.Printf("The table name was not specified\n")
+        os.Exit(1)
+    }
+}
+
+func create_db_table( database string, table_name string ) {
+    f, err := os.Create(table_name)
+    defer f.Close()
+
+    if err != nil {
+        fmt.Printf("Error creating the table: %s\n", err)
+        os.Exit(1)
+    }
+
+    var timestamp int64 = time.Now().Unix()
+
+    _, err = f.WriteString("\n")
+    _, err = f.WriteString(fmt.Sprintf( "-- database: %s\n", database ))
+    _, err = f.WriteString(fmt.Sprintf( "-- table_name: %s\n", table_name ))
+    _, err = f.WriteString(fmt.Sprintf( "-- table_columns: \n" ))
+    _, err = f.WriteString(fmt.Sprintf( "-- auto_increment: 0\n" ))
+    _, err = f.WriteString(fmt.Sprintf( "-- total_rows: 0\n" ))
+    _, err = f.WriteString(fmt.Sprintf( "-- separator: ,\n" ))
+    _, err = f.WriteString(fmt.Sprintf( "-- created_at: %d\n", timestamp ))
+    _, err = f.WriteString(fmt.Sprintf( "-- updated_at: %d\n", timestamp ))
+    _, err = f.WriteString("\n")
+
+    if err != nil {
+        fmt.Printf("Error writing into table: %s\n", err)
         os.Exit(1)
     }
 }
