@@ -38,19 +38,19 @@ var force_creation = flag.Bool("force", false, "Force the creation of the databa
 func main() {
     flag.Parse()
 
-    use_database(*database, *force_creation)
-    check_table(*database, *table_name, *force_creation)
+    use_database()
+    check_table()
 
     fmt.Printf( "Database name: %s\n", *database )
     fmt.Printf( "Table name: %s\n", *table_name )
 }
 
-func use_database( database string, force_creation bool ) {
-    _, err := os.Stat(database)
+func use_database() {
+    _, err := os.Stat(*database)
 
     if err != nil {
-        if force_creation {
-            err = os.Mkdir(database, 0755)
+        if *force_creation {
+            err = os.Mkdir(*database, 0755)
 
             if err != nil {
                 fmt.Printf("Can not create the database\n")
@@ -62,7 +62,7 @@ func use_database( database string, force_creation bool ) {
         }
     }
 
-    err = os.Chdir(database)
+    err = os.Chdir(*database)
 
     if err != nil {
         fmt.Printf("Error using the database specified\n")
@@ -70,17 +70,17 @@ func use_database( database string, force_creation bool ) {
     }
 }
 
-func check_table( database string, table_name string, force_creation bool ) {
-    if table_name != "" {
-        finfo, err := os.Stat(table_name)
+func check_table() {
+    if *table_name != "" {
+        finfo, err := os.Stat(*table_name)
 
         if err == nil {
             if finfo.IsDir() {
                 fmt.Printf("Can not use a directory as a file\n")
                 os.Exit(1)
             }
-        } else if force_creation {
-            create_db_table(database, table_name)
+        } else if *force_creation {
+            create_db_table()
         } else {
             fmt.Printf("The table specified does not exists\n")
             os.Exit(1)
@@ -91,8 +91,8 @@ func check_table( database string, table_name string, force_creation bool ) {
     }
 }
 
-func create_db_table( database string, table_name string ) {
-    f, err := os.Create(table_name)
+func create_db_table() {
+    f, err := os.Create(*table_name)
     defer f.Close()
 
     if err != nil {
@@ -103,8 +103,8 @@ func create_db_table( database string, table_name string ) {
     var timestamp int64 = time.Now().Unix()
 
     _, err = f.WriteString("\n")
-    _, err = f.WriteString(fmt.Sprintf( "-- database: %s\n", database ))
-    _, err = f.WriteString(fmt.Sprintf( "-- table_name: %s\n", table_name ))
+    _, err = f.WriteString(fmt.Sprintf( "-- database: %s\n", *database ))
+    _, err = f.WriteString(fmt.Sprintf( "-- table_name: %s\n", *table_name ))
     _, err = f.WriteString(fmt.Sprintf( "-- table_columns: \n" ))
     _, err = f.WriteString(fmt.Sprintf( "-- auto_increment: 0\n" ))
     _, err = f.WriteString(fmt.Sprintf( "-- total_rows: 0\n" ))
