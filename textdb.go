@@ -34,6 +34,7 @@ import (
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
 var table_name = flag.String("table", "", "Table name where the data will be stored")
 var force_creation = flag.Bool("force", false, "Force the creation of the database and table")
+var separator = flag.String("sep", ",", "Set the character that will act as the column separator")
 
 func main() {
     flag.Parse()
@@ -43,6 +44,7 @@ func main() {
 
     fmt.Printf( "Database name: %s\n", *database )
     fmt.Printf( "Table name: %s\n", *table_name )
+    fmt.Printf( "Column separator: %s\n", *separator )
 }
 
 func use_database() {
@@ -108,7 +110,7 @@ func create_db_table() {
     _, err = f.WriteString(fmt.Sprintf( "-- table_columns: \n" ))
     _, err = f.WriteString(fmt.Sprintf( "-- auto_increment: 0\n" ))
     _, err = f.WriteString(fmt.Sprintf( "-- total_rows: 0\n" ))
-    _, err = f.WriteString(fmt.Sprintf( "-- separator: ,\n" ))
+    _, err = f.WriteString(fmt.Sprintf( "-- separator: %s\n", *separator ))
     _, err = f.WriteString(fmt.Sprintf( "-- created_at: %d\n", timestamp ))
     _, err = f.WriteString(fmt.Sprintf( "-- updated_at: %d\n", timestamp ))
     _, err = f.WriteString("\n")
