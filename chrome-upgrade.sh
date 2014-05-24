@@ -44,8 +44,8 @@ function initialize {
     echo '    https://github.com/cixtor/mamutools'
     echo '    http://cixtor.com/blog/chrome-upgrade'
     echo
-    question 'Choose the version family (beta|stable) '; read VERSION
-    if [[ "${VERSION}" =~ (beta|stable) ]]; then VERSION="${VERSION}"; else VERSION='beta'; fi
+    question 'Choose the version family (beta|stable|unstable) '; read VERSION
+    if [[ "${VERSION}" =~ (beta|stable|unstable) ]]; then VERSION="${VERSION}"; else VERSION='beta'; fi
     question 'Choose the architecture in bits (i386|amd64) '; read ARCHITECTURE
     if [[ "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE="${ARCHITECTURE}"; else ARCHITECTURE='i386'; fi
 }
