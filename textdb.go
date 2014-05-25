@@ -9,7 +9,7 @@
  * text file or a binary file. There are usually no structural relationships
  * between the records.
  *
- * Plain text files usually contain one record per line,[2] There are different
+ * Plain text files usually contain one record per line. There are different
  * conventions for depicting data. In comma-separated values and delimiter-
  * separated values files, fields can be separated by delimiters such as comma
  * or tab characters. In other cases, each field may have a fixed length; short
@@ -37,6 +37,15 @@ var force_creation = flag.Bool("force", false, "Force the creation of the databa
 var separator = flag.String("sep", ",", "Set the character that will act as the column separator")
 
 func main() {
+    flag.Usage = func() {
+        fmt.Println("Text Database")
+        fmt.Println("  http://cixtor.com/")
+        fmt.Println("  https://github.com/cixtor/mamutools")
+        fmt.Println("  http://en.wikipedia.org/wiki/Flat_file_database")
+        fmt.Println("Usage:")
+        flag.PrintDefaults()
+    }
+
     flag.Parse()
 
     use_database()
@@ -47,6 +56,19 @@ func main() {
     fmt.Printf( "Column separator: %s\n", *separator )
 }
 
+func fail_and_usage( message string, display_usage bool ) {
+    if display_usage {
+        flag.Usage()
+    }
+
+    fmt.Printf("\n%s\n", message)
+    os.Exit(1)
+}
+
+func fail( message string ) {
+    fail_and_usage( message, false )
+}
+
 func use_database() {
     _, err := os.Stat(*database)
 
@@ -55,20 +77,17 @@ func use_database() {
             err = os.Mkdir(*database, 0755)
 
             if err != nil {
-                fmt.Printf("Can not create the database\n")
-                os.Exit(1)
+                fail("Can not create the database")
             }
         } else {
-            fmt.Printf("The database specified does not exists\n")
-            os.Exit(1)
+            fail("The database specified does not exists")
         }
     }
 
     err = os.Chdir(*database)
 
     if err != nil {
-        fmt.Printf("Error using the database specified\n")
-        os.Exit(1)
+        fail("Error using the database specified")
     }
 }
 
@@ -78,18 +97,15 @@ func check_table() {
 
         if err == nil {
             if finfo.IsDir() {
-                fmt.Printf("Can not use a directory as a file\n")
-                os.Exit(1)
+                fail("Can not use a directory as a file")
             }
         } else if *force_creation {
             create_db_table()
         } else {
-            fmt.Printf("The table specified does not exists\n")
-            os.Exit(1)
+            fail("The table specified does not exists")
         }
     } else {
-        fmt.Printf("The table name was not specified\n")
-        os.Exit(1)
+        fail_and_usage( "The table name was not specified", true )
     }
 }
 
