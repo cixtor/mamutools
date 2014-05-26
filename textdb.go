@@ -29,6 +29,7 @@ import (
     "fmt"
     "flag"
     "time"
+    "bufio"
 )
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
@@ -59,9 +60,10 @@ func main() {
 func fail_and_usage( message string, display_usage bool ) {
     if display_usage {
         flag.Usage()
+        fmt.Println()
     }
 
-    fmt.Printf("\n%s\n", message)
+    fmt.Printf("%s\n", message)
     os.Exit(1)
 }
 
@@ -135,4 +137,17 @@ func create_db_table() {
         fmt.Printf("Error writing into table: %s\n", err)
         os.Exit(1)
     }
+}
+
+func read_database_table( table_name string ) ( *os.File, []string ) {
+    file, _ := os.Open(table_name)
+    defer file.Close()
+
+    var lines []string
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        lines = append(lines, scanner.Text())
+    }
+
+    return file, lines
 }
