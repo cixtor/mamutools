@@ -30,12 +30,14 @@ import (
     "flag"
     "time"
     "bufio"
+    "regexp"
 )
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
 var table_name = flag.String("table", "", "Table name where the data will be stored")
 var force_creation = flag.Bool("force", false, "Force the creation of the database and table")
 var separator = flag.String("sep", ",", "Set the character that will act as the column separator")
+var display_info = flag.Bool("info", false, "Display the information of the table")
 
 func main() {
     flag.Usage = func() {
@@ -52,9 +54,9 @@ func main() {
     use_database()
     check_table()
 
-    fmt.Printf( "Database name: %s\n", *database )
-    fmt.Printf( "Table name: %s\n", *table_name )
-    fmt.Printf( "Column separator: %s\n", *separator )
+    _, entries := read_database_table(*table_name)
+
+    display_table_info(entries)
 }
 
 func fail_and_usage( message string, display_usage bool ) {
@@ -150,4 +152,20 @@ func read_database_table( table_name string ) ( *os.File, []string ) {
     }
 
     return file, lines
+}
+
+func display_table_info( entries []string ) {
+    if *display_info {
+        re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
+
+        fmt.Printf("Database Table Attributes:\n")
+
+        for _, entry := range entries {
+            var match []string = re.FindStringSubmatch(entry)
+
+            if match != nil {
+                fmt.Printf("- %s: %s\n", match[1], match[2])
+            }
+        }
+    }
 }
