@@ -156,6 +156,8 @@ func read_database_table( table_name string ) ( *os.File, []string ) {
 
 func display_table_info( entries []string ) {
     if *display_info {
+        var total_attrs int = 8
+        var attr_counter int = 0
         re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
 
         fmt.Printf("Database Table Attributes:\n")
@@ -164,7 +166,12 @@ func display_table_info( entries []string ) {
             var match []string = re.FindStringSubmatch(entry)
 
             if match != nil {
+                attr_counter += 1
                 fmt.Printf("- %s: %s\n", match[1], match[2])
+            }
+
+            if attr_counter >= total_attrs {
+                os.Exit(0)
             }
         }
     }
