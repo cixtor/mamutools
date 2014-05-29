@@ -56,7 +56,7 @@ func main() {
 
     _, entries := read_database_table(*table_name)
 
-    display_table_info(entries)
+    _ = display_table_info(entries)
 }
 
 func fail_and_usage( message string, display_usage bool ) {
@@ -154,8 +154,9 @@ func read_database_table( table_name string ) ( *os.File, []string ) {
     return file, lines
 }
 
-func display_table_info( entries []string ) {
+func display_table_info( entries []string ) ( map[string]string ) {
     if *display_info {
+        var attributes = make(map[string]string)
         var total_attrs int = 8
         var attr_counter int = 0
         re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
@@ -167,12 +168,17 @@ func display_table_info( entries []string ) {
 
             if match != nil {
                 attr_counter += 1
+                attributes[match[1]] = match[2]
                 fmt.Printf("- %s: %s\n", match[1], match[2])
             }
 
             if attr_counter >= total_attrs {
-                os.Exit(0)
+                break
             }
         }
+
+        return attributes
     }
+
+    return nil
 }
