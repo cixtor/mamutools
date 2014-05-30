@@ -31,6 +31,7 @@ import (
     "time"
     "bufio"
     "regexp"
+    "strings"
 )
 
 var database = flag.String("db", ".", "Directory name where the flat files are stored")
@@ -38,6 +39,7 @@ var table_name = flag.String("table", "", "Table name where the data will be sto
 var force_creation = flag.Bool("force", false, "Force the creation of the database and table")
 var separator = flag.String("sep", ",", "Set the character that will act as the column separator")
 var display_info = flag.Bool("info", false, "Display the information of the table")
+var insert_entry = flag.String("insert", "", "Insert a new entry at the end of the table")
 
 func main() {
     flag.Usage = func() {
@@ -54,9 +56,10 @@ func main() {
     use_database()
     check_table()
 
-    _, entries := read_database_table(*table_name)
+    file, entries := read_database_table(*table_name)
+    var attributes map[string]string = display_table_info(entries)
 
-    _ = display_table_info(entries)
+    process_database_query(file, entries, attributes)
 }
 
 func fail_and_usage( message string, display_usage bool ) {
@@ -155,30 +158,45 @@ func read_database_table( table_name string ) ( *os.File, []string ) {
 }
 
 func display_table_info( entries []string ) ( map[string]string ) {
+    var attributes = make(map[string]string)
+    var total_attrs int = 8
+    var attr_counter int = 0
+    re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
+
     if *display_info {
-        var attributes = make(map[string]string)
-        var total_attrs int = 8
-        var attr_counter int = 0
-        re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
-
         fmt.Printf("Database Table Attributes:\n")
+    }
 
-        for _, entry := range entries {
-            var match []string = re.FindStringSubmatch(entry)
+    for _, entry := range entries {
+        var match []string = re.FindStringSubmatch(entry)
 
-            if match != nil {
-                attr_counter += 1
-                attributes[match[1]] = match[2]
+        if match != nil {
+            attr_counter += 1
+            attributes[match[1]] = match[2]
+
+            if *display_info {
                 fmt.Printf("- %s: %s\n", match[1], match[2])
-            }
-
-            if attr_counter >= total_attrs {
-                break
             }
         }
 
-        return attributes
+        if attr_counter >= total_attrs {
+            break
+        }
     }
 
-    return nil
+    return attributes
+}
+
+func process_database_query( file *os.File, entries []string, attributes map[string]string ) {
+    var default_separator string = ","
+
+    if *insert_entry != "" {
+        var data string = *insert_entry
+
+        if attributes["separator"] != default_separator {
+            data = strings.Replace( *insert_entry, default_separator, attributes["separator"], -1 )
+        }
+
+        fmt.Printf("Writing: %#v\n", data)
+    }
 }
