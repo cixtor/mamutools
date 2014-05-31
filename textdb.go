@@ -161,7 +161,7 @@ func display_table_info( entries []string ) ( map[string]string ) {
     var attributes = make(map[string]string)
     var total_attrs int = 8
     var attr_counter int = 0
-    re := regexp.MustCompile(`^-- ([a-z_]+): ([a-zA-Z0-9\-_\., ]+)`)
+    re := regexp.MustCompile(`^-- ([a-z_]+): (.*)`)
 
     if *display_info {
         fmt.Printf("Database Table Attributes:\n")
