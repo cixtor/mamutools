@@ -26,6 +26,7 @@
 url_target='http://brackets.io/'
 user_agent='Mozilla/5.0 (KHTML, like Gecko)'
 github_releases='https://github.com/adobe/brackets/releases/download'
+versioning_url='http://s3.amazonaws.com/files.brackets.io/updates/stable/en.json'
 local_filename='brackets.deb'
 
 echo 'Brackets Upgrade'
@@ -45,17 +46,13 @@ echo "Computer architecture detected: ${architecture}"
 if [ "${architecture}" == "x86_64" ]; then archi_type=64; else archi_type=32; fi
 
 # Retrieve the URL to download.
-counter=0
-build_number=''
-while [ "${build_number}" == "" ]; do
-    build_number=$(curl --silent "${url_target}" --user-agent "${user_agent}" | grep 'var buildNum =')
-    build_number=$(echo "${build_number}" | sed 's/ //g' | awk -F '"' '{print $2}')
-    counter=$(( $counter + 1 ))
-    if [ $counter -gt 5 ]; then
-        echo "Can not get the download link, try again."
-        exit 1
-    fi
-done
+build_number=$(curl --silent "${url_target}" --user-agent "${user_agent}" | grep 'var buildNum =')
+build_number=$(echo "${build_number}" | sed 's/ //g' | awk -F '"' '{print $2}')
+if [ "${build_number}" == "" ]; then
+    versioning=$(curl --compressed --silent "${versioning_url}" --user-agent "${user_agent}" | grep versionString)
+    versioning=$(echo "${versioning}" | head -n 1 | sed 's/[":,a-zA-Z ]//g')
+    build_number=$versioning
+fi
 download_link="${github_releases}/sprint-${build_number}/Brackets.Sprint.${build_number}.${archi_type}-bit.deb"
 echo "Download link: ${download_link}"
 echo "Build number: ${build_number}"
