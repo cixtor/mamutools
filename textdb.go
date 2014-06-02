@@ -60,6 +60,7 @@ func main() {
     var attributes map[string]string = display_table_info(entries)
 
     process_database_query(file, entries, attributes)
+    defer file.Close()
 }
 
 func fail_and_usage( message string, display_usage bool ) {
@@ -145,8 +146,7 @@ func create_db_table() {
 }
 
 func read_database_table( table_name string ) ( *os.File, []string ) {
-    file, _ := os.Open(table_name)
-    defer file.Close()
+    file, _ := os.OpenFile( table_name, os.O_RDWR, 0600 )
 
     var lines []string
     scanner := bufio.NewScanner(file)
@@ -197,6 +197,10 @@ func process_database_query( file *os.File, entries []string, attributes map[str
             data = strings.Replace( *insert_entry, default_separator, attributes["separator"], -1 )
         }
 
-        fmt.Printf("Writing: %#v\n", data)
+        _, err := file.WriteString(data + "\n")
+
+        if err != nil {
+            fail("Could not write into the file")
+        }
     }
 }
