@@ -50,10 +50,13 @@ function initialize {
     echo
 
     question 'Choose the version family (beta|stable|unstable) '; read VERSION
-    if [[ "${VERSION}" =~ (beta|stable|unstable) ]]; then VERSION="${VERSION}"; else VERSION='beta'; fi
+    if [[ ! "${VERSION}" =~ (beta|stable|unstable) ]]; then VERSION='beta'; fi
 
     question 'Choose the architecture in bits (i386|amd64) '; read ARCHITECTURE
-    if [[ "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE="${ARCHITECTURE}"; else ARCHITECTURE='i386'; fi
+    if [[ ! "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE='i386'; fi
+
+    question 'How to install the shortcut (root|user) '; read INST_TARGET
+    if [[ ! "${INST_TARGET}" =~ (root|user) ]]; then INST_TARGET='user'; fi
 }
 
 function request_sudo {
