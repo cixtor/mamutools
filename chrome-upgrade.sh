@@ -57,6 +57,16 @@ function initialize {
 
     question 'How to install the shortcut (root|user) '; read INST_TARGET
     if [[ ! "${INST_TARGET}" =~ (root|user) ]]; then INST_TARGET='user'; fi
+
+    if [ "${INST_TARGET}" == 'root' ]; then
+        INST_TARGET_PATH='/usr/local/bin/'
+    else
+        INST_TARGET_PATH="${HOME}/bin/"
+
+        if [ -e "${INST_TARGET_PATH}" ]; then
+            mkdir "${INST_TARGET_PATH}"
+        fi
+    fi
 }
 
 function request_sudo {
@@ -199,9 +209,13 @@ function install_package {
             sudo ln -s "${LAUNCHER_PATH}";
 
             # Install Google Chrome binary globally.
-            cd /usr/local/bin/
+            SYMLINK_BIN='/opt/google/chrome/google-chrome'
+            cd "${INST_TARGET_PATH}"
             sudo rm -f google-chrome
-            sudo ln -s /opt/google/chrome/google-chrome
+            if [ ! -e "${SYMLINK_BIN}" ]; then
+                SYMLINK_BIN=$( echo "${SYMLINK_BIN}" | sed 's/\/chrome\//\/chrome-beta\//g')
+            fi
+            sudo ln -s "${SYMLINK_BIN}" google-chrome
 
             # Finishing
             echo
