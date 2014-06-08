@@ -74,3 +74,18 @@ func get_numbers( arguments []string ) []int {
 
     return numbers
 }
+
+func max_slice( list []int ) int {
+    var max int
+    var list_len int = len(list)
+
+    for i := 0; i < list_len; i++ {
+        var value int = list[i]
+
+        if value > max {
+            max = value
+        }
+    }
+
+    return max
+}
