@@ -28,6 +28,7 @@ func main() {
     if len(os.Args) > 1 {
         var numbers []int = get_numbers(os.Args)
         var max_num int = max_slice(numbers)
+        // var min_num int = min_slice(numbers)
         var num_len int = len(numbers)
         var sparks = make([]rune, 0)
 
@@ -88,4 +89,19 @@ func max_slice( list []int ) int {
     }
 
     return max
+}
+
+func min_slice( list []int ) int {
+    var min int
+    var list_len int = len(list)
+
+    for i := 0; i < list_len; i++ {
+        var value int = list[i]
+
+        if value < min {
+            min = value
+        }
+    }
+
+    return min
 }
