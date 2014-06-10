@@ -26,8 +26,8 @@ import "strconv"
 
 func main() {
     if len(os.Args) > 1 {
-        var numbers []int = get_numbers(os.Args)
-        var max_num int = max_slice(numbers)
+        var numbers []float64 = get_numbers(os.Args)
+        var max_num float64 = max_slice(numbers)
         // var min_num int = min_slice(numbers)
         var num_len int = len(numbers)
         var sparks = make([]rune, 0)
@@ -46,8 +46,7 @@ func main() {
 
         // Get the sparkline for each number.
         for i := 0; i < num_len; i++ {
-            var num int = int(numbers[i])
-            var unit int = (num * 7 ) / max_num
+            var unit int = int( (numbers[i] * 7 ) / max_num )
             sparks = append( sparks, sticks[unit] )
         }
 
@@ -63,25 +62,25 @@ func main() {
     }
 }
 
-func get_numbers( arguments []string ) []int {
-    var numbers []int
+func get_numbers( arguments []string ) []float64 {
+    var numbers []float64
     var letters []string = arguments[1:]
     var list_len int = len(letters)
 
     for i := 0; i < list_len; i++ {
-        num, _ := strconv.Atoi(letters[i])
+        num, _ := strconv.ParseFloat( letters[i], 64 )
         numbers = append( numbers, num )
     }
 
     return numbers
 }
 
-func max_slice( list []int ) int {
-    var max int
+func max_slice( list []float64 ) float64 {
+    var max float64
     var list_len int = len(list)
 
     for i := 0; i < list_len; i++ {
-        var value int = list[i]
+        var value float64 = list[i]
 
         if value > max {
             max = value
@@ -91,14 +90,14 @@ func max_slice( list []int ) int {
     return max
 }
 
-func min_slice( list []int ) int {
-    var min int
+func min_slice( list []float64 ) float64 {
+    var min float64
     var list_len int = len(list)
 
     for i := 0; i < list_len; i++ {
-        var value int = list[i]
+        var value float64 = list[i]
 
-        if value < min {
+        if value > min {
             min = value
         }
     }
