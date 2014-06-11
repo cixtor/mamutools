@@ -26,45 +26,59 @@ import "strconv"
 
 func main() {
     if len(os.Args) > 1 {
-        var numbers []float64 = get_numbers(os.Args)
-        var max_num float64 = max_slice(numbers)
-        // var min_num int = min_slice(numbers)
-        var num_len int = len(numbers)
-        var sparks = make([]rune, 0)
+        var action string = os.Args[1]
+        var arguments []string = os.Args[1:]
 
-        // Unicode representation of the sparks.
-        var sticks = []rune {
-            '\u2581',
-            '\u2582',
-            '\u2583',
-            '\u2584',
-            '\u2585',
-            '\u2586',
-            '\u2587',
-            '\u2588',
+        if action == "-help" {
+            fmt.Printf("Display binary help\n")
+            os.Exit(0)
+        } else if action == "-verbose" {
+            fmt.Printf("Verbose mode enabled\n")
+            arguments = os.Args[2:]
         }
 
-        // Get the sparkline for each number.
-        for i := 0; i < num_len; i++ {
-            var unit int = int( (numbers[i] * 7 ) / max_num )
-            sparks = append( sparks, sticks[unit] )
-        }
-
-        // Print the sparklines in the console.
-        for i := 0; i < num_len; i++ {
-            fmt.Printf( "%s", string(sparks[i]) )
-        }
-
-        fmt.Printf("\n")
-
+        spark_numbers(arguments)
+        os.Exit(0)
     } else {
         os.Exit(1)
     }
 }
 
-func get_numbers( arguments []string ) []float64 {
+func spark_numbers( arguments []string ) {
+    var numbers []float64 = get_numbers(arguments)
+    var max_num float64 = max_slice(numbers)
+    // var min_num int = min_slice(numbers)
+    var num_len int = len(numbers)
+    var sparks = make([]rune, 0)
+
+    // Unicode representation of the sparks.
+    var sticks = []rune {
+        '\u2581',
+        '\u2582',
+        '\u2583',
+        '\u2584',
+        '\u2585',
+        '\u2586',
+        '\u2587',
+        '\u2588',
+    }
+
+    // Get the sparkline for each number.
+    for i := 0; i < num_len; i++ {
+        var unit int = int( (numbers[i] * 7 ) / max_num )
+        sparks = append( sparks, sticks[unit] )
+    }
+
+    // Print the sparklines in the console.
+    for i := 0; i < num_len; i++ {
+        fmt.Printf( "%s", string(sparks[i]) )
+    }
+
+    fmt.Printf("\n")
+}
+
+func get_numbers( letters []string ) []float64 {
     var numbers []float64
-    var letters []string = arguments[1:]
     var list_len int = len(letters)
 
     for i := 0; i < list_len; i++ {
