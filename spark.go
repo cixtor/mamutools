@@ -23,31 +23,32 @@ package main
 import "os"
 import "fmt"
 import "strconv"
+import "strings"
 
 func main() {
     if len(os.Args) > 1 {
         var action string = os.Args[1]
         var arguments []string = os.Args[1:]
+        var verbose bool = false
 
         if action == "-help" {
             fmt.Printf("Display binary help\n")
             os.Exit(0)
         } else if action == "-verbose" {
-            fmt.Printf("Verbose mode enabled\n")
             arguments = os.Args[2:]
+            verbose = true
         }
 
-        spark_numbers(arguments)
+        spark_numbers( arguments, verbose )
         os.Exit(0)
     } else {
         os.Exit(1)
     }
 }
 
-func spark_numbers( arguments []string ) {
+func spark_numbers( arguments []string, verbose bool ) {
     var numbers []float64 = get_numbers(arguments)
     var max_num float64 = max_slice(numbers)
-    // var min_num int = min_slice(numbers)
     var num_len int = len(numbers)
     var sparks = make([]rune, 0)
 
@@ -67,6 +68,34 @@ func spark_numbers( arguments []string ) {
     for i := 0; i < num_len; i++ {
         var unit int = int( (numbers[i] * 7 ) / max_num )
         sparks = append( sparks, sticks[unit] )
+    }
+
+    if verbose {
+        var min_num float64 = min_slice(numbers)
+        var ellipsis_arr []string
+        var ellipsis_limit int = num_len
+        var add_three_dots bool = false
+        var num_ellipsis string
+
+        if num_len > 15 {
+            ellipsis_limit = 15
+            add_three_dots = true
+        }
+
+        for j := 0; j < ellipsis_limit; j++ {
+            ellipsis_arr = append( ellipsis_arr, float_to_string(numbers[j]) )
+        }
+
+        num_ellipsis = strings.Join( ellipsis_arr, ", " )
+
+        if add_three_dots {
+            num_ellipsis += " ..."
+        }
+
+        fmt.Printf( "Spark\n" )
+        fmt.Printf( "Total numbers: %d\n", num_len )
+        fmt.Printf( "Min: %.2f ; Max: %.2f\n", min_num, max_num )
+        fmt.Printf( "Numbers: %s\n", num_ellipsis )
     }
 
     // Print the sparklines in the console.
@@ -117,4 +146,8 @@ func min_slice( list []float64 ) float64 {
     }
 
     return min
+}
+
+func float_to_string( number float64 ) string {
+    return strconv.FormatFloat( number, 'f', 1, 64 )
 }
