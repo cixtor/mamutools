@@ -32,7 +32,12 @@ func main() {
         var verbose bool = false
 
         if action == "-help" {
-            fmt.Printf("Display binary help\n")
+            fmt.Println("Spark")
+            fmt.Println("  http://cixtor.com/")
+            fmt.Println("  https://github.com/cixtor/mamutools")
+            fmt.Println("  http://en.wikipedia.org/wiki/Sparkline")
+            fmt.Println("Usage:")
+            fmt.Println("  spark [-help|-verbose] values")
             os.Exit(0)
         } else if action == "-verbose" {
             arguments = os.Args[2:]
