@@ -38,6 +38,10 @@ func main() {
             fmt.Println("  http://en.wikipedia.org/wiki/Sparkline")
             fmt.Println("Usage:")
             fmt.Println("  spark [-help|-verbose] values")
+            fmt.Println("Examples:")
+            fmt.Println("  spark 1 5 22 13 53")
+            fmt.Println("  spark $(echo 9 13 5 17 1)")
+            fmt.Println("  spark $(print i in [1..50])")
             os.Exit(0)
         } else if action == "-verbose" {
             arguments = os.Args[2:]
