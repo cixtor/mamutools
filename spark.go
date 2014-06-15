@@ -14,8 +14,6 @@
  * Whereas the typical chart is designed to show as much data as possible, and
  * is set off from the flow of text, sparklines are intended to be succinct,
  * memorable, and located where they are discussed.
- *
- * PS. All credits go to @holman by its original implementation in Bash.
  */
 
 package main
