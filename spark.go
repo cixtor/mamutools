@@ -30,16 +30,7 @@ func main() {
         var verbose bool = false
 
         if action == "-help" {
-            fmt.Println("Spark")
-            fmt.Println("  http://cixtor.com/")
-            fmt.Println("  https://github.com/cixtor/mamutools")
-            fmt.Println("  http://en.wikipedia.org/wiki/Sparkline")
-            fmt.Println("Usage:")
-            fmt.Println("  spark [-help|-verbose] values")
-            fmt.Println("Examples:")
-            fmt.Println("  spark 1 5 22 13 53")
-            fmt.Println("  spark $(echo 9 13 5 17 1)")
-            fmt.Println("  spark $(print i in [1..50])")
+            display_help()
             os.Exit(0)
         } else if action == "-verbose" {
             arguments = os.Args[2:]
@@ -49,8 +40,23 @@ func main() {
         spark_numbers( arguments, verbose )
         os.Exit(0)
     } else {
+        display_help()
+        fmt.Printf("\nError. Values were not specified\n")
         os.Exit(1)
     }
+}
+
+func display_help() {
+    fmt.Println("Spark")
+    fmt.Println("  http://cixtor.com/")
+    fmt.Println("  https://github.com/cixtor/mamutools")
+    fmt.Println("  http://en.wikipedia.org/wiki/Sparkline")
+    fmt.Println("Usage:")
+    fmt.Println("  spark [-help|-verbose] values")
+    fmt.Println("Examples:")
+    fmt.Println("  spark 1 5 22 13 53")
+    fmt.Println("  spark $(echo 9 13 5 17 1)")
+    fmt.Println("  spark $(print i in [1..50])")
 }
 
 func spark_numbers( arguments []string, verbose bool ) {
