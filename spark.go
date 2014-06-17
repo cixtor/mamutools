@@ -56,7 +56,7 @@ func display_help() {
     fmt.Println("Examples:")
     fmt.Println("  spark 1 5 22 13 53")
     fmt.Println("  spark $(echo 9 13 5 17 1)")
-    fmt.Println("  spark $(print i in [1..50])")
+    fmt.Println("  spark $(seq 0 50 | sort -R)")
 }
 
 func spark_numbers( arguments []string, verbose bool ) {
