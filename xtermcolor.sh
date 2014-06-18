@@ -27,19 +27,34 @@
 # libraries, such as termcap or terminfo, or a higher-level library such as curses.
 #
 echo 'X-Term Color'
-echo '    http://cixtor.com/'
-echo '    https://github.com/cixtor/mamutools'
-echo '    http://en.wikipedia.org/wiki/ANSI_escape_code'
+echo '  http://cixtor.com/'
+echo '  https://github.com/cixtor/mamutools'
+echo '  http://en.wikipedia.org/wiki/ANSI_escape_code'
 echo
 if [ "$1" == "basic" ]; then
-    SEPARATOR=$(for(( j=0; j<10; j++ )); do echo -n "_"; done)
     for(( i=0; i<110; i+=3 )); do
         a=$i
         b=$(( $i+1 ))
         c=$(( $i+2 ))
-        echo -ne "[0;${a}m => \e[0;${a}mHello world\e[0m"; echo -n $SEPARATOR
-        echo -ne "[0;${b}m => \e[0;${b}mHello world\e[0m"; echo -n $SEPARATOR
-        echo -e  "[0;${c}m => \e[0;${c}mHello world\e[0m";
+
+        if   [ $a -lt 10  ]; then a_indent="  ";
+        elif [ $a -lt 100 ]; then a_indent=" ";
+        else a_indent=""
+        fi
+
+        if   [ $b -lt 10  ]; then b_indent="  ";
+        elif [ $b -lt 100 ]; then b_indent=" ";
+        else b_indent=""
+        fi
+
+        if   [ $c -lt 10  ]; then c_indent="  ";
+        elif [ $c -lt 100 ]; then c_indent=" ";
+        else c_indent=""
+        fi
+
+        echo -ne "${a_indent}[0;${a}m => \e[0;${a}mHello world\e[0m   ";
+        echo -ne "${b_indent}[0;${b}m => \e[0;${b}mHello world\e[0m   ";
+        echo -e  "${c_indent}[0;${c}m => \e[0;${c}mHello world\e[0m";
     done
 elif [ "$1" == "palette" ]; then
     for c in $(seq 0 255);do
