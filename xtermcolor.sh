@@ -33,6 +33,10 @@ echo '  http://en.wikipedia.org/wiki/ANSI_escape_code'
 echo
 if [ "$1" == "basic" ]; then
     for(( i=0; i<110; i+=3 )); do
+        if [ $i -gt 11 ] && [ $i -lt 30 ]; then continue; fi
+
+        if [ $i -gt 50 ] && [ $i -lt 90 ]; then continue; fi
+
         a=$i
         b=$(( $i+1 ))
         c=$(( $i+2 ))
