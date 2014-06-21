@@ -31,7 +31,9 @@ echo '  http://cixtor.com/'
 echo '  https://github.com/cixtor/mamutools'
 echo '  http://en.wikipedia.org/wiki/ANSI_escape_code'
 echo
-if [ "$1" == "basic" ]; then
+if [ "$1" == "basic" ] || [ "$1" == "basic-bold" ]; then
+    if [ "$1" == "basic-bold" ]; then boldness=1; else boldness=0; fi
+
     for(( i=0; i<110; i+=3 )); do
         if [ $i -gt 11 ] && [ $i -lt 30 ]; then continue; fi
 
@@ -56,9 +58,9 @@ if [ "$1" == "basic" ]; then
         else c_indent=""
         fi
 
-        echo -ne "${a_indent}[0;${a}m : \e[0;${a}mHello world\e[0m   ";
-        echo -ne "${b_indent}[0;${b}m : \e[0;${b}mHello world\e[0m   ";
-        echo -e  "${c_indent}[0;${c}m : \e[0;${c}mHello world\e[0m";
+        echo -ne "${a_indent}[0;${a}m : \e[${boldness};${a}mHello world\e[0m   ";
+        echo -ne "${b_indent}[0;${b}m : \e[${boldness};${b}mHello world\e[0m   ";
+        echo -e  "${c_indent}[0;${c}m : \e[${boldness};${c}mHello world\e[0m";
     done
 elif [ "$1" == "palette" ]; then
     for c in $(seq 0 255);do
@@ -69,6 +71,6 @@ elif [ "$1" == "palette" ]; then
         done;
     done
 else
-    echo "Usage: $0 [basic|palette]";
+    echo "Usage: $0 [basic|basic-bold|palette]";
 fi
 #
