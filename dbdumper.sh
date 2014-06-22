@@ -31,6 +31,7 @@
 # devices can be arranged to provide geographic redundancy, data security, and
 # portability.
 #
+
 MAXIMUN_BACKUP_FILES=10
 BACKUP_FOLDERNAME='dbbackup'
 DB_HOSTNAME='localhost'
@@ -41,48 +42,59 @@ DATABASES=(
     'mysql'
     'test'
 )
-#
+
 function success {
     echo -e "\e[0;92mOK.\e[0m ${1}"
 }
+
 function warning {
     echo -e "\e[0;93m[!]\e[0m ${1}"
 }
+
 function warning_wait {
     echo -en "\e[0;93m[!]\e[0m ${1}"
 }
+
 function error {
     echo -e "\e[0;91m[x] Error.\e[0m ${1}"
 }
+
 function fail {
     error $1
     exit
 }
+
 function initialize {
     echo 'Database Dumper'
     echo '    http://cixtor.com/'
     echo '    https://github.com/cixtor/mamutools'
     echo '    http://en.wikipedia.org/wiki/Database_dump'
     echo
+
     cd $(dirname $0)
     CWD=$(pwd)
     success "Current working directory (CWD): \e[0;93m${CWD}\e[0m"
     CURRENT_DATE=$(date +%Y%m%d_%H%M%S)
     BACKUP_FOLDER="${BACKUP_FOLDERNAME}_${CURRENT_DATE}"
     mkdir $BACKUP_FOLDER
+
     if [ ! -d "${BACKUP_FOLDER}" ]; then
         fail 'Root backup folder was not created.'
     fi
 }
+
 function count_databases {
     COUNT=0
+
     for DATABASE in ${DATABASES[@]}; do COUNT=$(( COUNT + 1)); done
+
     if [ $COUNT -gt 0 ]; then
         success "\e[0;93m${COUNT}\e[0m databases will be backed up"
     else
         fail 'There are not databases to create the backup package'
     fi
 }
+
 function dump_databases {
     # Iterate overthe database list and dump (in SQL) the content of each one
     for DATABASE in ${DATABASES[@]}; do
@@ -95,6 +107,7 @@ function dump_databases {
         echo "    Began...: ${DUMP_BEGIN_TIME}"
         echo "    Finished: ${DUMP_FINISH_TIME}"
         echo -n "    "
+
         if [ "${DBDUMP_SUCCEEDED}" -eq 0 ];
             then success 'Dumped successfully!';
             else error 'Database dump failed';
@@ -102,41 +115,47 @@ function dump_databases {
     done
     echo
 }
+
 function package_backup {
     warning_wait 'Package and compress the backup folder... '
     tar -c $BACKUP_FOLDER | bzip2 > ${BACKUP_FOLDER}.tar.bz2 && rm -rf $BACKUP_FOLDER
     BACKUP_FILES_MADE=$(ls -1 ${BACKUP_FOLDERNAME}*.tar.bz2 | wc -l)
     BACKUP_FILES_MADE=$(( $BACKUP_FILES_MADE - 0 )) # Convert into integer number.
     success
-    #
+
     warning "\e[0;93m${BACKUP_FILES_MADE}\e[0m backup files currently exist"
     if [ $BACKUP_FILES_MADE -gt $MAXIMUN_BACKUP_FILES ]; then
         REMOVE_FILES=$(( $BACKUP_FILES_MADE - $MAXIMUN_BACKUP_FILES ))
         warning "Remove \e[0;93m${REMOVE_FILES}\e[0m old backup files"
         ALL_BACKUP_FILES=($(ls -tr1 ${BACKUP_FOLDERNAME}*.tar.bz2))
         SAFE_BACKUP_FILES=("${ALL_BACKUP_FILES[@]:0:${MAXIMUN_BACKUP_FILES}}") # Like: [0..10] in Ruby
-        #
+
         warning 'Saving newest backup files and removing the old ones:'
         FOLDER_SAFETY='_safety'
         mkdir $FOLDER_SAFETY
+
         for FILE in ${SAFE_BACKUP_FILES[@]}; do
             mv -i $FILE $FOLDER_SAFETY/
         done
+
         for FILE in $(ls -1 ${BACKUP_FOLDERNAME}*.tar.bz2); do
             echo -n '    ' && rm -fv $FILE;
         done
+
         success 'These backup files are the newest:'
         cd $FOLDER_SAFETY
+
         for FILE in $(ls -1 *.tar.bz2); do
             echo -n '    ' && echo $FILE
             mv -i $FILE ../
         done
+
         cd ../ && rm -rf $FOLDER_SAFETY
     fi
 }
+
 initialize
 count_databases
 dump_databases
 package_backup
 success 'Finished'
-#
