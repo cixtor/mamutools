@@ -61,7 +61,7 @@ function error {
 
 function fail {
     error $1
-    exit
+    exit 1
 }
 
 function initialize {
@@ -96,24 +96,30 @@ function count_databases {
 }
 
 function dump_databases {
-    # Iterate overthe database list and dump (in SQL) the content of each one
-    for DATABASE in ${DATABASES[@]}; do
-        BACKUP_DATABASE_PATH="${BACKUP_FOLDER}/${DATABASE}.sql"
-        warning "Dumping database: ${DATABASE} ..."
-        DUMP_BEGIN_TIME=$(date)
-        mysqldump -h "${DB_HOSTNAME}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DATABASE}" > "${BACKUP_DATABASE_PATH}"
-        DBDUMP_SUCCEEDED=$?
-        DUMP_FINISH_TIME=$(date)
-        echo "    Began...: ${DUMP_BEGIN_TIME}"
-        echo "    Finished: ${DUMP_FINISH_TIME}"
-        echo -n "    "
+    dump_bin=$(which mysqldump)
 
-        if [ "${DBDUMP_SUCCEEDED}" -eq 0 ];
-            then success 'Dumped successfully!';
-            else error 'Database dump failed';
-        fi
-    done
-    echo
+    if [ "${dump_bin}" ]; then
+        # Iterate overthe database list and dump (in SQL) the content of each one
+        for DATABASE in ${DATABASES[@]}; do
+            BACKUP_DATABASE_PATH="${BACKUP_FOLDER}/${DATABASE}.sql"
+            warning "Dumping database: ${DATABASE} ..."
+            DUMP_BEGIN_TIME=$(date)
+            $dump_bin -h "${DB_HOSTNAME}" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" "${DATABASE}" > "${BACKUP_DATABASE_PATH}"
+            DBDUMP_SUCCEEDED=$?
+            DUMP_FINISH_TIME=$(date)
+            echo "    Began...: ${DUMP_BEGIN_TIME}"
+            echo "    Finished: ${DUMP_FINISH_TIME}"
+            echo -n "    "
+
+            if [ "${DBDUMP_SUCCEEDED}" -eq 0 ];
+                then success 'Dumped successfully!';
+                else error 'Database dump failed';
+            fi
+        done
+        echo
+    else
+        fail "MySQL dumper binary was not found"
+    fi
 }
 
 function package_backup {
