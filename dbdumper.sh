@@ -60,7 +60,7 @@ function error {
 }
 
 function fail {
-    error $1
+    error "${1}"
     exit 1
 }
 
@@ -118,7 +118,7 @@ function dump_databases {
         done
         echo
     else
-        fail "MySQL dumper binary was not found"
+        fail 'MySQL dumper binary was not found'
     fi
 }
 
