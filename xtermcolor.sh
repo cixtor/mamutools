@@ -64,11 +64,12 @@ if [ "$1" == "basic" ] || [ "$1" == "basic-bold" ]; then
     done
 elif [ "$1" == "palette" ]; then
     for c in $(seq 0 255);do
-        t=5;
-        for i in $(seq $t 5); do
-            CONTENT=$(seq -s+0 $((40)) | tr -d '[0-9]')
-            echo -e "\e[0;48;$i;${c}m$i:$c $CONTENT\e[0m";
-        done;
+        CONTENT='::::::::::'
+        if   [ $c -lt 10  ]; then d="00${c}";
+        elif [ $c -lt 100 ]; then d="0${c}";
+        else d="${c}";
+        fi
+        echo -e "\e[0;48;5;${c}m${d} $CONTENT\e[0m";
     done
 else
     echo "Usage: $0 [basic|basic-bold|palette]";
