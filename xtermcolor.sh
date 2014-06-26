@@ -71,6 +71,44 @@ elif [ "$1" == "palette" ]; then
         fi
         echo -e "\e[0;48;5;${c}m${d} $CONTENT\e[0m";
     done
+elif [ "$1" == "verbose" ]; then
+    # System colors
+    for fgbg in 38 48; do
+        echo "System colors (${fgbg};5;0..15):"
+
+        for color in {0..15}; do
+            echo -en "\e[${fgbg};5;${color}m::\e[0m"
+
+            if [ $color -eq 7 ] || [ $color -eq 15 ]; then echo; fi
+        done
+    done
+
+    # Color cubes
+    for fgbg in 38 48; do
+        echo "Color cube (6x6):"
+        rgb_seq=$(seq 0 5)
+
+        for g in $rgb_seq; do
+            for r in $rgb_seq; do
+                for b in $rgb_seq; do
+                    color=$(( 16 + $r * 36 + $g * 6 + $b ))
+                    echo -en "\e[${fgbg};5;${color}m::"
+                done
+                echo -en "\e[0m "
+            done
+            echo
+        done
+    done
+
+    # Grayscale ramp
+    echo "Grayscale ramp:"
+
+    for fgbg in 38 48; do
+        for color in {232..255}; do
+            echo -en "\e[${fgbg};5;${color}m::\e[0m"
+        done
+        echo
+    done
 else
     echo "Usage: $0 [basic|basic-bold|palette]";
 fi
