@@ -109,6 +109,39 @@ elif [ "$1" == "verbose" ]; then
         done
         echo
     done
+elif [ "$1" == "cubes" ]; then
+    function render_cube {
+        action=$1
+        fgbg=48
+        rgb_seq=$(seq 0 5)
+
+        for x in $rgb_seq; do
+            for y in $rgb_seq; do
+                for z in $rgb_seq; do
+                      if [ "${action}" == "rgb" ]; then r=$x; g=$y; b=$z;
+                    elif [ "${action}" == "rbg" ]; then r=$x; g=$z; b=$y;
+                    elif [ "${action}" == "grb" ]; then r=$y; g=$x; b=$z;
+                    elif [ "${action}" == "gbr" ]; then r=$y; g=$z; b=$x;
+                    elif [ "${action}" == "brg" ]; then r=$z; g=$x; b=$y;
+                    elif [ "${action}" == "bgr" ]; then r=$z; g=$y; b=$x;
+                    else r=0; g=0; b=0;
+                      fi
+
+                    color=$(( 16 + $r * 36 + $g * 6 + $b ))
+                    echo -en "\e[${fgbg};5;${color}m::"
+                done
+                echo -en "\e[0m "
+            done
+            echo
+        done
+    }
+
+    echo "Color cube (rgb):" && render_cube "rgb"
+    echo "Color cube (bgr):" && render_cube "bgr"
+    echo "Color cube (gbr):" && render_cube "gbr"
+    echo "Color cube (grb):" && render_cube "grb"
+    echo "Color cube (rbg):" && render_cube "rbg"
+    echo "Color cube (brg):" && render_cube "brg"
 else
     echo "Usage: $0 [basic|basic-bold|palette]";
 fi
