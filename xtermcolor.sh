@@ -26,13 +26,25 @@
 # Utility programs such as tput output them, as well as in low-level programming
 # libraries, such as termcap or terminfo, or a higher-level library such as curses.
 #
-echo 'X-Term Color'
-echo '  http://cixtor.com/'
-echo '  https://github.com/cixtor/mamutools'
-echo '  http://en.wikipedia.org/wiki/ANSI_escape_code'
-echo
-if [ "$1" == "basic" ] || [ "$1" == "basic-bold" ]; then
-    if [ "$1" == "basic-bold" ]; then boldness=1; else boldness=0; fi
+
+action="${1}"
+boldness="${2}"
+
+if [ "${action}" == "" ]; then
+    echo 'X-Term Color'
+    echo '  http://cixtor.com/'
+    echo '  https://github.com/cixtor/mamutools'
+    echo '  http://en.wikipedia.org/wiki/ANSI_escape_code'
+    echo 'Usage:'
+    echo "  $0 basic [clear]"
+    echo "  $0 basic [bold]"
+    echo "  $0 cubes [clear]"
+    echo "  $0 cubes [bold]"
+    echo "  $0 palette"
+    echo "  $0 verbose"
+    exit 1
+elif [ "${action}" == "basic" ]; then
+    if [ "${boldness}" == "bold" ]; then boldnum=1; else boldnum=0; fi
 
     for(( i=0; i<110; i+=3 )); do
         if [ $i -gt 11 ] && [ $i -lt 30 ]; then continue; fi
@@ -58,72 +70,25 @@ if [ "$1" == "basic" ] || [ "$1" == "basic-bold" ]; then
         else c_indent=""
         fi
 
-        echo -ne "${a_indent}[0;${a}m : \e[${boldness};${a}mHello world\e[0m   ";
-        echo -ne "${b_indent}[0;${b}m : \e[${boldness};${b}mHello world\e[0m   ";
-        echo -e  "${c_indent}[0;${c}m : \e[${boldness};${c}mHello world\e[0m";
+        echo -ne "${a_indent}[0;${a}m : \e[${boldnum};${a}mHello world\e[0m   ";
+        echo -ne "${b_indent}[0;${b}m : \e[${boldnum};${b}mHello world\e[0m   ";
+        echo -e  "${c_indent}[0;${c}m : \e[${boldnum};${c}mHello world\e[0m";
     done
-elif [ "$1" == "palette" ]; then
-    for c in $(seq 0 255);do
-        CONTENT='::::::::::'
-        if   [ $c -lt 10  ]; then d="00${c}";
-        elif [ $c -lt 100 ]; then d="0${c}";
-        else d="${c}";
-        fi
-        echo -e "\e[0;48;5;${c}m${d} $CONTENT\e[0m";
-    done
-elif [ "$1" == "verbose" ]; then
-    # System colors
-    for fgbg in 38 48; do
-        echo "System colors (${fgbg};5;0..15):"
-
-        for color in {0..15}; do
-            echo -en "\e[${fgbg};5;${color}m::\e[0m"
-
-            if [ $color -eq 7 ] || [ $color -eq 15 ]; then echo; fi
-        done
-    done
-
-    # Color cubes
-    for fgbg in 38 48; do
-        echo "Color cube (6x6):"
-        rgb_seq=$(seq 0 5)
-
-        for g in $rgb_seq; do
-            for r in $rgb_seq; do
-                for b in $rgb_seq; do
-                    color=$(( 16 + $r * 36 + $g * 6 + $b ))
-                    echo -en "\e[${fgbg};5;${color}m::"
-                done
-                echo -en "\e[0m "
-            done
-            echo
-        done
-    done
-
-    # Grayscale ramp
-    echo "Grayscale ramp:"
-
-    for fgbg in 38 48; do
-        for color in {232..255}; do
-            echo -en "\e[${fgbg};5;${color}m::\e[0m"
-        done
-        echo
-    done
-elif [ "$1" == "cubes" ]; then
+elif [ "${action}" == "cubes" ]; then
     function render_cube {
-        action=$1
+        combo=$1
         fgbg=48
         rgb_seq=$(seq 0 5)
 
         for x in $rgb_seq; do
             for y in $rgb_seq; do
                 for z in $rgb_seq; do
-                      if [ "${action}" == "rgb" ]; then r=$x; g=$y; b=$z;
-                    elif [ "${action}" == "rbg" ]; then r=$x; g=$z; b=$y;
-                    elif [ "${action}" == "grb" ]; then r=$y; g=$x; b=$z;
-                    elif [ "${action}" == "gbr" ]; then r=$y; g=$z; b=$x;
-                    elif [ "${action}" == "brg" ]; then r=$z; g=$x; b=$y;
-                    elif [ "${action}" == "bgr" ]; then r=$z; g=$y; b=$x;
+                      if [ "${combo}" == "rgb" ]; then r=$x; g=$y; b=$z;
+                    elif [ "${combo}" == "rbg" ]; then r=$x; g=$z; b=$y;
+                    elif [ "${combo}" == "grb" ]; then r=$y; g=$x; b=$z;
+                    elif [ "${combo}" == "gbr" ]; then r=$y; g=$z; b=$x;
+                    elif [ "${combo}" == "brg" ]; then r=$z; g=$x; b=$y;
+                    elif [ "${combo}" == "bgr" ]; then r=$z; g=$y; b=$x;
                     else r=0; g=0; b=0;
                       fi
 
@@ -142,7 +107,55 @@ elif [ "$1" == "cubes" ]; then
     echo "Color cube (grb):" && render_cube "grb"
     echo "Color cube (rbg):" && render_cube "rbg"
     echo "Color cube (brg):" && render_cube "brg"
-else
-    echo "Usage: $0 [basic|basic-bold|palette]";
+elif [ "${action}" == "palette" ]; then
+    for c in $(seq 0 255);do
+        CONTENT='::::::::::'
+        if   [ $c -lt 10  ]; then d="00${c}";
+        elif [ $c -lt 100 ]; then d="0${c}";
+        else d="${c}";
+        fi
+        echo -e "\e[0;48;5;${c}m${d} $CONTENT\e[0m";
+    done
+elif [ "${action}" == "verbose" ]; then
+    # System colors
+    for fgbg in 38 48; do
+        echo "System colors (${fgbg};5;0..15):"
+
+        for color in {0..15}; do
+            echo -en "\e[${fgbg};5;${color}m::\e[0m"
+
+            if [ $color -eq 7 ] || [ $color -eq 15 ]; then echo; fi
+        done
+
+        echo
+    done
+
+    # Color cubes
+    for fgbg in 38 48; do
+        echo "Color cube (6x6):"
+        rgb_seq=$(seq 0 5)
+
+        for g in $rgb_seq; do
+            for r in $rgb_seq; do
+                for b in $rgb_seq; do
+                    color=$(( 16 + $r * 36 + $g * 6 + $b ))
+                    echo -en "\e[${fgbg};5;${color}m::"
+                done
+                echo -en "\e[0m "
+            done
+            echo
+        done
+
+        echo
+    done
+
+    # Grayscale ramp
+    echo "Grayscale ramp:"
+
+    for fgbg in 38 48; do
+        for color in {232..255}; do
+            echo -en "\e[${fgbg};5;${color}m::\e[0m"
+        done
+        echo
+    done
 fi
-#
