@@ -30,7 +30,7 @@
 action="${1}"
 boldness="${2}"
 
-if [ "${action}" == "" ]; then
+function usage {
     echo 'X-Term Color'
     echo '  http://cixtor.com/'
     echo '  https://github.com/cixtor/mamutools'
@@ -43,6 +43,10 @@ if [ "${action}" == "" ]; then
     echo "  $0 palette"
     echo "  $0 verbose"
     exit 1
+}
+
+if [ "${action}" == "" ]; then
+    usage
 elif [ "${action}" == "basic" ]; then
     if [ "${boldness}" == "bold" ]; then boldnum=1; else boldnum=0; fi
 
@@ -77,8 +81,8 @@ elif [ "${action}" == "basic" ]; then
 elif [ "${action}" == "cubes" ]; then
     function render_cube {
         combo=$1
-        fgbg=48
         rgb_seq=$(seq 0 5)
+        if [ "${boldness}" == "clear" ]; then fgbg=38; else fgbg=48; fi
 
         for x in $rgb_seq; do
             for y in $rgb_seq; do
@@ -158,4 +162,6 @@ elif [ "${action}" == "verbose" ]; then
         done
         echo
     done
+else
+    usage
 fi
