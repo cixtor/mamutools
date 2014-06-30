@@ -105,12 +105,10 @@ elif [ "${action}" == "cubes" ]; then
         done
     }
 
-    echo "Color cube (rgb):" && render_cube "rgb"
-    echo "Color cube (bgr):" && render_cube "bgr"
-    echo "Color cube (gbr):" && render_cube "gbr"
-    echo "Color cube (grb):" && render_cube "grb"
-    echo "Color cube (rbg):" && render_cube "rbg"
-    echo "Color cube (brg):" && render_cube "brg"
+    for combination in rgb bgr gbr grb rbg brg; do
+        echo "Color cube (${combination}):"
+        render_cube "${combination}"
+    done
 elif [ "${action}" == "palette" ]; then
     for c in $(seq 0 255);do
         CONTENT='::::::::::'
