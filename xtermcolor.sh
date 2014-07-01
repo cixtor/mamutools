@@ -110,13 +110,26 @@ elif [ "${action}" == "cubes" ]; then
         render_cube "${combination}"
     done
 elif [ "${action}" == "palette" ]; then
-    for c in $(seq 0 255);do
-        CONTENT='::::::::::'
-        if   [ $c -lt 10  ]; then d="00${c}";
-        elif [ $c -lt 100 ]; then d="0${c}";
-        else d="${c}";
+    counter=0
+    echo "Palette (48;5;0..255):"
+
+    for color in $(seq 0 255);do
+        if   [ $color -lt 10  ]; then color_pad="00${color}";
+        elif [ $color -lt 100 ]; then color_pad="0${color}";
+        else color_pad="${color}";
         fi
-        echo -e "\e[0;48;5;${c}m${d} $CONTENT\e[0m";
+
+        echo -en "\e[0;48;5;${color}m${color_pad}\e[0m";
+
+        if [ $color -gt 15 ] && [ $color -lt 232 ]; then
+            if [ $counter -eq 5 ]; then
+                counter=0; echo
+            else
+                counter=$(( $counter + 1 ))
+            fi
+        elif [ $color -eq 7 ] || [ $color -eq 15 ] || [ $color -eq 255 ]; then
+            echo
+        fi
     done
 elif [ "${action}" == "verbose" ]; then
     # System colors
