@@ -62,6 +62,10 @@ rm -rf ./*
 echo 'Downloading package...'
 wget -c "${download_link}" --user-agent "${user_agent}" -O "${local_filename}"
 
+# Check whether the package was downloaded successfully.
+is_empty=$(file "${local_filename}" | tr -d ' ' | cut -d ':' -f 2)
+if [ "${is_empty}" == "empty" ]; then rm -f "${local_filename}"; fi
+
 # Check whether the package was downloaded or not.
 if [ -e "${local_filename}" ]; then
     # Extracting package content.
