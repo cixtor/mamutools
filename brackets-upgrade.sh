@@ -27,6 +27,7 @@ url_target='http://brackets.io/'
 user_agent='Mozilla/5.0 (KHTML, like Gecko)'
 github_releases='https://github.com/adobe/brackets/releases/download'
 versioning_url='http://s3.amazonaws.com/files.brackets.io/updates/stable/en.json'
+target_folder='/opt/brackets'
 local_filename='brackets.deb'
 
 echo 'Brackets Upgrade'
@@ -36,7 +37,6 @@ echo '  https://github.com/adobe/brackets'
 echo
 
 # Check target folder existence.
-target_folder="/opt/brackets/"
 if [ ! -e "${target_folder}" ]; then mkdir -p "${target_folder}"; fi
 if [ -e "${target_folder}" ]; then cd "${target_folder}"; fi
 
@@ -53,18 +53,22 @@ if [ "${build_number}" == "" ]; then
     versioning=$(echo "${versioning}" | head -n 1 | sed 's/[":,a-zA-Z ]//g')
     build_number=$versioning
 fi
-download_link="${github_releases}/sprint-${build_number}/Brackets.Sprint.${build_number}.${archi_type}-bit.deb"
+download_link="${github_releases}/release-${build_number}/Brackets.Release.${build_number}.${archi_type}-bit.deb"
 echo "Download link: ${download_link}"
 echo "Build number: ${build_number}"
 
 # Download package.
-rm -rf ./*
-echo 'Downloading package...'
-wget -c "${download_link}" --user-agent "${user_agent}" -O "${local_filename}"
+if [ $(pwd) == "${target_folder}" ]; then
+    rm -rf ./*
+    echo 'Downloading package...'
+    wget -c "${download_link}" --user-agent "${user_agent}" -O "${local_filename}"
 
-# Check whether the package was downloaded successfully.
-is_empty=$(file "${local_filename}" | tr -d ' ' | cut -d ':' -f 2)
-if [ "${is_empty}" == "empty" ]; then rm -f "${local_filename}"; fi
+    # Check whether the package was downloaded successfully.
+    is_empty=$(file "${local_filename}" | tr -d ' ' | cut -d ':' -f 2)
+    if [ "${is_empty}" == "empty" ]; then
+        rm -f "${local_filename}"
+    fi
+fi
 
 # Check whether the package was downloaded or not.
 if [ -e "${local_filename}" ]; then
