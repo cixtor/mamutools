@@ -63,7 +63,7 @@ function initialize {
     else
         INST_TARGET_PATH="${HOME}/bin/"
 
-        if [ -e "${INST_TARGET_PATH}" ]; then
+        if [ ! -e "${INST_TARGET_PATH}" ]; then
             mkdir "${INST_TARGET_PATH}"
         fi
     fi
@@ -207,6 +207,13 @@ function install_package {
             cd /usr/share/applications/
             sudo rm -f google-chrome.desktop
             sudo ln -s "${LAUNCHER_PATH}";
+
+            # Fix beta symlink
+            cd "${CHROME_FOLDER_PATH}"
+            if [ -e 'google-chrome-beta' ]; then
+                rm -f google-chrome
+                ln -s google-chrome-beta google-chrome
+            fi
 
             # Install Google Chrome binary globally.
             SYMLINK_BIN='/opt/google/chrome/google-chrome'
