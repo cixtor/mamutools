@@ -44,6 +44,7 @@ var action = flag.String("action", "none", "String convertion that will be execu
 var text = flag.String("text", "", "Text string that will be processed")
 var old_str = flag.String("old", "", "Text string that will be replaced")
 var new_str = flag.String("new", "", "Text string that will replace the old one")
+var number = flag.Int("num", 13, "Positions to shift the text in the alphabet")
 
 var replace = flag.Bool("replace", false, "Replace a text string with another")
 var capitalize = flag.Bool("capitalize", false, "Convert a text string into a capitalized version of its words")
@@ -56,6 +57,7 @@ var base64_enc = flag.Bool("b64enc", false, "Encodes data with MIME base64")
 var base64_dec = flag.Bool("b64dec", false, "Decodes data encoded with MIME base64")
 var url_decode = flag.Bool("urldec", false, "Decodes URL-encoded string")
 var url_encode = flag.Bool("urlenc", false, "Encodes URL string with their correspondent hex digits")
+var rotate = flag.Bool("rotate", false, "Perform a rotation on a string by the value specified")
 
 func main() {
     flag.Usage = func(){
@@ -137,6 +139,20 @@ func main() {
 
     if *action == "urlenc" || *url_encode == true {
         fmt.Printf("%s\n", url.QueryEscape(*text))
+        os.Exit(0)
+    }
+
+    if *action == "rotate" || *rotate == true {
+        rotator := func(letter rune) rune {
+            switch {
+            case letter >= 'A' && letter <= 'Z':
+                return 'A' + ( letter - 'A' + rune(*number) ) % 26
+            case letter >= 'a' && letter <= 'z':
+                return 'a' + ( letter - 'a' + rune(*number) ) % 26
+            }
+            return letter
+        }
+        fmt.Printf( "%s\n", strings.Map(rotator, *text) )
         os.Exit(0)
     }
 
