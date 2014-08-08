@@ -122,7 +122,7 @@ func main() {
             fmt.Println("Error:", err)
             os.Exit(1)
         }
-        fmt.Printf("%q\n", data)
+        fmt.Printf("%s\n", data)
         os.Exit(0)
     }
 
