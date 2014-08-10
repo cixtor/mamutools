@@ -23,72 +23,114 @@ package main
 import (
     "os"
     "fmt"
+    "bufio"
     "net/http"
     "io/ioutil"
     "encoding/json"
 )
 
-func usage(filename string) {
+func usage() {
     fmt.Printf("JSON Prettify\n")
     fmt.Printf("  http://cixtor.com/\n")
     fmt.Printf("  https://github.com/cixtor/mamutools\n")
     fmt.Printf("  http://en.wikipedia.org/wiki/JSON\n")
     fmt.Printf("Usage:\n")
-    fmt.Printf("  %s /local/filepath.json\n", filename)
-    fmt.Printf("  %s http://example.com/remote/filepath.json\n", filename)
+    fmt.Printf("  jsonfy -help\n")
+    fmt.Printf("  jsonfy http://example.com/remote/filepath.json\n")
+    fmt.Printf("  jsonfy /local/filepath.json\n")
+    fmt.Printf("  cat filepath.json | jsonfy\n")
     os.Exit(2)
 }
 
-func get_remote_content(url string) ([]byte) {
-    client := &http.Client{ }
-    req, err1 := http.NewRequest("GET", url, nil)
+func main() {
+    was_piped, content := read_content_from_pipe()
 
-    if err1 == nil {
-        req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
-        resp, err2 := client.Do(req)
+    if was_piped {
+        print_json_data(content)
+    } else {
+        if len(os.Args) <= 1 || os.Args[1] == "-help" {
+            usage()
+        } else {
+            is_file, content := read_content_from_file()
 
-        if err2 == nil {
-            defer resp.Body.Close()
-            body, _ := ioutil.ReadAll(resp.Body)
-            return body
+            if is_file {
+                print_json_data(content)
+            } else {
+                is_remote, content := get_remote_content(os.Args[1])
+
+                if is_remote {
+                    print_json_data(content)
+                }
+            }
         }
     }
 
-    return nil
+    fmt.Printf( "No JSON data found\n" )
+    os.Exit(1)
 }
 
-func main() {
-    if len(os.Args) <= 1 {
-        usage(os.Args[0])
-    }
-
-    var content []byte
-    var filepath string = os.Args[1]
-    _, err1 := os.Stat(filepath)
-
-    if err1 == nil {
-        response, err2 := ioutil.ReadFile(filepath)
-
-        if err2 != nil {
-            fmt.Printf("Error reading file: %s\n", filepath)
-            fmt.Printf("Backtrace: %s\n", err2)
-            os.Exit(1)
-        } else {
-            content = response
-        }
-    } else {
-        var response []byte = get_remote_content(filepath)
-        content = response
-    }
-
+func print_json_data( content []byte ) {
     var f interface { }
-    err3 := json.Unmarshal(content, &f)
+    err := json.Unmarshal(content, &f)
 
-    if err3 != nil {
-        fmt.Printf("Error formatting data: %s\n", err3)
+    if err == nil {
+        result, _ := json.MarshalIndent(f, "", "  ")
+        fmt.Printf( "%s\n", string(result) )
+        os.Exit(0)
+    } else {
+        fmt.Printf( "Error formatting data: %s\n", err )
         os.Exit(1)
     }
+}
 
-    result, err3 := json.MarshalIndent(f, "", "  ")
-    os.Stdout.Write(result)
+func read_content_from_pipe() (bool, []byte) {
+    pipe, err := os.Stdin.Stat()
+
+    if err == nil {
+        if pipe.Mode() & os.ModeNamedPipe == 0 {
+            // No pipe detected.
+        } else {
+            reader := bufio.NewReader(os.Stdin)
+            line, _, err := reader.ReadLine()
+
+            if err == nil {
+                return true, line
+            }
+        }
+    }
+
+    return false, nil
+}
+
+func read_content_from_file() (bool, []byte) {
+    var filepath string = os.Args[1]
+    _, err := os.Stat(filepath)
+
+    if err == nil {
+        response, err := ioutil.ReadFile(filepath)
+
+        if err == nil {
+            return true, response
+        }
+    }
+
+    return false, nil
+}
+
+func get_remote_content( url string ) (bool, []byte) {
+    client := &http.Client{ }
+    req, err := http.NewRequest("GET", url, nil)
+
+    if err == nil {
+        req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
+        resp, err := client.Do(req)
+
+        if err == nil {
+            defer resp.Body.Close()
+            body, _ := ioutil.ReadAll(resp.Body)
+            return true, body
+        }
+    }
+
+    return false, nil
 }
