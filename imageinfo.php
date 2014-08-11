@@ -21,6 +21,23 @@
  * (Linear PCM or ITU-T G.711 μ-Law PCM for uncompressed audio data, and IMA-ADPCM
  * for compressed audio data). It is not supported in JPEG 2000, PNG, or GIF.
  */
+
+function usage(){
+    $this_filename = basename(__FILE__);
+
+    echo "Image Information\n";
+    echo "  http://cixtor.com/\n";
+    echo "  https://github.com/cixtor/mamutools\n";
+    echo "  http://php.net/manual/en/function.getimagesize.php\n";
+    echo "Usage:\n";
+    echo "  {$this_filename} -help\n";
+    echo "  {$this_filename} image.{jpg,gif,png}\n";
+    echo "  {$this_filename} image.jpg image.gif image.png\n";
+    echo "  {$this_filename} /image/folder/\n";
+
+    exit(0);
+}
+
 function _valid_type( $filepath='' ){
     if(
         file_exists($filepath)
@@ -95,18 +112,9 @@ function process_files( $files=array(), $recursive=TRUE ){
         }
     }
 }
-if( count($argv)>1 ){
+
+if( count($argv) > 1 && $argv[1] != '-help' ){
     process_files($argv);
 } else {
-    $this_filename = basename(__FILE__);
-    echo "Image Information\n";
-    echo "  http://cixtor.com/\n";
-    echo "  https://github.com/cixtor/mamutools\n";
-    echo "  http://php.net/manual/en/function.getimagesize.php\n";
-    echo "\n";
-    echo "Usage:\n";
-    echo "  {$this_filename} image_file_path.{jpg,gif,png}\n";
-    echo "  {$this_filename} /image/folder/\n";
-    exit;
+    usage();
 }
-/* EOF */
