@@ -14,24 +14,31 @@
 # containing just the latest version of the code. That way I can update the code
 # whenever I want and decrease the quantity of disk needed to store those projects.
 #
+
 function help {
     echo 'Latest Repository Downloader'
     echo '  http://cixtor.com/'
     echo '  https://github.com/cixtor/mamutools'
-    echo
-    echo "Usage: $0 [clone|pull] [remote_repository|dirname]"
-    echo
+    echo 'Usage:'
+    echo "  $0 -help"
+    echo "  $0 clone remote_repository"
+    echo "  $0 pull dirname"
+    exit
 }
+
 function fail {
     echo -e "\e[0;91m[x] Error.\e[0m ${1}"
     exit 1
 }
+
 function warning {
     echo -e "\e[0;93m[x] Warning.\e[0m ${1}"
 }
+
 function success {
     echo -e "\e[0;92mOK.\e[0m ${1}"
 }
+
 function clone_repository {
     repository=$1
     if [ "${repository}" != "" ]; then
@@ -46,10 +53,10 @@ function clone_repository {
         rm -rf "${directory}/.git"
         echo && success "Process finished"
     else
-        fail "You should specify the URL of the repository when cloning."
+        fail "You must specify the URL of the repository."
     fi
 }
-help
+
 if [ "${1}" == "pull" ]; then
     directory=$2
     if [ -d "${directory}" ]; then
@@ -70,5 +77,6 @@ if [ "${1}" == "pull" ]; then
     fi
 elif [ "${1}" == "clone" ]; then
     clone_repository $2
+else
+    help
 fi
-#
