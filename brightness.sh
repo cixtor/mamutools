@@ -22,10 +22,18 @@
 # monitor, laptop or integrated panel (such as the iMac) using software, but
 # depending on hardware and model, sometimes only some options are available.
 #
-LEVEL=$(zenity --entry --title='Set brightness level' --text='Type a number in range 0-9 representing the\nbrightness level you want for the display')
+
+# Select correct dialog manager.
+ZENITY=$(which zenity)
+MATEDIALOG=$(which matedialog)
+if [ $ZENITY ]; then DIALOG="${ZENITY}"; else DIALOG="${MATEDIALOG}"; fi
+
+# Define settings and location of system files.
+LEVEL=$($DIALOG --entry --title='Set brightness level' --text='Type a number in range 0-9 representing the\nbrightness level you want for the display')
 FILEPATH="/sys/devices/pci0000:00/0000:00:01.0/backlight/acpi_video0/brightness"
 FILEPATH="/sys/class/backlight/acpi_video0/brightness"
-#
+
+# Ask for administrative privileges to write in system files.
 echo "Setting brightness to: ${LEVEL}"
 if [ -w "${FILEPATH}" ]; then
     echo "The brightness file is writable"
@@ -36,18 +44,19 @@ else
         echo "Permission to write on the brightness file granted successfully"
     else
         echo "Error granting permission to write on the brightness file"
-        zenity --error --title='Set brightness level' --text='Set brightness level\nThe brightness file is not writable.'
+        $DIALOG --error --title='Set brightness level' --text='Set brightness level\nThe brightness file is not writable.'
     fi
 fi
+
+# Set the brightness level defined by the user.
 if [ "${LEVEL}" != "" ]; then
     if [ $LEVEL -gt -1 -a $LEVEL -lt 10 ]; then
         echo "${LEVEL}" > "${FILEPATH}"
     else
         echo "Invalid value, use a number in range 0-9"
-        zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, use a number in range 0-9'
+        $DIALOG --error --title='Set brightness level' --text='Set brightness level\nInvalid value, use a number in range 0-9'
     fi
 else
     echo "Invalid value, type a number as argument"
-    zenity --error --title='Set brightness level' --text='Set brightness level\nInvalid value, type a number as argument'
+    $DIALOG --error --title='Set brightness level' --text='Set brightness level\nInvalid value, type a number as argument'
 fi
-#
