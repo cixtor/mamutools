@@ -124,7 +124,7 @@ function remove_old_version {
     fi
 
     if [ -e "${CONFIG_FILES_PATH}" ]; then
-        question 'Remove old configuration files (stable edition) (Y/n)'
+        question 'Remove old configuration files (stable edition) (Y/n) '
         read REMOVE
 
         if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
@@ -133,7 +133,7 @@ function remove_old_version {
     fi
 
     if [ -e "${BETA_CONFIG_FILES_PATH}" ]; then
-        question 'Remove old configuration files (beta edition) (Y/n)'
+        question 'Remove old configuration files (beta edition) (Y/n) '
         read REMOVE
 
         if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
