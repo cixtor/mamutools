@@ -35,10 +35,11 @@ import (
     "time"
 )
 
-var length    = flag.Int("length", 10, "Set the length of each password. Default: 10")
-var count     = flag.Int("count", 1, "Set the quantity of passwords to generate. Default: 1")
-var type_dict = flag.String("type", "1a@A", "Set the character family to use, valid values are [a, A, 1, @] you can combine them: 1a@")
-var all_types = flag.Bool("all", false, "Set the use of all character families, same as: -type '1a@A'")
+var length = flag.Int("length", 10, "Length of each password (default: 10)")
+var count = flag.Int("count", 1, "Quantity of passwords to generate (default: 1)")
+var type_dict = flag.String("type", "", "Group of characters to use (one of more): a, A, 1, @")
+var all_types = flag.Bool("all", false, "Use all character groups, same as: -type '1a@A'")
+var custom_types = flag.String("custom", "", "Custom list of characters for the dictionary")
 
 var user_dict string
 var dictionary = map[string]string {
@@ -76,7 +77,7 @@ func main() {
                         break
                     }
                 }
-            }else{
+            } else {
                 for _, c := range *type_dict {
                     for _, key_values := range dictionary {
                         if strings.Contains(key_values, string(c)) {
@@ -85,6 +86,10 @@ func main() {
                     }
                 }
             }
+        }
+
+        if *custom_types != "" {
+            user_dict += *custom_types
         }
 
         rand.Seed( time.Now().UnixNano())
@@ -100,7 +105,7 @@ func main() {
 
             fmt.Printf("%s\n", password)
         }
-    }else{
+    } else {
         flag.Usage()
     }
 }
