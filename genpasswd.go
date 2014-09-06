@@ -28,8 +28,9 @@
 package main
 
 import (
-    "flag"
+    "os"
     "fmt"
+    "flag"
     "strings"
     "math/rand"
     "time"
@@ -90,6 +91,12 @@ func main() {
 
         if *custom_types != "" {
             user_dict += *custom_types
+        }
+
+        if user_dict == "" {
+            flag.Usage()
+            fmt.Printf( "\nCan not generate password with empty dictionary.\n" )
+            os.Exit(1)
         }
 
         rand.Seed( time.Now().UnixNano())
