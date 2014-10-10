@@ -16,3 +16,21 @@
 # copied, including byte order swapping and conversion to and from the ASCII and
 # EBCDIC text encodings.
 #
+
+if [[ "${1}" =~ help ]]; then
+    echo 'DD File'
+    echo '  http://cixtor.com/'
+    echo '  https://github.com/cixtor/mamutools'
+    echo '  http://en.wikipedia.org/wiki/Dd_(Unix)'
+    echo
+    echo 'Description:'
+    echo '  The command creates a zero-filled file named output.dat consisting of a count of'
+    echo '  a number of blocks specified in the first argument, each of block size 1024, or'
+    echo '  you can specify the size as a second argument.'
+    echo
+    echo 'Usage:'
+    echo '  ddfile help     Prints this help message.'
+    echo '  ddfile 10       Creates a file of 10 KB, each block is 1024 bs.'
+    echo '  ddfile 10 1M    Creates a file of 10 MB, each block is 1 MB.'
+    echo '  ddfile 30 1M    Creates a file of 30 MB, each block is 1 MB.'
+fi
