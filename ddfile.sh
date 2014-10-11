@@ -33,4 +33,7 @@ if [[ "${1}" =~ help ]]; then
     echo '  ddfile 10       Creates a file of 10 KB, each block is 1024 bs.'
     echo '  ddfile 10 1M    Creates a file of 10 MB, each block is 1 MB.'
     echo '  ddfile 30 1M    Creates a file of 30 MB, each block is 1 MB.'
+else
+    if [ "${2}" == "" ]; then bytes=1024; else bytes=$2; fi
+    dd if=/dev/zero of=output.dat bs=$bytes count=$1
 fi
