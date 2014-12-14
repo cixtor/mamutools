@@ -40,7 +40,6 @@ import "math"
 import "flag"
 import "os"
 import "github.com/rakyll/magicmime"
-// import "github.com/dustin/go-humanize"
 
 func main(){
     flag.Parse()
@@ -66,7 +65,7 @@ func file_size(location string){
     if err == nil {
         fmt.Printf("Location: %s\n", location)
 
-        mm, err := magicmime.New()
+        mm, err := magicmime.New( magicmime.MAGIC_MIME_TYPE | magicmime.MAGIC_SYMLINK | magicmime.MAGIC_ERROR )
         if err != nil { fmt.Printf("Error ocurred") }
         mimetype, err := mm.TypeByFile(location)
         fmt.Printf("Mimetype: %s\n", mimetype)
