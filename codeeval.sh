@@ -26,6 +26,21 @@ if [[ "$1" != "" ]]; then
         'cpp' ) exec_command="g++ -o test.bin ${solution_file} && ./test.bin %s && rm test.bin";;
     esac
 
+    if [[ "${exec_command}" == "null" ]]; then
+        echo "[x] Not supported extension file: ${extension}"
+        exit 1
+    fi
+
+    if [[ ! -e "input.txt" ]]; then
+        echo "[x] There is no input.txt file"
+        exit 1
+    fi
+
+    if [[ ! -e "output.txt" ]]; then
+        echo "[x] There is no output.txt file"
+        exit 1
+    fi
+
     input_values=()
     output_values=()
 
