@@ -18,6 +18,7 @@ if [[ "$1" != "" ]]; then
     exec_command='null'
     solution_file="${1}"
     debug_unit_test="${2}"
+    phpunit_bin=$(which phpunit)
     temp_input_file='temp.input.txt'
     unit_test_file='temp.unittest.php'
     extension=$(echo "${solution_file}" | rev | cut -d '.' -f 1 | rev)
@@ -38,6 +39,12 @@ if [[ "$1" != "" ]]; then
 
     if [[ ! -e "output.txt" ]]; then
         echo "[x] There is no output.txt file"
+        exit 1
+    fi
+
+    if [[ "$phpunit_bin" == "" ]]; then
+        echo "[x] PHPUnit was not found"
+        echo "    https://phpunit.de/"
         exit 1
     fi
 
@@ -76,7 +83,7 @@ if [[ "$1" != "" ]]; then
         cat $unit_test_file && exit 0
     fi
 
-    phpunit --color $unit_test_file
+    $phpunit_bin --color $unit_test_file
     rm -fv $unit_test_file
     rm -fv $temp_input_file
 fi
