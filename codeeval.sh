@@ -26,6 +26,7 @@ if [[ "$1" != "" ]]; then
     case $extension in
         'cpp' ) exec_command="g++ -o test.bin ${solution_file} && ./test.bin %s && rm test.bin";;
         'go' ) exec_command="go run ${solution_file} %s";;
+        'sh' ) exec_command="bash ${solution_file} %s";;
     esac
 
     if [[ "${exec_command}" == "null" ]]; then
