@@ -28,6 +28,7 @@ if [[ "$1" != "" ]]; then
         'go' ) exec_command="go run ${solution_file} %s";;
         'sh' ) exec_command="bash ${solution_file} %s";;
         'rb' ) exec_command="ruby ${solution_file} %s";;
+        'py' ) exec_command="python3 ${solution_file} %s";;
     esac
 
     if [[ "${exec_command}" == "null" ]]; then
