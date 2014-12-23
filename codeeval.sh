@@ -29,6 +29,7 @@ if [[ "$1" != "" ]]; then
         'sh' ) exec_command="bash ${solution_file} %s";;
         'rb' ) exec_command="ruby ${solution_file} %s";;
         'py' ) exec_command="python3 ${solution_file} %s";;
+        'php' ) exec_command="php -f ${solution_file} %s";;
     esac
 
     if [[ "${exec_command}" == "null" ]]; then
