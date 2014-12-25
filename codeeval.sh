@@ -14,7 +14,12 @@
 #
 IFS=$'\n'
 
-if [[ "$1" != "" ]]; then
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+    echo "Usage: $0 [challenge.ext] [--debug]"
+    echo "       $0 solution.cpp --debug"
+    echo "       $0 solution.go"
+    exit 1
+else
     exec_command='null'
     solution_file="${1}"
     debug_unit_test="${2}"
@@ -91,4 +96,5 @@ if [[ "$1" != "" ]]; then
     $phpunit_bin --color $unit_test_file
     rm -fv $unit_test_file
     rm -fv $temp_input_file
+    exit 0
 fi
