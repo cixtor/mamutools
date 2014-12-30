@@ -56,22 +56,20 @@ func main() {
 		request.Header.Add("X-Requested-With", "XMLHttpRequest")
 		request.Header.Add("Connection", "keep-alive")
 
-		response, err := client.Do(request)
+		for i := 0; i < 10; i++ {
+			response, err := client.Do(request)
 
-		if err == nil {
-			defer response.Body.Close()
-			body, _ := ioutil.ReadAll(response.Body)
+			if err == nil {
+				defer response.Body.Close()
+				body, _ := ioutil.ReadAll(response.Body)
 
-			fmt.Printf("%s.com\n", body)
-			os.Exit(0)
-		} else {
-			fmt.Printf("[x] Error executing the HTTP request.\n")
-			fmt.Printf("    Error: %s\n", err)
-			os.Exit(1)
+				fmt.Printf("%s.com\n", body)
+			}
 		}
-	} else {
-		fmt.Printf("[x] Error building the HTTP request.\n")
-		fmt.Printf("    Error: %s\n", err)
-		os.Exit(1)
+
+		os.Exit(0)
 	}
+
+	fmt.Printf("Error: %s\n", err)
+	os.Exit(1)
 }
