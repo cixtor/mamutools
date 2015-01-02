@@ -25,11 +25,31 @@
 
 package main
 
+import "encoding/json"
 import "flag"
 import "fmt"
 import "io/ioutil"
 import "net/http"
 import "os"
+
+type GeoLocation struct {
+	Longitude float64 `json:"longitude"`
+	Latitude float64 `json:"latitude"`
+	ASN string `json:"asn"`
+	Offset string `json:"offset"`
+	IP string `json:"ip"`
+	AreaCode string `json:"area_code"`
+	ContinentCode string `json:"continent_code"`
+	DmaCode string `json:"dma_code"`
+	City string `json:"city"`
+	Timezone string `json:"timezone"`
+	Region string `json:"region"`
+	CountryCode string `json:"country_code"`
+	ISP string `json:"isp"`
+	Country string `json:"country"`
+	CountryCode3 string `json:"country_code3"`
+	RegionCode string `json:"region_code"`
+}
 
 var address = flag.String("ip", "127.0.0.1", "IP address to geo-locate")
 
@@ -66,8 +86,16 @@ func main() {
 				defer response.Body.Close()
 				body, _ := ioutil.ReadAll(response.Body)
 
-				fmt.Printf("%s", body)
-				os.Exit(0)
+				var geolocation GeoLocation
+				err := json.Unmarshal(body, &geolocation)
+
+				if err == nil {
+					fmt.Printf("%s\n", geolocation)
+					os.Exit(0)
+				} else {
+					fmt.Printf("%s\n", err)
+					os.Exit(1)
+				}
 			}
 		}
 	}
