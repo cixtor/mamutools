@@ -90,7 +90,8 @@ func main() {
 				err := json.Unmarshal(body, &geolocation)
 
 				if err == nil {
-					fmt.Printf("%s\n", geolocation)
+					output, _ := json.MarshalIndent(geolocation, "", "    ")
+					fmt.Printf("%s\n", output)
 					os.Exit(0)
 				} else {
 					fmt.Printf("%s\n", err)
