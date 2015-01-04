@@ -2,8 +2,8 @@
  * Telize Geo Location
  * http://cixtor.com/
  * https://github.com/cixtor/mamutools
- * http://en.wikipedia.org/wiki/String_(computer_science)
- * http://en.wikipedia.org/wiki/String_functions
+ * http://en.wikipedia.org/wiki/Geolocation
+ * http://www.telize.com/
  *
  * Geolocation is the identification of the real-world geographic location of an
  * object, such as a radar source, mobile phone or Internet-connected computer
