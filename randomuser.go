@@ -19,6 +19,11 @@
 
 package main
 
+import "fmt"
+import "io/ioutil"
+import "net/http"
+import "os"
+
 type UserLocation struct {
 	City string `json:"city"`
 	State string `json:"state"`
@@ -67,4 +72,33 @@ type RandomUser struct {
 }
 
 func main() {
+	client := http.Client{}
+	request, err := http.NewRequest("GET", "http://api.randomuser.me/", nil)
+
+	if err == nil {
+		request.Header.Add("DNT", "1")
+		request.Header.Add("Origin", "https://randomuser.me")
+		request.Header.Add("Accept-Language", "en-US,en")
+		request.Header.Add("User-Agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
+		request.Header.Add("Content-Type", "application/json;charset=UTF-8")
+		request.Header.Add("Accept", "application/json, text/plain, */*")
+		request.Header.Add("Referer", "https://randomuser.me/")
+		request.Header.Add("Connection", "keep-alive")
+
+		response, err := client.Do(request)
+
+		if err == nil {
+			defer response.Body.Close()
+			body, _ := ioutil.ReadAll(response.Body)
+
+			fmt.Printf("%s\n", body)
+			os.Exit(0)
+		} else {
+			fmt.Printf( "HTTP Request (Execute): %s\n", err )
+		}
+	} else {
+		fmt.Printf( "HTTP Request (Setup): %s\n", err )
+	}
+
+	os.Exit(1)
 }
