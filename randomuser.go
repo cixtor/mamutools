@@ -19,6 +19,7 @@
 
 package main
 
+import "encoding/json"
 import "fmt"
 import "io/ioutil"
 import "net/http"
@@ -91,8 +92,16 @@ func main() {
 			defer response.Body.Close()
 			body, _ := ioutil.ReadAll(response.Body)
 
-			fmt.Printf("%s\n", body)
-			os.Exit(0)
+			var users RandomUser
+			err := json.Unmarshal(body, &users)
+
+			if err == nil {
+				output, _ := json.MarshalIndent(users, "", "    ")
+				fmt.Printf("%s\n", output)
+				os.Exit(0)
+			} else {
+				fmt.Printf( "JSON Decode: %s\n", err )
+			}
 		} else {
 			fmt.Printf( "HTTP Request (Execute): %s\n", err )
 		}
