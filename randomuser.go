@@ -20,6 +20,7 @@
 package main
 
 import "encoding/json"
+import "flag"
 import "fmt"
 import "io/ioutil"
 import "net/http"
@@ -72,9 +73,33 @@ type RandomUser struct {
 	} `json:"results"`
 }
 
+var results = flag.Int("results", 1, "Quantity of users to generate")
+
 func main() {
+	flag.Usage = func() {
+		fmt.Println("Random User")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  http://en.wikipedia.org/wiki/Randomness")
+		fmt.Println("  https://randomuser.me/")
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
+	var request_url string
+
+	if *results < 1 {
+		request_url = "http://api.randomuser.me/"
+	} else if *results > 500 {
+		request_url = "http://api.randomuser.me/?results=500"
+	} else {
+		request_url = fmt.Sprintf("http://api.randomuser.me/?results=%d", *results)
+	}
+
 	client := http.Client{}
-	request, err := http.NewRequest("GET", "http://api.randomuser.me/", nil)
+	request, err := http.NewRequest("GET", request_url, nil)
 
 	if err == nil {
 		request.Header.Add("DNT", "1")
