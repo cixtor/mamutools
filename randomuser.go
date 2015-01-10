@@ -24,7 +24,9 @@ import "flag"
 import "fmt"
 import "io/ioutil"
 import "net/http"
+import "net/url"
 import "os"
+import "strconv"
 
 type UserLocation struct {
 	City string `json:"city"`
@@ -88,14 +90,20 @@ func main() {
 
 	flag.Parse()
 
-	var request_url string
+	var request_url string = "http://api.randomuser.me/"
+	request_params := url.Values{}
 
 	if *results < 1 {
-		request_url = "http://api.randomuser.me/"
+		request_params.Add("results", "1")
 	} else if *results > 500 {
-		request_url = "http://api.randomuser.me/?results=500"
+		request_params.Add("results", "500")
 	} else {
-		request_url = fmt.Sprintf("http://api.randomuser.me/?results=%d", *results)
+		var quantity string = strconv.Itoa(*results)
+		request_params.Add("results", quantity)
+	}
+
+	if len(request_params) > 0 {
+		request_url = fmt.Sprintf("%s?%s", request_url, request_params.Encode())
 	}
 
 	client := http.Client{}
