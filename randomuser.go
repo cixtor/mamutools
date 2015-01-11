@@ -76,6 +76,7 @@ type RandomUser struct {
 }
 
 var results = flag.Int("results", 1, "Quantity of users to generate")
+var apikey = flag.String("key", "", "API key to remove limitations")
 
 func main() {
 	flag.Usage = func() {
@@ -100,6 +101,10 @@ func main() {
 	} else {
 		var quantity string = strconv.Itoa(*results)
 		request_params.Add("results", quantity)
+	}
+
+	if *apikey != "" {
+		request_params.Add("key", *apikey)
 	}
 
 	if len(request_params) > 0 {
