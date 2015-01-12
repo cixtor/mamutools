@@ -77,6 +77,7 @@ type RandomUser struct {
 
 var results = flag.Int("results", 1, "Quantity of users to generate")
 var apikey = flag.String("key", "", "API key to remove limitations")
+var gender = flag.String("gender", "", "Either male or female users")
 
 func main() {
 	flag.Usage = func() {
@@ -105,6 +106,10 @@ func main() {
 
 	if *apikey != "" {
 		request_params.Add("key", *apikey)
+	}
+
+	if *gender == "male" || *gender == "female" {
+		request_params.Add("gender", *gender)
 	}
 
 	if len(request_params) > 0 {
