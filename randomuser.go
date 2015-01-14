@@ -79,6 +79,7 @@ var results = flag.Int("results", 1, "Quantity of users to generate")
 var apikey = flag.String("key", "", "API key to remove limitations")
 var gender = flag.String("gender", "", "Either male or female users")
 var seed = flag.String("seed", "", "Use a specific user data set")
+var format = flag.String("format", "", "Either json, csv, sql, or yaml")
 
 func main() {
 	flag.Usage = func() {
@@ -93,6 +94,7 @@ func main() {
 
 	flag.Parse()
 
+	var parse_json bool = true
 	var request_url string = "http://api.randomuser.me/"
 	request_params := url.Values{}
 
@@ -115,6 +117,11 @@ func main() {
 
 	if *seed != "" {
 		request_params.Add("seed", *seed)
+	}
+
+	if *format == "csv" || *format == "sql" || *format == "yaml" {
+		parse_json = false
+		request_params.Add("format", *format)
 	}
 
 	if len(request_params) > 0 {
@@ -140,15 +147,20 @@ func main() {
 			defer response.Body.Close()
 			body, _ := ioutil.ReadAll(response.Body)
 
-			var users RandomUser
-			err := json.Unmarshal(body, &users)
+			if parse_json == true {
+				var users RandomUser
+				err := json.Unmarshal(body, &users)
 
-			if err == nil {
-				output, _ := json.MarshalIndent(users, "", "    ")
-				fmt.Printf("%s\n", output)
-				os.Exit(0)
+				if err == nil {
+					output, _ := json.MarshalIndent(users, "", "    ")
+					fmt.Printf("%s\n", output)
+					os.Exit(0)
+				} else {
+					fmt.Printf( "JSON Decode: %s\n", err )
+				}
 			} else {
-				fmt.Printf( "JSON Decode: %s\n", err )
+				fmt.Printf("%s", body)
+				os.Exit(0)
 			}
 		} else {
 			fmt.Printf( "HTTP Request (Execute): %s\n", err )
