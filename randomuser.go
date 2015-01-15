@@ -80,6 +80,7 @@ var apikey = flag.String("key", "", "API key to remove limitations")
 var gender = flag.String("gender", "", "Either male or female users")
 var seed = flag.String("seed", "", "Use a specific user data set")
 var format = flag.String("format", "", "Either json, csv, sql, or yaml")
+var nationality = flag.String("nat", "", "Nationality of the users")
 
 func main() {
 	flag.Usage = func() {
@@ -122,6 +123,10 @@ func main() {
 	if *format == "csv" || *format == "sql" || *format == "yaml" {
 		parse_json = false
 		request_params.Add("format", *format)
+	}
+
+	if *nationality != "" && len(*nationality) == 2 {
+		request_params.Add("nat", *nationality)
 	}
 
 	if len(request_params) > 0 {
