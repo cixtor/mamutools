@@ -162,6 +162,7 @@ func main() {
 					os.Exit(0)
 				} else {
 					fmt.Printf( "JSON Decode: %s\n", err )
+					os.Exit(1)
 				}
 			} else {
 				fmt.Printf("%s", body)
@@ -169,10 +170,10 @@ func main() {
 			}
 		} else {
 			fmt.Printf( "HTTP Request (Execute): %s\n", err )
+			os.Exit(1)
 		}
 	} else {
 		fmt.Printf( "HTTP Request (Setup): %s\n", err )
+		os.Exit(1)
 	}
-
-	os.Exit(1)
 }
