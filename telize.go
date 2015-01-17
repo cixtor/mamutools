@@ -55,11 +55,11 @@ var address = flag.String("ip", "127.0.0.1", "IP address to geo-locate")
 
 func main() {
 	flag.Usage = func(){
-		fmt.Println("String Conversion")
+		fmt.Println("Telize Geo Location")
 		fmt.Println("  http://cixtor.com/")
 		fmt.Println("  https://github.com/cixtor/mamutools")
-		fmt.Println("  http://en.wikipedia.org/wiki/String_(computer_science)")
-		fmt.Println("  http://en.wikipedia.org/wiki/String_functions")
+		fmt.Println("  http://en.wikipedia.org/wiki/Geolocation")
+		fmt.Println("  http://www.telize.com/")
 		fmt.Println("Usage:")
 		flag.PrintDefaults()
 	}
