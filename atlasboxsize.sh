@@ -11,3 +11,31 @@
 # Vagrant Cloud, but still what was initially offered. You can learn more about
 # Atlas on the homepage.
 #
+
+if [[ "$1" != "" ]]; then
+    atlas_url="$1"
+    base_url=$(echo "$atlas_url" | sed 's/.*:\/\///g')
+    owner=$(echo "$base_url" | cut -d '/' -f 2)
+    box_name=$(echo "$base_url" | cut -d '/' -f 4)
+    version=$(curl --silent \
+        --url "$atlas_url" \
+        --header 'DNT: 1' \
+        --header 'Accept-Language: en-US,en;q=0.8' \
+        --header 'Accept-Encoding: gzip, deflate, sdch' \
+        --header 'User-Agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+        --header 'Accept: text/html,application/xhtml+xml,application/xml' \
+        --header 'Cache-Control: max-age=0' \
+        --header 'Connection: keep-alive' \
+        --compressed \
+        | grep '/versions/' \
+        | head -n 1 | tr -d ' ' \
+        | cut -d '"' -f 2 | rev \
+        | cut -d '/' -f 1 | rev
+    )
+    box_url="https://atlas.hashicorp.com/${owner}/boxes/${box_name}/versions/${version}/providers/virtualbox.box"
+    echo "OwnerBox: ${owner}/${box_name}"
+    echo "Base URL: $base_url"
+    echo "Box URL.: $box_url"
+    curl --head "$box_url" --silent --location | grep -i '^content-length'
+    exit 0
+fi
