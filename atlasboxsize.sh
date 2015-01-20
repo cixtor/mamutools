@@ -12,7 +12,13 @@
 # Atlas on the homepage.
 #
 
-if [[ "$1" != "" ]]; then
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+    echo "Usage: $0 [atlas_box_url]"
+    echo "       $0 https://atlas.hashicorp.com/chef/boxes/centos-7.0"
+    echo "       $0 https://atlas.hashicorp.com/ubuntu/boxes/trusty64"
+    echo "       $0 https://atlas.hashicorp.com/hashicorp/boxes/precise64"
+    exit 2
+else
     atlas_url="$1"
     base_url=$(echo "$atlas_url" | sed 's/.*:\/\///g')
     owner=$(echo "$base_url" | cut -d '/' -f 2)
