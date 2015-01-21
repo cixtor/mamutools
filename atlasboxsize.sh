@@ -42,6 +42,10 @@ else
     echo "OwnerBox: ${owner}/${box_name}"
     echo "Base URL: $base_url"
     echo "Box URL.: $box_url"
-    curl --head "$box_url" --silent --location | grep -i '^content-length'
+    if [[ $(which filesize) ]]; then
+        filesize "$box_url"
+    else
+        curl --head "$box_url" --silent --location | grep -i '^content-length'
+    fi
     exit 0
 fi
