@@ -45,7 +45,17 @@ else
     if [[ $(which filesize) ]]; then
         filesize "$box_url"
     else
-        curl --head "$box_url" --silent --location | grep -i '^content-length'
+        curl --silent \
+            --head \
+            --location \
+            --url "$box_url" \
+            --header 'DNT: 1' \
+            --header 'Accept: text/html,application/xhtml+xml,application/xml' \
+            --header 'Connection: keep-alive' \
+            --header 'Accept-Language: en-US,en;q=0.8' \
+            --header 'Accept-Encoding: gzip, deflate, sdch' \
+            --header 'Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+            --compressed | grep -i '^content-length'
     fi
     exit 0
 fi
