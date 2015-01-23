@@ -41,10 +41,10 @@ else
     box_url="https://atlas.hashicorp.com/${owner}/boxes/${box_name}/versions/${version}/providers/virtualbox.box"
     echo "OwnerBox: ${owner}/${box_name}"
     echo "Base URL: $base_url"
-    echo "Box URL.: $box_url"
     if [[ $(which filesize) ]]; then
         filesize "$box_url"
     else
+        echo "Box URL.: $box_url"
         curl --silent \
             --head \
             --location \
