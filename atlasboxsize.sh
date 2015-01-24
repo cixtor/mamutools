@@ -42,7 +42,7 @@ else
     echo "OwnerBox: ${owner}/${box_name}"
     echo "Base URL: $base_url"
     if [[ $(which filesize) ]]; then
-        filesize "$box_url"
+        filesize "$box_url" 2> /dev/null
     else
         echo "Box URL.: $box_url"
         curl --silent \
@@ -55,7 +55,7 @@ else
             --header 'Accept-Language: en-US,en;q=0.8' \
             --header 'Accept-Encoding: gzip, deflate, sdch' \
             --header 'Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
-            --compressed | grep -i '^content-length'
+            --compressed | grep -i '^content-length' 2> /dev/null
     fi
     exit 0
 fi
