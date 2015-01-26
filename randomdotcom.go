@@ -29,7 +29,7 @@ import "io/ioutil"
 import "net/http"
 import "os"
 
-var quantity = flag.Int("c", 1, "Quantity of random domains to generate")
+var quantity = flag.Int("quantity", 1, "Quantity of random domains to generate")
 
 func main() {
 	flag.Usage = func() {
@@ -38,8 +38,8 @@ func main() {
 		fmt.Println("  https://github.com/cixtor/mamutools")
 		fmt.Println("  http://en.wikipedia.org/wiki/.com")
 		fmt.Println("  http://www.randomdotcom.com/")
-        fmt.Println("Usage:")
-        flag.PrintDefaults()
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
 	}
 
 	flag.Parse()
@@ -56,7 +56,7 @@ func main() {
 		request.Header.Add("X-Requested-With", "XMLHttpRequest")
 		request.Header.Add("Connection", "keep-alive")
 
-		for i := 0; i < 10; i++ {
+		for i := 0; i < *quantity; i++ {
 			response, err := client.Do(request)
 
 			if err == nil {
