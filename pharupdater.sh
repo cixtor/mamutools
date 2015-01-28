@@ -14,3 +14,14 @@
 # PHP as easily as any other file, both on the commandline and from a web
 # server. Phar is kind of like a thumb drive for PHP applications.
 #
+
+echo "Updating of PHP Phar files"
+cd /opt/standalone/
+
+echo "- Updating PHPUnit "
+echo "  $(phpunit --version | tr -d '\n')"
+rm phpunit.phar
+wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
+echo "  $(phpunit --version | tr -d '\n')"
+
+echo "Finished"
