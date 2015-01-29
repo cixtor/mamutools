@@ -24,4 +24,11 @@ rm phpunit.phar
 wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
 echo "  $(phpunit --version | tr -d '\n')"
 
+echo "- Updating PHPDocumentor"
+echo "  $(phpdoc --version)"
+echo "  average size ~33M (may take a while)"
+rm phpdoc.phar
+wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
+echo "  $(phpdoc --version)"
+
 echo "Finished"
