@@ -31,4 +31,20 @@ rm phpdoc.phar
 wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
 echo "  $(phpdoc --version)"
 
+if [[ $(which curl) ]]; then
+    log_path='php_codesniffer.log'
+    curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
+
+    echo "- Updating PHPCodeSniffer"
+    phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
+    if [[ "$phpcs_url" != "" ]]; then
+        echo "  $(phpcs --version)"
+        rm phpcs.phar
+        wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
+        echo "  $(phpcs --version)"
+    fi
+
+    rm $log_path
+fi
+
 echo "Finished"
