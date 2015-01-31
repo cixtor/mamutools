@@ -44,6 +44,15 @@ if [[ $(which curl) ]]; then
         echo "  $(phpcs --version)"
     fi
 
+    echo "- Updating PHPCodeSniffer Fixer"
+    phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
+    if [[ "$phpcbf_url" != "" ]]; then
+        echo "  $(phpcbf --version)"
+        rm phpcbf.phar
+        wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf.phar
+        echo "  $(phpcbf --version)"
+    fi
+
     rm $log_path
 fi
 
