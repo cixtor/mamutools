@@ -56,4 +56,10 @@ if [[ $(which curl) ]]; then
     rm $log_path
 fi
 
+echo "- Updating PHPLOC (Lines Of Code)"
+echo "  $(phploc --version)"
+rm phploc.phar
+wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
+echo "  $(phploc --version)"
+
 echo "Finished"
