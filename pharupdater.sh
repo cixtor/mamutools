@@ -62,4 +62,10 @@ rm phploc.phar
 wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
 echo "  $(phploc --version)"
 
+echo "- Updating PHPCPD (Copy/Paste Detector)"
+echo "  $(phpcpd --version)"
+rm phpcpd.phar
+wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
+echo "  $(phpcpd --version)"
+
 echo "Finished"
