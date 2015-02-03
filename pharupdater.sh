@@ -68,4 +68,10 @@ rm phpcpd.phar
 wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
 echo "  $(phpcpd --version)"
 
+echo "- Updating PHPMD (Mess Detector)"
+echo "  $(phpmd --version)"
+rm phpmd.phar
+wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
+echo "  $(phpmd --version)"
+
 echo "Finished"
