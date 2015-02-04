@@ -74,4 +74,10 @@ rm phpmd.phar
 wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
 echo "  $(phpmd --version)"
 
+echo "- Updating PHP Metrics"
+echo "  $(phpmetrics --version)"
+rm phpmetrics.phar
+wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
+echo "  $(phpmetrics --version)"
+
 echo "Finished"
