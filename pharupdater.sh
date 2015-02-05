@@ -80,4 +80,10 @@ rm phpmetrics.phar
 wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
 echo "  $(phpmetrics --version)"
 
+echo "- Updating WordPress CLI"
+echo "  $(wpcli --version)"
+rm wpcli.phar
+wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
+echo "  $(wpcli --version)"
+
 echo "Finished"
