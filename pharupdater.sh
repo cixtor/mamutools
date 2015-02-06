@@ -15,6 +15,22 @@
 # server. Phar is kind of like a thumb drive for PHP applications.
 #
 
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+    echo "Usage: $0 [args]"
+    echo "       $0 --target [dir] Directory to download the files"
+    echo "       $0 --phpunit      Update PHP Unit-Test"
+    echo "       $0 --phpdoc       Update PHP Documentor"
+    echo "       $0 --phpcs        Update PHP CodeSniffer"
+    echo "       $0 --phpcbf       Update PHP CodeSniffer Fixer"
+    echo "       $0 --phploc       Update PHP Lines Of Code"
+    echo "       $0 --phpcpd       Update PHP Copy/Paste Detector"
+    echo "       $0 --phpmd        Update PHP Mess Detector"
+    echo "       $0 --phpmetrics   Update PHP Metrics"
+    echo "       $0 --wpcli        Update PHP WordPress CLI"
+    echo "       $0 --all          Update all the supported tools"
+    exit 2
+fi
+
 echo "Updating of PHP Phar files"
 cd /opt/standalone/
 
