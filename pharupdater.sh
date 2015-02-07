@@ -15,9 +15,9 @@
 # server. Phar is kind of like a thumb drive for PHP applications.
 #
 
-if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+function usage_options() {
     echo "Usage: $0 [args]"
-    echo "       $0 --target [dir] Directory to download the files"
+    echo "       $0 --target [dir] Installation directory"
     echo "       $0 --phpunit      Update PHP Unit-Test"
     echo "       $0 --phpdoc       Update PHP Documentor"
     echo "       $0 --phpcs        Update PHP CodeSniffer"
@@ -28,11 +28,31 @@ if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     echo "       $0 --phpmetrics   Update PHP Metrics"
     echo "       $0 --wpcli        Update PHP WordPress CLI"
     echo "       $0 --all          Update all the supported tools"
+}
+
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+    usage_options
     exit 2
 fi
 
-echo "Updating of PHP Phar files"
-cd /opt/standalone/
+default_target="/opt/standalone/"
+echo "$@" | grep --quiet '\-\-target'
+
+if [[ "$?" -eq 0 ]]; then
+    user_defined_target=$(echo "$@" | tr -d '-' | sed 's/.*target//g' | awk '{print $1}')
+    if [[ -e "$user_defined_target" ]]; then
+        echo "Updating of PHP Phar files"
+        echo "Installation directory: ${user_defined_target}"
+    else
+        echo "Error: Installation directory does not exists: ${user_defined_target}"
+        usage_options
+        exit 1
+    fi
+else
+    echo "Error: Installation directory was not specified."
+    usage_options
+    exit 1
+fi
 
 echo "- Updating PHPUnit "
 echo "  $(phpunit --version | tr -d '\n')"
