@@ -30,19 +30,31 @@ function usage_options() {
     echo "       $0 --all          Update all the supported tools"
 }
 
+function update_phpunit_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpunit') ]]; then
+        echo "- Updating PHPUnit "
+        echo "  $(phpunit --version | tr -d '\n')"
+        rm phpunit.phar
+        wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
+        echo "  $(phpunit --version | tr -d '\n')"
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
 fi
 
 default_target="/opt/standalone/"
-echo "$@" | grep --quiet '\-\-target'
+target_was_set=$(echo "$@" | grep --quiet '\-\-target')
 
 if [[ "$?" -eq 0 ]]; then
     user_defined_target=$(echo "$@" | tr -d '-' | sed 's/.*target//g' | awk '{print $1}')
     if [[ -e "$user_defined_target" ]]; then
         echo "Updating of PHP Phar files"
         echo "Installation directory: ${user_defined_target}"
+
+        update_phpunit_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -53,12 +65,6 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating PHPUnit "
-echo "  $(phpunit --version | tr -d '\n')"
-rm phpunit.phar
-wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
-echo "  $(phpunit --version | tr -d '\n')"
 
 echo "- Updating PHPDocumentor"
 echo "  $(phpdoc --version)"
