@@ -40,6 +40,17 @@ function update_phpunit_tool() {
     fi
 }
 
+function update_phpdoc_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpdoc') ]]; then
+        echo "- Updating PHPDocumentor"
+        echo "  $(phpdoc --version)"
+        echo "  average size ~33M (may take a while)"
+        rm phpdoc.phar
+        wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
+        echo "  $(phpdoc --version)"
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
@@ -55,6 +66,7 @@ if [[ "$?" -eq 0 ]]; then
         echo "Installation directory: ${user_defined_target}"
 
         update_phpunit_tool "$@"
+        update_phpdoc_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -65,13 +77,6 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating PHPDocumentor"
-echo "  $(phpdoc --version)"
-echo "  average size ~33M (may take a while)"
-rm phpdoc.phar
-wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
-echo "  $(phpdoc --version)"
 
 if [[ $(which curl) ]]; then
     log_path='php_codesniffer.log'
