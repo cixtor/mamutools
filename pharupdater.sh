@@ -51,6 +51,30 @@ function update_phpdoc_tool() {
     fi
 }
 
+function update_phpcs_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpcs') ]]; then
+        if [[ $(which curl) ]]; then
+            log_path='php_codesniffer.log'
+            curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
+
+            echo "- Updating PHPCodeSniffer"
+            phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
+            if [[ "$phpcs_url" != "" ]]; then
+                echo "  $(phpcs --version)"
+                rm phpcs.phar
+                wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
+                echo "  $(phpcs --version)"
+            fi
+
+            rm $log_path
+        else
+            echo "Error: Curl is required to update this tool"
+            usage_options
+            exit 1
+        fi
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
@@ -67,6 +91,7 @@ if [[ "$?" -eq 0 ]]; then
 
         update_phpunit_tool "$@"
         update_phpdoc_tool "$@"
+        update_phpcs_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -81,15 +106,6 @@ fi
 if [[ $(which curl) ]]; then
     log_path='php_codesniffer.log'
     curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
-
-    echo "- Updating PHPCodeSniffer"
-    phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
-    if [[ "$phpcs_url" != "" ]]; then
-        echo "  $(phpcs --version)"
-        rm phpcs.phar
-        wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
-        echo "  $(phpcs --version)"
-    fi
 
     echo "- Updating PHPCodeSniffer Fixer"
     phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
