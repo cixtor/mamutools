@@ -51,19 +51,32 @@ function update_phpdoc_tool() {
     fi
 }
 
-function update_phpcs_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpcs') ]]; then
+function update_phpcs_and_phpcbf_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpcs\|--phpcbf') ]]; then
         if [[ $(which curl) ]]; then
             log_path='php_codesniffer.log'
             curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
 
-            echo "- Updating PHPCodeSniffer"
-            phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
-            if [[ "$phpcs_url" != "" ]]; then
-                echo "  $(phpcs --version)"
-                rm phpcs.phar
-                wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
-                echo "  $(phpcs --version)"
+            if [[ $(echo "$1" | grep -- '--phpcs') ]]; then
+                echo "- Updating PHPCodeSniffer"
+                phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
+                if [[ "$phpcs_url" != "" ]]; then
+                    echo "  $(phpcs --version)"
+                    rm phpcs.phar
+                    wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
+                    echo "  $(phpcs --version)"
+                fi
+            fi
+
+            if [[ $(echo "$1" | grep -- '--phpcbf') ]]; then
+                echo "- Updating PHPCodeSniffer Fixer"
+                phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
+                if [[ "$phpcbf_url" != "" ]]; then
+                    echo "  $(phpcbf --version)"
+                    rm phpcbf.phar
+                    wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf.phar
+                    echo "  $(phpcbf --version)"
+                fi
             fi
 
             rm $log_path
@@ -91,7 +104,7 @@ if [[ "$?" -eq 0 ]]; then
 
         update_phpunit_tool "$@"
         update_phpdoc_tool "$@"
-        update_phpcs_tool "$@"
+        update_phpcs_and_phpcbf_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -101,22 +114,6 @@ else
     echo "Error: Installation directory was not specified."
     usage_options
     exit 1
-fi
-
-if [[ $(which curl) ]]; then
-    log_path='php_codesniffer.log'
-    curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
-
-    echo "- Updating PHPCodeSniffer Fixer"
-    phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
-    if [[ "$phpcbf_url" != "" ]]; then
-        echo "  $(phpcbf --version)"
-        rm phpcbf.phar
-        wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf.phar
-        echo "  $(phpcbf --version)"
-    fi
-
-    rm $log_path
 fi
 
 echo "- Updating PHPLOC (Lines Of Code)"
