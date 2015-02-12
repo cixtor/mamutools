@@ -88,6 +88,16 @@ function update_phpcs_and_phpcbf_tool() {
     fi
 }
 
+function update_phploc_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phploc') ]]; then
+        echo "- Updating PHPLOC (Lines Of Code)"
+        echo "  $(phploc --version)"
+        rm phploc.phar
+        wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
+        echo "  $(phploc --version)"
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
@@ -105,6 +115,7 @@ if [[ "$?" -eq 0 ]]; then
         update_phpunit_tool "$@"
         update_phpdoc_tool "$@"
         update_phpcs_and_phpcbf_tool "$@"
+        update_phploc_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -115,12 +126,6 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating PHPLOC (Lines Of Code)"
-echo "  $(phploc --version)"
-rm phploc.phar
-wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
-echo "  $(phploc --version)"
 
 echo "- Updating PHPCPD (Copy/Paste Detector)"
 echo "  $(phpcpd --version)"
