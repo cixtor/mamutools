@@ -98,6 +98,16 @@ function update_phploc_tool() {
     fi
 }
 
+function update_phpcpd_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+        echo "- Updating PHPCPD (Copy/Paste Detector)"
+        echo "  $(phpcpd --version)"
+        rm phpcpd.phar
+        wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
+        echo "  $(phpcpd --version)"
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
@@ -116,6 +126,7 @@ if [[ "$?" -eq 0 ]]; then
         update_phpdoc_tool "$@"
         update_phpcs_and_phpcbf_tool "$@"
         update_phploc_tool "$@"
+        update_phpcpd_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -126,12 +137,6 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating PHPCPD (Copy/Paste Detector)"
-echo "  $(phpcpd --version)"
-rm phpcpd.phar
-wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
-echo "  $(phpcpd --version)"
 
 echo "- Updating PHPMD (Mess Detector)"
 echo "  $(phpmd --version)"
