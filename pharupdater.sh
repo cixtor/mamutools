@@ -108,6 +108,26 @@ function update_phpcpd_tool() {
     fi
 }
 
+function update_phpmd_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+        echo "- Updating PHPMD (Mess Detector)"
+        echo "  $(phpmd --version)"
+        rm phpmd.phar
+        wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
+        echo "  $(phpmd --version)"
+    fi
+}
+
+function update_phpmetrics_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+        echo "- Updating PHP Metrics"
+        echo "  $(phpmetrics --version)"
+        rm phpmetrics.phar
+        wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
+        echo "  $(phpmetrics --version)"
+    fi
+}
+
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     usage_options
     exit 2
@@ -127,6 +147,8 @@ if [[ "$?" -eq 0 ]]; then
         update_phpcs_and_phpcbf_tool "$@"
         update_phploc_tool "$@"
         update_phpcpd_tool "$@"
+        update_phpmd_tool "$@"
+        update_phpmetrics_tool "$@"
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -137,18 +159,6 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating PHPMD (Mess Detector)"
-echo "  $(phpmd --version)"
-rm phpmd.phar
-wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
-echo "  $(phpmd --version)"
-
-echo "- Updating PHP Metrics"
-echo "  $(phpmetrics --version)"
-rm phpmetrics.phar
-wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
-echo "  $(phpmetrics --version)"
 
 echo "- Updating WordPress CLI"
 echo "  $(wpcli --version)"
