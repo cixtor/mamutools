@@ -109,7 +109,7 @@ function update_phpcpd_tool() {
 }
 
 function update_phpmd_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+    if [[ $(echo "$1" | grep -- '--all\|--phpmd') ]]; then
         echo "- Updating PHPMD (Mess Detector)"
         echo "  $(phpmd --version)"
         rm phpmd.phar
@@ -119,12 +119,22 @@ function update_phpmd_tool() {
 }
 
 function update_phpmetrics_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+    if [[ $(echo "$1" | grep -- '--all\|--phpmetrics') ]]; then
         echo "- Updating PHP Metrics"
         echo "  $(phpmetrics --version)"
         rm phpmetrics.phar
         wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
         echo "  $(phpmetrics --version)"
+    fi
+}
+
+function update_wpcli_tool() {
+    if [[ $(echo "$1" | grep -- '--all\|--wpcli') ]]; then
+        echo "- Updating WordPress CLI"
+        echo "  $(wpcli --version)"
+        rm wpcli.phar
+        wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
+        echo "  $(wpcli --version)"
     fi
 }
 
@@ -149,6 +159,10 @@ if [[ "$?" -eq 0 ]]; then
         update_phpcpd_tool "$@"
         update_phpmd_tool "$@"
         update_phpmetrics_tool "$@"
+        update_wpcli_tool "$@"
+
+        echo "Finished"
+        exit 0
     else
         echo "Error: Installation directory does not exists: ${user_defined_target}"
         usage_options
@@ -159,11 +173,3 @@ else
     usage_options
     exit 1
 fi
-
-echo "- Updating WordPress CLI"
-echo "  $(wpcli --version)"
-rm wpcli.phar
-wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
-echo "  $(wpcli --version)"
-
-echo "Finished"
