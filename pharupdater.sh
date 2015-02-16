@@ -151,6 +151,7 @@ if [[ "$?" -eq 0 ]]; then
     if [[ -e "$user_defined_target" ]]; then
         echo "Updating of PHP Phar files"
         echo "Installation directory: ${user_defined_target}"
+        cd "${user_defined_target}"
 
         update_phpunit_tool "$@"
         update_phpdoc_tool "$@"
