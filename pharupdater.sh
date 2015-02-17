@@ -31,7 +31,7 @@ function usage_options() {
 }
 
 function update_phpunit_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpunit') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpunit') ]]; then
         echo "- Updating PHPUnit "
         echo "  $(phpunit --version | tr -d '\n')"
         rm phpunit.phar
@@ -41,7 +41,7 @@ function update_phpunit_tool() {
 }
 
 function update_phpdoc_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpdoc') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpdoc') ]]; then
         echo "- Updating PHPDocumentor"
         echo "  $(phpdoc --version)"
         echo "  average size ~33M (may take a while)"
@@ -52,12 +52,12 @@ function update_phpdoc_tool() {
 }
 
 function update_phpcs_and_phpcbf_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpcs\|--phpcbf') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpcs\|--phpcbf') ]]; then
         if [[ $(which curl) ]]; then
             log_path='php_codesniffer.log'
             curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
 
-            if [[ $(echo "$1" | grep -- '--phpcs') ]]; then
+            if [[ $(echo "$@" | grep -- '--phpcs') ]]; then
                 echo "- Updating PHPCodeSniffer"
                 phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcs_url" != "" ]]; then
@@ -68,7 +68,7 @@ function update_phpcs_and_phpcbf_tool() {
                 fi
             fi
 
-            if [[ $(echo "$1" | grep -- '--phpcbf') ]]; then
+            if [[ $(echo "$@" | grep -- '--phpcbf') ]]; then
                 echo "- Updating PHPCodeSniffer Fixer"
                 phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcbf_url" != "" ]]; then
@@ -89,7 +89,7 @@ function update_phpcs_and_phpcbf_tool() {
 }
 
 function update_phploc_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phploc') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phploc') ]]; then
         echo "- Updating PHPLOC (Lines Of Code)"
         echo "  $(phploc --version)"
         rm phploc.phar
@@ -99,7 +99,7 @@ function update_phploc_tool() {
 }
 
 function update_phpcpd_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpcpd') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpcpd') ]]; then
         echo "- Updating PHPCPD (Copy/Paste Detector)"
         echo "  $(phpcpd --version)"
         rm phpcpd.phar
@@ -109,7 +109,7 @@ function update_phpcpd_tool() {
 }
 
 function update_phpmd_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpmd') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpmd') ]]; then
         echo "- Updating PHPMD (Mess Detector)"
         echo "  $(phpmd --version)"
         rm phpmd.phar
@@ -119,7 +119,7 @@ function update_phpmd_tool() {
 }
 
 function update_phpmetrics_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--phpmetrics') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--phpmetrics') ]]; then
         echo "- Updating PHP Metrics"
         echo "  $(phpmetrics --version)"
         rm phpmetrics.phar
@@ -129,7 +129,7 @@ function update_phpmetrics_tool() {
 }
 
 function update_wpcli_tool() {
-    if [[ $(echo "$1" | grep -- '--all\|--wpcli') ]]; then
+    if [[ $(echo "$@" | grep -- '--all\|--wpcli') ]]; then
         echo "- Updating WordPress CLI"
         echo "  $(wpcli --version)"
         rm wpcli.phar
