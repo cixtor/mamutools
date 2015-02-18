@@ -131,10 +131,13 @@ function update_phpmetrics_tool() {
 function update_wpcli_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--wpcli') ]]; then
         echo "- Updating WordPress CLI"
-        echo "  $(wpcli --version)"
+        echo -n "  Old version: "
+        wpcli.phar --version 2> /dev/null || echo '0.0.0'
         rm wpcli.phar
         wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
-        echo "  $(wpcli --version)"
+        chmod 755 wpcli.phar
+        echo -n "  New version: "
+        ./wpcli.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
