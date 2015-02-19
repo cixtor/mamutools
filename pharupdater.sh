@@ -121,10 +121,13 @@ function update_phpmd_tool() {
 function update_phpmetrics_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phpmetrics') ]]; then
         echo "- Updating PHP Metrics"
-        echo "  $(phpmetrics --version)"
-        rm phpmetrics.phar
+        echo -n "  Old version: "
+        phpmetrics.phar --version 2> /dev/null || echo '0.0.0'
+        rm phpmetrics.phar 2> /dev/null
         wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
-        echo "  $(phpmetrics --version)"
+        chmod 755 phpmetrics.phar
+        echo -n "  New version: "
+        ./phpmetrics.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -133,7 +136,7 @@ function update_wpcli_tool() {
         echo "- Updating WordPress CLI"
         echo -n "  Old version: "
         wpcli.phar --version 2> /dev/null || echo '0.0.0'
-        rm wpcli.phar
+        rm wpcli.phar 2> /dev/null
         wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
         chmod 755 wpcli.phar
         echo -n "  New version: "
