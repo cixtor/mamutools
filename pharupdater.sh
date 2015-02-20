@@ -111,10 +111,13 @@ function update_phpcpd_tool() {
 function update_phpmd_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phpmd') ]]; then
         echo "- Updating PHPMD (Mess Detector)"
-        echo "  $(phpmd --version)"
-        rm phpmd.phar
+        echo -n "  Old version: "
+        phpmd.phar --version 2> /dev/null || echo '0.0.0'
+        rm phpmd.phar 2> /dev/null
         wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
-        echo "  $(phpmd --version)"
+        chmod 755 phpmd.phar
+        echo -n "  New version: "
+        ./phpmd.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
