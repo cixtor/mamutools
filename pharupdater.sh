@@ -101,10 +101,13 @@ function update_phploc_tool() {
 function update_phpcpd_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phpcpd') ]]; then
         echo "- Updating PHPCPD (Copy/Paste Detector)"
-        echo "  $(phpcpd --version)"
-        rm phpcpd.phar
+        echo -n "  Old version: "
+        phpcpd.phar --version 2> /dev/null || echo '0.0.0'
+        rm phpcpd.phar 2> /dev/null
         wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
-        echo "  $(phpcpd --version)"
+        chmod 755 phpcpd.phar
+        echo -n "  New version: "
+        ./phpcpd.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
