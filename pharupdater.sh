@@ -91,10 +91,13 @@ function update_phpcs_and_phpcbf_tool() {
 function update_phploc_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phploc') ]]; then
         echo "- Updating PHPLOC (Lines Of Code)"
-        echo "  $(phploc --version)"
-        rm phploc.phar
+        echo -n "  Old version: "
+        phploc.phar --version 2> /dev/null || echo '0.0.0'
+        rm phploc.phar 2> /dev/null
         wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
-        echo "  $(phploc --version)"
+        chmod 755 phploc.phar
+        echo -n "  New version: "
+        ./phploc.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
