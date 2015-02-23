@@ -72,10 +72,13 @@ function update_phpcs_and_phpcbf_tool() {
                 echo "- Updating PHPCodeSniffer Fixer"
                 phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcbf_url" != "" ]]; then
-                    echo "  $(phpcbf --version)"
-                    rm phpcbf.phar
+                    echo -n "  Old version: "
+                    phpcbf.phar --version 2> /dev/null || echo '0.0.0'
+                    rm phpcbf.phar 2> /dev/null
                     wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf.phar
-                    echo "  $(phpcbf --version)"
+                    chmod 755 phpcbf.phar
+                    echo -n "  New version: "
+                    ./phpcbf.phar --version 2> /dev/null || echo '0.0.0'
                 fi
             fi
 
