@@ -61,10 +61,13 @@ function update_phpcs_and_phpcbf_tool() {
                 echo "- Updating PHPCodeSniffer"
                 phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcs_url" != "" ]]; then
-                    echo "  $(phpcs --version)"
-                    rm phpcs.phar
+                    echo -n "  Old version: "
+                    phpcs.phar --version 2> /dev/null || echo '0.0.0'
+                    rm phpcs.phar 2> /dev/null
                     wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
-                    echo "  $(phpcs --version)"
+                    chmod 755 phpcs.phar
+                    echo -n "  New version: "
+                    ./phpcs.phar --version 2> /dev/null || echo '0.0.0'
                 fi
             fi
 
