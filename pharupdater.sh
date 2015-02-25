@@ -43,11 +43,14 @@ function update_phpunit_tool() {
 function update_phpdoc_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phpdoc') ]]; then
         echo "- Updating PHPDocumentor"
-        echo "  $(phpdoc --version)"
+        echo -n "  Old version: "
+        phpdoc.phar --version 2> /dev/null || echo '0.0.0'
         echo "  average size ~33M (may take a while)"
-        rm phpdoc.phar
+        rm phpdoc.phar 2> /dev/null
         wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
-        echo "  $(phpdoc --version)"
+        chmod 755 phpdoc.phar
+        echo -n "  New version: "
+        ./phpdoc.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
