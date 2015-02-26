@@ -33,10 +33,13 @@ function usage_options() {
 function update_phpunit_tool() {
     if [[ $(echo "$@" | grep -- '--all\|--phpunit') ]]; then
         echo "- Updating PHPUnit "
-        echo "  $(phpunit --version | tr -d '\n')"
-        rm phpunit.phar
+        echo -n "  Old version: "
+        phpunit.phar --version 2> /dev/null || echo '0.0.0'
+        rm phpunit.phar 2> /dev/null
         wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
-        echo "  $(phpunit --version | tr -d '\n')"
+        chmod 755 phpunit.phar
+        echo -n "  New version: "
+        ./phpunit.phar --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
