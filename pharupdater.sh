@@ -15,19 +15,24 @@
 # server. Phar is kind of like a thumb drive for PHP applications.
 #
 
-function usage_options() {
-    echo "Usage: $0 [args]"
-    echo "       $0 --target [dir] Installation directory"
-    echo "       $0 --phpunit      Update PHP Unit-Test"
-    echo "       $0 --phpdoc       Update PHP Documentor"
-    echo "       $0 --phpcs        Update PHP CodeSniffer"
-    echo "       $0 --phpcbf       Update PHP CodeSniffer Fixer"
-    echo "       $0 --phploc       Update PHP Lines Of Code"
-    echo "       $0 --phpcpd       Update PHP Copy/Paste Detector"
-    echo "       $0 --phpmd        Update PHP Mess Detector"
-    echo "       $0 --phpmetrics   Update PHP Metrics"
-    echo "       $0 --wpcli        Update PHP WordPress CLI"
-    echo "       $0 --all          Update all the supported tools"
+function script_usage_options() {
+    echo "Phar Updater"
+    echo "  http://cixtor.com/"
+    echo "  https://github.com/cixtor/mamutools"
+    echo "  http://php.net/manual/en/intro.phar.php"
+    echo "Usage:"
+    echo "  $0 --target [directory] [args]"
+    echo "  --target [directory] Installation directory"
+    echo "  --phpunit            Update PHP Unit-Test"
+    echo "  --phpdoc             Update PHP Documentor"
+    echo "  --phpcs              Update PHP CodeSniffer"
+    echo "  --phpcbf             Update PHP CodeSniffer Fixer"
+    echo "  --phploc             Update PHP Lines Of Code"
+    echo "  --phpcpd             Update PHP Copy/Paste Detector"
+    echo "  --phpmd              Update PHP Mess Detector"
+    echo "  --phpmetrics         Update PHP Metrics"
+    echo "  --wpcli              Update PHP WordPress CLI"
+    echo "  --all                Update all the supported tools"
 }
 
 function update_phpunit_tool() {
@@ -93,8 +98,8 @@ function update_phpcs_and_phpcbf_tool() {
 
             rm $log_path
         else
+            script_usage_options
             echo "Error: Curl is required to update this tool"
-            usage_options
             exit 1
         fi
     fi
@@ -166,7 +171,7 @@ function update_wpcli_tool() {
 }
 
 if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
-    usage_options
+    script_usage_options
     exit 2
 fi
 
@@ -192,12 +197,12 @@ if [[ "$?" -eq 0 ]]; then
         echo "Finished"
         exit 0
     else
+        script_usage_options
         echo "Error: Installation directory does not exists: ${user_defined_target}"
-        usage_options
         exit 1
     fi
 else
+    script_usage_options
     echo "Error: Installation directory was not specified."
-    usage_options
     exit 1
 fi
