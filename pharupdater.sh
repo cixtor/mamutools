@@ -181,8 +181,6 @@ target_was_set=$(echo "$@" | grep --quiet '\-\-target')
 if [[ "$?" -eq 0 ]]; then
     user_defined_target=$(echo "$@" | tr -d '-' | sed 's/.*target//g' | awk '{print $1}')
     if [[ -e "$user_defined_target" ]]; then
-        echo "Updating of PHP Phar files"
-        echo "Installation directory: ${user_defined_target}"
         cd "${user_defined_target}"
 
         update_phpunit_tool "$@"
@@ -194,6 +192,7 @@ if [[ "$?" -eq 0 ]]; then
         update_phpmetrics_tool "$@"
         update_wpcli_tool "$@"
 
+        echo "Installation directory: ${user_defined_target}"
         echo "Finished"
         exit 0
     else
