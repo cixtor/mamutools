@@ -21,22 +21,22 @@ function script_usage_options() {
     echo "  https://github.com/cixtor/mamutools"
     echo "  http://php.net/manual/en/intro.phar.php"
     echo "Usage:"
-    echo "  $0 --target [directory] [args]"
-    echo "  --target [directory] Installation directory"
-    echo "  --phpunit            Update PHP Unit-Test"
-    echo "  --phpdoc             Update PHP Documentor"
-    echo "  --phpcs              Update PHP CodeSniffer"
-    echo "  --phpcbf             Update PHP CodeSniffer Fixer"
-    echo "  --phploc             Update PHP Lines Of Code"
-    echo "  --phpcpd             Update PHP Copy/Paste Detector"
-    echo "  --phpmd              Update PHP Mess Detector"
-    echo "  --phpmetrics         Update PHP Metrics"
-    echo "  --wpcli              Update PHP WordPress CLI"
-    echo "  --all                Update all the supported tools"
+    echo "  $0 -target [directory] [args]"
+    echo "  -target [directory] Installation directory"
+    echo "  -phpunit            Update PHP Unit-Test"
+    echo "  -phpdoc             Update PHP Documentor"
+    echo "  -phpcs              Update PHP CodeSniffer"
+    echo "  -phpcbf             Update PHP CodeSniffer Fixer"
+    echo "  -phploc             Update PHP Lines Of Code"
+    echo "  -phpcpd             Update PHP Copy/Paste Detector"
+    echo "  -phpmd              Update PHP Mess Detector"
+    echo "  -phpmetrics         Update PHP Metrics"
+    echo "  -wpcli              Update PHP WordPress CLI"
+    echo "  -all                Update all the supported tools"
 }
 
 function update_phpunit_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpunit') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpunit') ]]; then
         echo "- Updating PHPUnit "
         echo -n "  Old version: "
         phpunit.phar --version 2> /dev/null || echo '0.0.0'
@@ -49,11 +49,11 @@ function update_phpunit_tool() {
 }
 
 function update_phpdoc_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpdoc') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpdoc') ]]; then
         echo "- Updating PHPDocumentor"
         echo -n "  Old version: "
         phpdoc.phar --version 2> /dev/null || echo '0.0.0'
-        echo "  average size ~33M (may take a while)"
+        echo "  Average size ~33M (may take a while)"
         rm phpdoc.phar 2> /dev/null
         wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
         chmod 755 phpdoc.phar
@@ -63,12 +63,12 @@ function update_phpdoc_tool() {
 }
 
 function update_phpcs_and_phpcbf_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpcs\|--phpcbf') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpcs\|-phpcbf') ]]; then
         if [[ $(which curl) ]]; then
             log_path='php_codesniffer.log'
             curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
 
-            if [[ $(echo "$@" | grep -- '--phpcs') ]]; then
+            if [[ $(echo "$@" | grep -- '-phpcs') ]]; then
                 echo "- Updating PHPCodeSniffer"
                 phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcs_url" != "" ]]; then
@@ -82,7 +82,7 @@ function update_phpcs_and_phpcbf_tool() {
                 fi
             fi
 
-            if [[ $(echo "$@" | grep -- '--phpcbf') ]]; then
+            if [[ $(echo "$@" | grep -- '-phpcbf') ]]; then
                 echo "- Updating PHPCodeSniffer Fixer"
                 phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcbf_url" != "" ]]; then
@@ -106,7 +106,7 @@ function update_phpcs_and_phpcbf_tool() {
 }
 
 function update_phploc_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phploc') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phploc') ]]; then
         echo "- Updating PHPLOC (Lines Of Code)"
         echo -n "  Old version: "
         phploc.phar --version 2> /dev/null || echo '0.0.0'
@@ -119,7 +119,7 @@ function update_phploc_tool() {
 }
 
 function update_phpcpd_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpcpd') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpcpd') ]]; then
         echo "- Updating PHPCPD (Copy/Paste Detector)"
         echo -n "  Old version: "
         phpcpd.phar --version 2> /dev/null || echo '0.0.0'
@@ -132,7 +132,7 @@ function update_phpcpd_tool() {
 }
 
 function update_phpmd_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpmd') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpmd') ]]; then
         echo "- Updating PHPMD (Mess Detector)"
         echo -n "  Old version: "
         phpmd.phar --version 2> /dev/null || echo '0.0.0'
@@ -145,7 +145,7 @@ function update_phpmd_tool() {
 }
 
 function update_phpmetrics_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--phpmetrics') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-phpmetrics') ]]; then
         echo "- Updating PHP Metrics"
         echo -n "  Old version: "
         phpmetrics.phar --version 2> /dev/null || echo '0.0.0'
@@ -158,7 +158,7 @@ function update_phpmetrics_tool() {
 }
 
 function update_wpcli_tool() {
-    if [[ $(echo "$@" | grep -- '--all\|--wpcli') ]]; then
+    if [[ $(echo "$@" | grep -- '-all\|-wpcli') ]]; then
         echo "- Updating WordPress CLI"
         echo -n "  Old version: "
         wpcli.phar --version 2> /dev/null || echo '0.0.0'
@@ -176,12 +176,13 @@ if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
 fi
 
 default_target="/opt/standalone/"
-target_was_set=$(echo "$@" | grep --quiet '\-\-target')
+target_was_set=$(echo "$@" | grep --quiet -- '-target')
 
 if [[ "$?" -eq 0 ]]; then
     user_defined_target=$(echo "$@" | tr -d '-' | sed 's/.*target//g' | awk '{print $1}')
     if [[ -e "$user_defined_target" ]]; then
         cd "${user_defined_target}"
+        echo "Installation directory: ${user_defined_target}"
 
         update_phpunit_tool "$@"
         update_phpdoc_tool "$@"
@@ -192,7 +193,6 @@ if [[ "$?" -eq 0 ]]; then
         update_phpmetrics_tool "$@"
         update_wpcli_tool "$@"
 
-        echo "Installation directory: ${user_defined_target}"
         echo "Finished"
         exit 0
     else
