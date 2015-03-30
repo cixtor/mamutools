@@ -21,233 +21,56 @@
 # Upgrades can also worsen a product subjectively. A user may prefer an older version
 # even if a newer version functions perfectly as designed.
 #
-GOOGLE_FOLDER_PATH='/opt/google/'
-CHROME_FOLDER_PATH="${GOOGLE_FOLDER_PATH}chrome/"
-TEMP_PACKAGE='google-chrome-latest.deb'
 
-function fail {
-    echo -e "\e[0;91m[x] Error.\e[0m ${1}"
-    exit
-}
+echo 'Google Chrome Upgrade'
+echo '  http://cixtor.com/'
+echo '  https://github.com/cixtor/mamutools'
+echo '  http://cixtor.com/blog/chrome-upgrade'
+echo
 
-function success {
-    echo -e "\e[0;92mOK.\e[0m ${1}"
-}
+if [[ ! -e '/opt/google/' ]]; then
+    echo 'Directory does not exists: /opt/google/'
+    exit 1
+elif [[ ! -w '/opt/google/' ]]; then
+    echo 'Directory is not writable: /opt/google/'
+    exit 1
+elif [[ -e '/opt/google/chrome/' ]]; then
+    echo 'Installation already exists: /opt/google/chrome/'
+    exit 1
+else
+    mkdir -p '/opt/google/chrome/' 2> /dev/null
+    cd '/opt/google/chrome/'
 
-function warning {
-    echo -e "\e[0;93m[!]\e[0m ${1}"
-}
+    echo -n 'Which version (beta|stable|unstable) '; read VERSION
+    if [[ ! "${VERSION}" =~ (beta|stable|unstable) ]]; then VERSION='stable'; fi
 
-function question {
-    echo -en "\e[0;94m[?]\e[0m ${1}"
-}
+    echo -n 'Which architecture (i386|amd64) '; read ARCHITECTURE
+    if [[ ! "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE='amd64'; fi
 
-function initialize {
-    echo 'Google Chrome Upgrade'
-    echo '    http://cixtor.com/'
-    echo '    https://github.com/cixtor/mamutools'
-    echo '    http://cixtor.com/blog/chrome-upgrade'
-    echo
-
-    question 'Choose the version family (beta|stable|unstable) '; read VERSION
-    if [[ ! "${VERSION}" =~ (beta|stable|unstable) ]]; then VERSION='beta'; fi
-
-    question 'Choose the architecture in bits (i386|amd64) '; read ARCHITECTURE
-    if [[ ! "${ARCHITECTURE}" =~ (i386|amd64) ]]; then ARCHITECTURE='i386'; fi
-
-    question 'How to install the shortcut (root|user) '; read INST_TARGET
-    if [[ ! "${INST_TARGET}" =~ (root|user) ]]; then INST_TARGET='user'; fi
-
-    if [ "${INST_TARGET}" == 'root' ]; then
-        INST_TARGET_PATH='/usr/local/bin/'
-    else
-        INST_TARGET_PATH="${HOME}/bin/"
-
-        if [ ! -e "${INST_TARGET_PATH}" ]; then
-            mkdir "${INST_TARGET_PATH}"
-        fi
-    fi
-}
-
-function request_sudo {
-    warning 'Some operations will require Root provileges, type your password to continue:'
-    echo -n '    '
-
-    if [ $(sudo whoami) == 'root' ]; then
-        success 'Root privileges granted'
-    else
-        fail 'You can not proceed without root privileges.'
-    fi
-}
-
-function stop_current_processes {
-    question 'Stop all current Google Chrome processes (Y/n) '
-    read STOP_PROCESSES
-
-    if [ "${STOP_PROCESSES}" == 'y' ] || [ "${STOP_PROCESSES}" == 'Y' ]; then
-        STOP_PROCESSES='yes'
-    else
-        question 'Are you sure? Do you want to let those processes running? (Y/n) '
-        read LET_THEM_RUNNING
-
-        if [ "${LET_THEM_RUNNING}" == 'n' ] || [ "${LET_THEM_RUNNING}" == 'N' ]; then
-            STOP_PROCESSES='yes'
-        else
-            STOP_PROCESSES='no'
-        fi
-    fi
-
-    if [ "${STOP_PROCESSES}" == 'yes' ]; then
-        for PROCESS in $(ps -A u | grep "${CHROME_FOLDER_PATH}" | awk '{print $2}'); do
-            echo -n "    Killing Chrome process ${PROCESS}: "
-            sudo skill -kill $PROCESS
-            success
-        done
-    fi
-}
-
-function remove_old_version {
-    CONFIG_FILES_PATH="${HOME}/.config/google-chrome"
-    BETA_CONFIG_FILES_PATH="${HOME}/.config/google-chrome-beta"
-    CACHE_FILES_PATH="${HOME}/.cache/google-chrome"
-    BETA_CACHE_FILES_PATH="${HOME}/.cache/google-chrome-beta"
-
-    if [ -e "${CHROME_FOLDER_PATH}" ]; then
-        question 'Remove old versions of Google Chrome from your system (Y/n) '
-        read REMOVE
-
-        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
-            sudo rm -rf "${CHROME_FOLDER_PATH}";
-        else
-            fail 'You need to remove all the old versions of Google Chrome to continue.'
-        fi
-    fi
-
-    if [ -e "${CONFIG_FILES_PATH}" ]; then
-        question 'Remove old configuration files (stable edition) (Y/n) '
-        read REMOVE
-
-        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
-            sudo rm -rf "${CONFIG_FILES_PATH}"
-        fi
-    fi
-
-    if [ -e "${BETA_CONFIG_FILES_PATH}" ]; then
-        question 'Remove old configuration files (beta edition) (Y/n) '
-        read REMOVE
-
-        if [ "${REMOVE}" == 'y' ] || [ "${REMOVE}" == 'Y' ]; then
-            sudo rm -rf "${BETA_CONFIG_FILES_PATH}"
-        fi
-    fi
-
-    if [ -e "${CACHE_FILES_PATH}" ]; then
-        echo -en "    Removing old cache files (stable edition)... "
-        sudo rm -rf "${CACHE_FILES_PATH}"
-        success
-    fi
-
-    if [ -e "${BETA_CACHE_FILES_PATH}" ]; then
-        echo -en "    Removing old cache files (beta edition)... "
-        sudo rm -rf "${BETA_CACHE_FILES_PATH}"
-        success
-    fi
-}
-
-function goto_google_folder {
-    if [ ! -e "${GOOGLE_FOLDER_PATH}" ]; then sudo mkdir "${GOOGLE_FOLDER_PATH}"; fi
-
-    if [ -e "${GOOGLE_FOLDER_PATH}" ]; then
-        cd "${GOOGLE_FOLDER_PATH}"
-        CWD=$(pwd)
-        success "Current working directory: ${CWD}"
-    else
-        fail 'Impossible to continue, Google folder was not created.'
-    fi
-}
-
-function setup_download_package {
+    ARCHIVE_NAME="google-chrome-installer-$(timestamp).deb"
     LATEST_CHROME="https://dl.google.com/linux/direct/google-chrome-${VERSION}_current_${ARCHITECTURE}.deb"
-    echo -en "    Downloading configured package \e[0;93m${VERSION}/${ARCHITECTURE}\e[0m... "
-    sudo rm -f "${TEMP_PACKAGE}"
-    wget --quiet --continue "${LATEST_CHROME}" -O "${TEMP_PACKAGE}"
-    success
-}
+    wget "$LATEST_CHROME" -O "${ARCHIVE_NAME}"
+    download_result=$(file "${ARCHIVE_NAME}")
 
-function install_package {
-    setup_download_package
-
-    if [ -e "${TEMP_PACKAGE}" ]; then
-        echo "    Installing Google Chrome..."
-        dpkg --extract "${TEMP_PACKAGE}" "${CHROME_FOLDER_PATH}"
-
-        if [ -e "${CHROME_FOLDER_PATH}" ]; then
-            cd "${CHROME_FOLDER_PATH}"
-            if [ -e "./opt/google/chrome-beta" ]; then
-                mv -i ./opt/google/chrome-beta/* ./
-            else
-                mv -i ./opt/google/chrome/* ./
-            fi
-            rm -rf ./etc/ ./opt/ ./usr/
-
-            # Change user owner and permissions of the Chrome Sandbox file.
-            sudo chown root:root chrome-sandbox
-            sudo chmod 4755 chrome-sandbox
-
-            # Install desktop shortcut to the main menu.
-            LAUNCHER_PATH='/opt/google/chrome/google-chrome.desktop';
-            echo '[Desktop Entry]' > "${LAUNCHER_PATH}"; # Reset original file.
-            echo 'Type=Application' >> "${LAUNCHER_PATH}";
-            echo "Name=Google Chrome $(echo $VERSION | tr 'a-z' 'A-Z')" >> "${LAUNCHER_PATH}";
-            echo 'Comment=Access the Internet' >> "${LAUNCHER_PATH}";
-            echo 'Exec=/opt/google/chrome/google-chrome %U' >> "${LAUNCHER_PATH}";
-            echo 'Icon=/opt/google/chrome/product_logo_256.png' >> "${LAUNCHER_PATH}";
-            echo 'Categories=Network;' >> "${LAUNCHER_PATH}";
-            echo 'MimeType=text/html;text/xml;application/xhtml_xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/ftp;' >> "${LAUNCHER_PATH}";
-            cd /usr/share/applications/
-            sudo rm -f google-chrome.desktop
-            sudo ln -s "${LAUNCHER_PATH}";
-
-            # Fix beta symlink
-            cd "${CHROME_FOLDER_PATH}"
-            if [ -e 'google-chrome-beta' ]; then
-                rm -f google-chrome
-                ln -s google-chrome-beta google-chrome
-            fi
-
-            # Install Google Chrome binary globally.
-            SYMLINK_BIN='/opt/google/chrome/google-chrome'
-            cd "${INST_TARGET_PATH}"
-            sudo rm -f google-chrome
-            if [ ! -e "${SYMLINK_BIN}" ]; then
-                SYMLINK_BIN=$( echo "${SYMLINK_BIN}" | sed 's/\/chrome\//\/chrome-beta\//g')
-            fi
-            sudo ln -s "${SYMLINK_BIN}" google-chrome
-
-            # Finishing
-            echo
-            success "Package installed at: \e[0;93m${CHROME_FOLDER_PATH}\e[0m"
-            success "Press ALT + F2 and type \e[0;93mgoogle-chrome\e[0m"
-
-            # Send desktop notification
-            notify_send=$(which notify-send)
-            if [ $notify_send ]; then
-                $notify_send \
-                    -i /opt/google/chrome/product_logo_256.png \
-                    "Google Chrome Upgrade" \
-                    "Package installed at: ${CHROME_FOLDER_PATH}\nPress ALT + F2 and type 'google-chrome'"
-            fi
-        else
-            fail 'Package installation failed, try again.'
-        fi
-    else
-        fail 'Package download failed, try again.'
+    if [[ $(echo "$download_result" | grep ': empty') ]]; then
+        echo 'Downloaded archive is empty'
+        exit 1
+    elif [[ $(echo "$download_result" | grep 'No such file') ]]; then
+        echo 'Archive was not downloaded'
+        exit 1
     fi
-}
 
-initialize
-request_sudo
-stop_current_processes
-remove_old_version
-goto_google_folder
-install_package
+    dpkg --extract "${ARCHIVE_NAME}" package
+    chrome_dirs=$(ls -1 package/opt/google/ 2> /dev/null | wc -l)
+
+    if [[ "$chrome_dirs" -eq 1 ]]; then
+        mv -v package/opt/google/chrome*/* ./
+        rm -r package
+
+        echo 'Change ownership and permissions of chrome-sandbox'
+        sudo chown root:root chrome-sandbox
+        sudo chmod 4755 chrome-sandbox
+    fi
+
+    rm "${ARCHIVE_NAME}" 2> /dev/null
+fi
