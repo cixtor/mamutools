@@ -28,10 +28,23 @@ echo '  https://github.com/cixtor/mamutools'
 echo '  http://cixtor.com/blog/chrome-upgrade'
 echo
 
-if [[ ! -e '/opt/google/' ]]; then
-    echo 'Directory does not exists: /opt/google/'
-    exit 1
-elif [[ ! -w '/opt/google/' ]]; then
+org_directory='/opt/google/'
+if [[ ! -e "$org_directory" ]]; then
+    echo "Directory does not exists: ${org_directory}"
+    echo -n "Do you want to auto create it (y/n) "
+    read ANSWER
+
+    if [[ "$ANSWER" == "y" ]]; then
+        mkdir -p "$org_directory" 2> /dev/null
+    fi
+
+    if [[ ! -e "$org_directory" ]]; then
+        echo "Can not continue"
+        exit 1
+    fi
+fi
+
+if [[ ! -w '/opt/google/' ]]; then
     echo 'Directory is not writable: /opt/google/'
     exit 1
 elif [[ -e '/opt/google/chrome/' ]]; then
