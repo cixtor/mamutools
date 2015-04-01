@@ -28,7 +28,8 @@ echo '  https://github.com/cixtor/mamutools'
 echo '  http://cixtor.com/blog/chrome-upgrade'
 echo
 
-org_directory='/opt/google/'
+# Create the organization folder if not exists.
+org_directory="/opt/google/"
 if [[ ! -e "$org_directory" ]]; then
     echo "Directory does not exists: ${org_directory}"
     echo -n "Do you want to auto create it (y/n) "
@@ -44,10 +45,24 @@ if [[ ! -e "$org_directory" ]]; then
     fi
 fi
 
-if [[ ! -w '/opt/google/' ]]; then
-    echo 'Directory is not writable: /opt/google/'
-    exit 1
-elif [[ -e '/opt/google/chrome/' ]]; then
+# Make the organization folder writable if necessary.
+
+if [[ ! -w "$org_directory" ]]; then
+    echo "Directory is not writable: ${org_directory}"
+    echo -n "Do you want to add the permissions (y/n) "
+    read ANSWER
+
+    if [[ "$ANSWER" == "y" ]]; then
+        chmod +w "$org_directory" 2> /dev/null
+    fi
+
+    if [[ ! -w "$org_directory" ]]; then
+        echo "Can not continue"
+        exit 1
+    fi
+fi
+
+if [[ -e '/opt/google/chrome/' ]]; then
     echo 'Installation already exists: /opt/google/chrome/'
     exit 1
 else
