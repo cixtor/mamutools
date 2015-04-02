@@ -62,11 +62,31 @@ if [[ ! -w "$org_directory" ]]; then
     fi
 fi
 
-if [[ -e '/opt/google/chrome/' ]]; then
-    echo 'Installation already exists: /opt/google/chrome/'
-    exit 1
-else
-    mkdir -p '/opt/google/chrome/' 2> /dev/null
+# Empty application directory if necessary.
+app_directory="/opt/google/chrome/"
+if [[ -e "$app_directory" ]]; then
+    num_files=$(ls -1 "${app_directory}/" | wc -l)
+
+    if [[ "$num_files" -gt 0 ]]; then
+        echo "Installation already exists: ${app_directory}"
+        echo -n "Do you want to empty the directory (y/n) "
+        read ANSWER
+
+        if [[ "$ANSWER" == "y" ]]; then
+            rm -rf "${app_directory}/*" 2> /dev/null
+            num_files=$(ls -1 "${app_directory}/" | wc -l)
+        fi
+
+        if [[ "$num_files" -gt 0 ]]; then
+            echo "Can not continue"
+            exit 1
+        fi
+    fi
+fi
+
+# Download package and install the application.
+mkdir -p '/opt/google/chrome/' 2> /dev/null
+if [[ "$?" -eq 0 ]]; then
     cd '/opt/google/chrome/'
 
     echo -n 'Which version (beta|stable|unstable) '; read VERSION
@@ -101,4 +121,6 @@ else
     fi
 
     rm "${ARCHIVE_NAME}" 2> /dev/null
+    echo "Finished"
+    exit 0
 fi
