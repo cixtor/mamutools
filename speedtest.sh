@@ -4,6 +4,12 @@
 # http://cixtor.com/
 # https://github.com/cixtor/mamutools
 # http://en.wikipedia.org/wiki/Time_To_First_Byte
+# https://performance.sucuri.net/
+#
+# This test measures how long it takes to connect to your site and for one page
+# to fully load. A very important value to pay attention is the 'time to first
+# byte', which gives us how long it took for the content to be sent back to
+# browser to start processing the page.
 #
 # Time To First Byte or TTFB is a measurement that is often used as an
 # indication of the responsiveness of a webserver or other network resources. It
