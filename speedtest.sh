@@ -18,3 +18,10 @@
 # connection time, the time taken to send the HTTP request, and the time taken
 # to get the first byte of the page.
 #
+
+curl_version=$(curl --version 2> /dev/null)
+if [[ "$?" -ne 0 ]]; then
+    echo "error: This tool requires CURL to work"
+    echo "download: http://curl.haxx.se/"
+    exit 1
+fi
