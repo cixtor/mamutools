@@ -25,3 +25,10 @@ if [[ "$?" -ne 0 ]]; then
     echo "download: http://curl.haxx.se/"
     exit 1
 fi
+
+jq_version=$(jq --version 2> /dev/null)
+if [[ "$?" -ne 0 ]]; then
+    echo "error: This tool requires JQ to work"
+    echo "download: http://stedolan.github.io/jq/"
+    exit 1
+fi
