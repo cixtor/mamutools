@@ -19,6 +19,11 @@
 # to get the first byte of the page.
 #
 
+domain_name="$1"
+action_name="$2"
+
+echo "@ Testing domain '${domain_name}'"
+
 curl_version=$(curl --version 2> /dev/null)
 if [[ "$?" -ne 0 ]]; then
     echo "error: This tool requires CURL to work"
@@ -31,4 +36,27 @@ if [[ "$?" -ne 0 ]]; then
     echo "error: This tool requires JQ to work"
     echo "download: http://stedolan.github.io/jq/"
     exit 1
+fi
+
+if [[ "$action_name" == "-full" ]]; then
+    echo "- Geo-locating domain ..."
+    geo_location=$(
+        curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
+        --header 'dnt: 1' \
+        --header 'pragma: no-cache' \
+        --header 'accept-encoding: gzip, deflate' \
+        --header 'accept-language: en-US,en;q=0.8' \
+        --header 'x-requested-with: XMLHttpRequest' \
+        --header 'accept: application/json, text/javascript, */*; q=0.01' \
+        --header 'user-agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+        --header 'content-type: application/x-www-form-urlencoded; charset=UTF-8' \
+        --header 'referer: https://performance.sucuri.net/' \
+        --header 'origin: https://performance.sucuri.net' \
+        --header 'cache-control: no-cache' \
+        --data 'geo_location=1' \
+        --data 'is_private=false' \
+        --data "domain=${domain_name}" \
+        --compressed
+    )
+    echo "$geo_location" | jq '.'
 fi
