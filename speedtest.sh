@@ -21,6 +21,21 @@
 
 domain_name="$1"
 action_name="$2"
+servers=(
+    '8e84827#USA, Dallas'
+    'f1506d2#UK, London'
+    'efae235#JP, Tokyo'
+    '355689c#USA, Los Angeles'
+    '3f55894#Canada, Montreal'
+    '57e38d3#France, Paris'
+    '51bd240#Singapore'
+    'b688898#USA, Atlanta'
+    'b688899#USA, New York'
+    '78c55bd#NL, Amsterdam'
+    '198baae#Australia, Sydney'
+    'f22400e#Brazil/Sao Paulo'
+    'u60o9aq#Germany/Frankfurt'
+)
 
 echo "@ Testing domain '${domain_name}'"
 
@@ -60,3 +75,34 @@ if [[ "$action_name" == "-full" ]]; then
     )
     echo "$geo_location" | jq '.'
 fi
+
+for server in "${servers[@]}"; do
+    server_unique=$(echo "$server" | cut -d '#' -f 1)
+    server_name=$(echo "$server" | cut -d '#' -f 2)
+
+    echo -en "- Testing server '\e[0;33m${server_unique}\e[0m' -> "
+    response=$(
+        curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
+        --header 'dnt: 1' \
+        --header 'pragma: no-cache' \
+        --header 'accept-encoding: gzip, deflate' \
+        --header 'accept-language: en-US,en;q=0.8' \
+        --header 'x-requested-with: XMLHttpRequest' \
+        --header 'accept: application/json, text/javascript, */*; q=0.01' \
+        --header 'user-agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+        --header 'content-type: application/x-www-form-urlencoded; charset=UTF-8' \
+        --header 'referer: https://performance.sucuri.net/' \
+        --header 'origin: https://performance.sucuri.net' \
+        --header 'cache-control: no-cache' \
+        --data 'form_action=test_load_time' \
+        --data 'load_time_tester=1' \
+        --data 'is_private=false' \
+        --data "location=${server_unique}" \
+        --data "domain=${domain_name}" \
+        --compressed
+    )
+
+    if [[ "$action_name" == "-full" ]]; then
+        echo "$response" | jq '.'
+    fi
+done
