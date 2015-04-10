@@ -128,3 +128,9 @@ if [[ "$action_name" == "-full" ]]; then
     )
     echo "$cache_data" | jq '.'
 fi
+
+if [[ $(which notify-send) ]]; then
+    notify-send 'Sucuri Performance Test' \
+    "Finished testing '$domain_name'" \
+    -i 'dialog-information'
+fi
