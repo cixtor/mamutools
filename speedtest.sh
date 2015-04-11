@@ -37,6 +37,29 @@ servers=(
     'u60o9aq#Germany/Frankfurt'
 )
 
+if [[ "$domain_name" == "" ]]; then
+    domain_name="-help"
+fi
+
+if [[ "$domain_name" =~ "help" ]]; then
+    echo "Speed Test"
+    echo "  http://cixtor.com/"
+    echo "  https://github.com/cixtor/mamutools"
+    echo "  http://en.wikipedia.org/wiki/Time_To_First_Byte"
+    echo "  https://performance.sucuri.net/"
+    echo
+    echo "This test measures how long it takes to connect to your site and for one page to"
+    echo "fully load. A very important value to pay attention is the 'time to first byte',"
+    echo "which gives us how long it took for the content to be sent back to browser to"
+    echo "start processing the page."
+    echo
+    echo "Usage: $0 [domain] [-full]"
+    echo "       $0 -help                Print this message."
+    echo "       $0 example.com          Start the performance test with that domain."
+    echo "       $0 example.com -full    Start test and print all JSON responses"
+    exit 2
+fi
+
 echo "@ Testing domain '${domain_name}'"
 
 curl_version=$(curl --version 2> /dev/null)
