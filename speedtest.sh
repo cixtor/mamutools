@@ -99,6 +99,7 @@ if [[ "$action_name" == "-full" ]]; then
     echo "$geo_location" | jq '.'
 fi
 
+echo -e "\e[0;2m  Status: Connection Time, First Byte Time, Total Time\e[0m"
 for server in "${servers[@]}"; do
     server_unique=$(echo "$server" | cut -d '#' -f 1)
     server_name=$(echo "$server" | cut -d '#' -f 2)
@@ -127,6 +128,21 @@ for server in "${servers[@]}"; do
 
     if [[ "$action_name" == "-full" ]]; then
         echo "$response" | jq '.'
+    else
+        status=$(echo "$response" | jq '.status' | tr -d '"')
+        CN=$(echo "$response" | jq '.output.connect_time' | tr -d '"')
+        FB=$(echo "$response" | jq '.output.firstbyte_time' | tr -d '"')
+        TT=$(echo "$response" | jq '.output.total_time' | tr -d '"')
+
+        if [[ "$status" == "1" ]]; then
+            echo -en "\e[0;42m ${status} \e[0m"
+        else
+            echo -en "\e[0;41m ${status} \e[0m"
+        fi
+
+        echo -en " ${CN}, ${FB}, ${TT}"
+        echo -en " \e[0;2m${server_name}\e[0m"
+        echo
     fi
 done
 
