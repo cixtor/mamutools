@@ -165,7 +165,10 @@ if [[ "$action_name" == "-full" ]]; then
         --data "domain=${domain_name}" \
         --compressed
     )
-    echo "$cache_data" | jq '.'
+    echo "$cache_data" | jq '{action: .action, cache_exists: .cache_exists,
+        domain_name: .domain_name, is_cache_usable: .is_cache_usable,
+        is_correct_id: .is_correct_id, max_tests: .max_tests,
+        message: .message, status: .status, total_tests: .total_tests}'
 fi
 
 if [[ $(which notify-send) ]]; then
