@@ -53,10 +53,11 @@ if [[ "$domain_name" =~ "help" ]]; then
     echo "which gives us how long it took for the content to be sent back to browser to"
     echo "start processing the page."
     echo
-    echo "Usage: $0 [domain] [-full]"
-    echo "       $0 -help                Print this message."
-    echo "       $0 example.com          Start the performance test with that domain."
-    echo "       $0 example.com -full    Start test and print all JSON responses"
+    echo "Usage:"
+    echo "  $0 [domain] [-full]"
+    echo "  $0 -help              Print this message."
+    echo "  $0 example.com        Start the performance test with that domain."
+    echo "  $0 example.com -full  Start test and print all JSON responses"
     exit 2
 fi
 
@@ -176,3 +177,6 @@ if [[ $(which notify-send) ]]; then
     "Finished testing '$domain_name'" \
     -i 'dialog-information'
 fi
+
+echo "  Finished"
+exit 0
