@@ -58,6 +58,7 @@ if [[ "$domain_name" =~ "help" ]]; then
     echo "  $0 -help              Print this message."
     echo "  $0 example.com        Start the performance test with that domain."
     echo "  $0 example.com -full  Start test and print all JSON responses"
+    echo "  $0 example.com -local Start test from local network"
     exit 2
 fi
 
@@ -100,52 +101,62 @@ if [[ "$action_name" == "-full" ]]; then
     echo "$geo_location" | jq '.'
 fi
 
-echo -e "\e[0;2m  Status: Connection Time, First Byte Time, Total Time\e[0m"
-for server in "${servers[@]}"; do
-    server_unique=$(echo "$server" | cut -d '#' -f 1)
-    server_name=$(echo "$server" | cut -d '#' -f 2)
+if [[ "$action_name" == "-local" ]]; then
+    statistics=""
+    statistics+="  Connection:  %{time_connect} secs\n"
+    statistics+="  FirstByte:   %{time_starttransfer} secs\n"
+    statistics+="  TotalTime:   %{time_total} secs\n"
+    statistics+="  NameLookup:  %{time_namelookup} secs\n"
+    statistics+="  Redirection: %{time_redirect} secs\n"
+    curl --silent "$domain_name" --location --write-out "$statistics" -o /dev/null
+else
+    echo -e "\e[0;2m  Status: Connection Time, First Byte Time, Total Time\e[0m"
+    for server in "${servers[@]}"; do
+        server_unique=$(echo "$server" | cut -d '#' -f 1)
+        server_name=$(echo "$server" | cut -d '#' -f 2)
 
-    echo -en "- Testing server '\e[0;33m${server_unique}\e[0m' -> "
-    response=$(
-        curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
-        --header 'dnt: 1' \
-        --header 'pragma: no-cache' \
-        --header 'accept-encoding: gzip, deflate' \
-        --header 'accept-language: en-US,en;q=0.8' \
-        --header 'x-requested-with: XMLHttpRequest' \
-        --header 'accept: application/json, text/javascript, */*; q=0.01' \
-        --header 'user-agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
-        --header 'content-type: application/x-www-form-urlencoded; charset=UTF-8' \
-        --header 'referer: https://performance.sucuri.net/' \
-        --header 'origin: https://performance.sucuri.net' \
-        --header 'cache-control: no-cache' \
-        --data 'form_action=test_load_time' \
-        --data 'load_time_tester=1' \
-        --data 'is_private=false' \
-        --data "location=${server_unique}" \
-        --data "domain=${domain_name}" \
-        --compressed
-    )
+        echo -en "- Testing server '\e[0;33m${server_unique}\e[0m' -> "
+        response=$(
+            curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
+            --header 'dnt: 1' \
+            --header 'pragma: no-cache' \
+            --header 'accept-encoding: gzip, deflate' \
+            --header 'accept-language: en-US,en;q=0.8' \
+            --header 'x-requested-with: XMLHttpRequest' \
+            --header 'accept: application/json, text/javascript, */*; q=0.01' \
+            --header 'user-agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+            --header 'content-type: application/x-www-form-urlencoded; charset=UTF-8' \
+            --header 'referer: https://performance.sucuri.net/' \
+            --header 'origin: https://performance.sucuri.net' \
+            --header 'cache-control: no-cache' \
+            --data 'form_action=test_load_time' \
+            --data 'load_time_tester=1' \
+            --data 'is_private=false' \
+            --data "location=${server_unique}" \
+            --data "domain=${domain_name}" \
+            --compressed
+        )
 
-    if [[ "$action_name" == "-full" ]]; then
-        echo "$response" | jq '.'
-    else
-        status=$(echo "$response" | jq '.status' | tr -d '"')
-        CN=$(echo "$response" | jq '.output.connect_time' | tr -d '"')
-        FB=$(echo "$response" | jq '.output.firstbyte_time' | tr -d '"')
-        TT=$(echo "$response" | jq '.output.total_time' | tr -d '"')
-
-        if [[ "$status" == "1" ]]; then
-            echo -en "\e[0;42m ${status} \e[0m"
+        if [[ "$action_name" == "-full" ]]; then
+            echo "$response" | jq '.'
         else
-            echo -en "\e[0;41m ${status} \e[0m"
-        fi
+            status=$(echo "$response" | jq '.status' | tr -d '"')
+            CN=$(echo "$response" | jq '.output.connect_time' | tr -d '"')
+            FB=$(echo "$response" | jq '.output.firstbyte_time' | tr -d '"')
+            TT=$(echo "$response" | jq '.output.total_time' | tr -d '"')
 
-        echo -en " ${CN}, ${FB}, ${TT}"
-        echo -en " \e[0;2m${server_name}\e[0m"
-        echo
-    fi
-done
+            if [[ "$status" == "1" ]]; then
+                echo -en "\e[0;42m ${status} \e[0m"
+            else
+                echo -en "\e[0;41m ${status} \e[0m"
+            fi
+
+            echo -en " ${CN}, ${FB}, ${TT}"
+            echo -en " \e[0;2m${server_name}\e[0m"
+            echo
+        fi
+    done
+fi
 
 if [[ "$action_name" == "-full" ]]; then
     echo "- Retrieving cache data ..."
