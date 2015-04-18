@@ -54,6 +54,15 @@ func main() {
 	request, err := http.NewRequest("GET", request_url, nil)
 
 	if err == nil {
+		request.Header.Add("DNT", "1")
+		request.Header.Add("Origin", "http://www.crunchyroll.com")
+		request.Header.Add("Referer", "http://www.crunchyroll.com/")
+		request.Header.Add("Accept-Language", "en-US,en;q=0.8")
+		request.Header.Add("User-Agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
+		request.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml")
+		request.Header.Add("Cache-Control", "max-age=0")
+		request.Header.Add("Connection", "keep-alive")
+
 		response, err := client.Do(request)
 
 		if err == nil {
