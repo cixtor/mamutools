@@ -83,7 +83,16 @@ func main() {
 					episode_list = append(episode_list, entry)
 				}
 
-				fmt.Printf("%#v\n", episode_list)
+				fmt.Printf("#!/bin/bash\n")
+				fmt.Printf("episodes=(\n")
+
+				var total_entries int = len(episode_list)
+				var it_start int = total_entries - 1
+				for i := it_start; i >= 0; i-- {
+					fmt.Printf("  '%s'\n", episode_list[i])
+				}
+
+				fmt.Printf(")\n")
 
 				os.Exit(0)
 			} else {
