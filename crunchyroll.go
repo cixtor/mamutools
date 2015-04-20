@@ -93,6 +93,17 @@ func main() {
 				}
 
 				fmt.Printf(")\n")
+				fmt.Printf("for episode_url in \"${episodes[@]}\"; do\n")
+				fmt.Printf("  folder_name=$(echo \"$episode_url\" | rev | cut -d '/' -f 1 | rev)\n")
+				fmt.Printf("  mkdir \"$folder_name\"\n")
+				fmt.Printf("  if [[ -e \"$folder_name\" ]]; then\n")
+				fmt.Printf("    cd \"$folder_name\"\n")
+				fmt.Printf("    echo \"${folder_name}: ${episode_url}\"\n")
+				fmt.Printf("    youtube-dl --all-subs --format %s \"$episode_url\"\n", *format)
+				fmt.Printf("    notify-send '%s' \"Downloaded ${folder_name}\\n${episode_url}\" -i 'dialog-information'\n", anime_title)
+				fmt.Printf("    cd ../ && echo\n")
+				fmt.Printf("  fi\n")
+				fmt.Printf("done\n")
 
 				os.Exit(0)
 			} else {
