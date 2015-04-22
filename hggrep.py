@@ -20,3 +20,25 @@ requests, new connections and data transferred. Mercurial can also work over ssh
 where the protocol is very similar to the HTTP-based protocol. By default it
 uses a 3-way merge before calling external merge tools.
 '''
+
+import os
+import re
+import sys
+
+exit_status = os.system('hg log 1> hglog.txt')
+if exit_status == 0:
+    data_set = {}
+    commit_logs = []
+    fstream = open('hglog.txt', 'r')
+
+    for line in fstream:
+        line_str = line.strip()
+        print line_str
+
+    # Close file stream.
+    fstream.close()
+
+    # Delete the repository log file.
+    os.remove('hglog.txt')
+else:
+    print 'Failure: exporting mercurial logs'
