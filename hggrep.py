@@ -33,7 +33,36 @@ if exit_status == 0:
 
     for line in fstream:
         line_str = line.strip()
-        print line_str
+        match = re.search('(changeset|branch|tag|date|summary|user):\s*(.+)', line_str)
+
+        if match is not None:
+            key_name = match.group(1)
+            key_value = match.group(2)
+            data_set[key_name] = key_value
+
+            if key_name == 'user':
+                match = re.search('([^<]+)\s*<([^>]+)>', key_value)
+
+                if match is not None:
+                    data_set['display_name'] = match.group(1).strip()
+                    data_set['user_email'] = match.group(2)
+                else:
+                    data_set['display_name'] = None
+                    data_set['user_email'] = None
+
+            if key_name == 'changeset':
+                match = re.search('([0-9]+):([0-9a-z]+)', key_value)
+
+                if match is not None:
+                    data_set['changeset'] = match.group(1)
+                    data_set['commit'] = match.group(2)
+                else:
+                    data_set['commit'] = None
+
+        if line_str is '':
+            print data_set
+            commit_logs.append(data_set)
+            data_set = {}
 
     # Close file stream.
     fstream.close()
