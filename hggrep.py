@@ -21,6 +21,8 @@ where the protocol is very similar to the HTTP-based protocol. By default it
 uses a 3-way merge before calling external merge tools.
 '''
 
+import argparse
+import json
 import os
 import re
 import sys
@@ -66,6 +68,11 @@ if exit_status == 0:
 
     # Close file stream.
     fstream.close()
+
+    # JSON-encode and print the commit logs.
+    if sys.argv[1] == '-all':
+        print json.dumps(commit_logs, indent=4)
+        sys.exit(0)
 
     # Delete the repository log file.
     os.remove('hglog.txt')
