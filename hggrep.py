@@ -74,6 +74,15 @@ if exit_status == 0:
         print json.dumps(commit_logs, indent=4)
         sys.exit(0)
 
+    # Search text in commit summary.
+    if sys.argv[1] == '-search':
+        results = []
+        for commit in commit_logs:
+            position = commit['summary'].find( sys.argv[2] )
+            if position is not -1:
+                results.append(commit)
+        print json.dumps(results, indent=4)
+
     # Delete the repository log file.
     os.remove('hglog.txt')
 else:
