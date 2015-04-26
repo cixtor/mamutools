@@ -27,6 +27,11 @@ import os
 import re
 import sys
 
+flag = argparse.ArgumentParser()
+flag.add_argument('-search', help='Search text in commit summary')
+flag.add_argument('-all', default=False, help='Print all the commit logs')
+args = flag.parse_args()
+
 exit_status = os.system('hg log 1> hglog.txt')
 if exit_status == 0:
     data_set = {}
@@ -62,7 +67,6 @@ if exit_status == 0:
                     data_set['commit'] = None
 
         if line_str is '':
-            print data_set
             commit_logs.append(data_set)
             data_set = {}
 
