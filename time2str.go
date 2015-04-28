@@ -18,3 +18,20 @@
  * In filesystems, timestamp may mean the stored date/time of creation or
  * modification of a file.
  */
+
+package main
+
+import (
+    "fmt"
+    "time"
+    "strconv"
+)
+
+func main() {
+    i, err := strconv.ParseInt("1405544146", 10, 64)
+    if err != nil {
+        panic(err)
+    }
+    tm := time.Unix(i, 0)
+    fmt.Println(tm)
+}
