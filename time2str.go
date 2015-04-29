@@ -21,17 +21,18 @@
 
 package main
 
-import (
-    "fmt"
-    "time"
-    "strconv"
-)
+import "fmt"
+import "os"
+import "strconv"
+import "time"
 
 func main() {
-    i, err := strconv.ParseInt("1405544146", 10, 64)
-    if err != nil {
-        panic(err)
-    }
-    tm := time.Unix(i, 0)
-    fmt.Println(tm)
+	value, err := strconv.ParseInt("1405544146", 10, 64)
+
+	if err == nil {
+		time := time.Unix(value, 0)
+		fmt.Println(time)
+	} else {
+		panic(err)
+	}
 }
