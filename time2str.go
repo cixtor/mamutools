@@ -32,7 +32,9 @@ func main() {
 	if err == nil {
 		time := time.Unix(value, 0)
 		fmt.Println(time)
+		os.Exit(0)
 	} else {
 		panic(err)
+		os.Exit(1)
 	}
 }
