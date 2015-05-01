@@ -21,20 +21,26 @@
 
 package main
 
+import "flag"
 import "fmt"
 import "os"
 import "strconv"
 import "time"
 
 func main() {
-	value, err := strconv.ParseInt("1405544146", 10, 64)
+	flag.Parse()
 
-	if err == nil {
-		time := time.Unix(value, 0)
-		fmt.Println(time)
-		os.Exit(0)
-	} else {
-		panic(err)
-		os.Exit(1)
+	var time_str string = flag.Arg(0)
+
+	if time_str != "" {
+		value, err := strconv.ParseInt(time_str, 10, 64)
+
+		if err == nil {
+			time := time.Unix(value, 0)
+			fmt.Println(time)
+			os.Exit(0)
+		}
 	}
+
+	os.Exit(1)
 }
