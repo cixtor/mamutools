@@ -30,6 +30,16 @@ import "time"
 func main() {
 	flag.Parse()
 
+	if flag.NArg() == 0 {
+		fmt.Println("Time to String")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  http://en.wikipedia.org/wiki/Timestamp")
+		fmt.Println("Usage:")
+		fmt.Println("  time2str 1433946549")
+		os.Exit(2)
+	}
+
 	var time_str string = flag.Arg(0)
 
 	if time_str != "" {
