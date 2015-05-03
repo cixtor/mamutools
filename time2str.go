@@ -37,20 +37,18 @@ func main() {
 		fmt.Println("  http://en.wikipedia.org/wiki/Timestamp")
 		fmt.Println("Usage:")
 		fmt.Println("  time2str 1433946549")
+		fmt.Println("  time2str 1433946549 [...]")
 		os.Exit(2)
 	}
 
-	var time_str string = flag.Arg(0)
-
-	if time_str != "" {
+	for _, time_str := range flag.Args() {
 		value, err := strconv.ParseInt(time_str, 10, 64)
 
 		if err == nil {
 			time := time.Unix(value, 0)
 			fmt.Println(time)
-			os.Exit(0)
 		}
 	}
 
-	os.Exit(1)
+	os.Exit(0)
 }
