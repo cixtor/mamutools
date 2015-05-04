@@ -35,12 +35,13 @@ args = flag.parse_args()
 exit_status = os.system('hg log 1> hglog.txt')
 if exit_status == 0:
     data_set = {}
+    response = []
     commit_logs = []
     fstream = open('hglog.txt', 'r')
 
     for line in fstream:
         line_str = line.strip()
-        match = re.search('(changeset|branch|tag|date|summary|user):\s*(.+)', line_str)
+        match = re.search('(changeset|parent|branch|tag|date|summary|user):\s*(.+)', line_str)
 
         if match is not None:
             key_name = match.group(1)
@@ -73,10 +74,12 @@ if exit_status == 0:
     # Close file stream.
     fstream.close()
 
+    # Delete the repository log file.
+    os.remove('hglog.txt')
+
     # JSON-encode and print the commit logs.
     if sys.argv[1] == '-all':
-        print json.dumps(commit_logs, indent=4)
-        sys.exit(0)
+        response = commit_logs
 
     # Search text in commit summary.
     if sys.argv[1] == '-search':
@@ -85,9 +88,13 @@ if exit_status == 0:
             position = commit['summary'].find( sys.argv[2] )
             if position is not -1:
                 results.append(commit)
-        print json.dumps(results, indent=4)
+        response = results;
 
-    # Delete the repository log file.
-    os.remove('hglog.txt')
+    # Exit to system safely.
+    try:
+        print json.dumps(response, indent=4)
+        sys.exit(0)
+    except IOError:
+        pass
 else:
     print 'Failure: exporting mercurial logs'
