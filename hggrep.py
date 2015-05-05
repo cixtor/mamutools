@@ -30,6 +30,7 @@ import sys
 flag = argparse.ArgumentParser()
 flag.add_argument('-search', help='Search text in commit summary')
 flag.add_argument('-all', default=False, help='Print all the commit logs')
+flag.add_argument('-merges', default=False, help='Print all the merged branches')
 args = flag.parse_args()
 
 exit_status = os.system('hg log 1> hglog.txt')
@@ -68,6 +69,10 @@ if exit_status == 0:
                     data_set['commit'] = None
 
         if line_str is '':
+            # Check whether the commit is a merge.
+            data_set['is_merge'] = 'parent' in data_set
+
+            # Append commit information to the history pool.
             commit_logs.append(data_set)
             data_set = {}
 
@@ -87,6 +92,16 @@ if exit_status == 0:
         for commit in commit_logs:
             position = commit['summary'].find( sys.argv[2] )
             if position is not -1:
+                results.append(commit)
+        response = results;
+
+    # Search text in commit summary.
+    if sys.argv[1] == '-merges':
+        results = []
+        for commit in commit_logs:
+            position = commit['summary'].lower().find( 'merge' )
+            in_position = position is not -1
+            if commit['is_merge'] and in_position:
                 results.append(commit)
         response = results;
 
