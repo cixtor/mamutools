@@ -31,6 +31,7 @@ flag = argparse.ArgumentParser()
 flag.add_argument('-search', help='Search text in commit summary')
 flag.add_argument('-all', default=False, help='Print all the commit logs')
 flag.add_argument('-merges', default=False, help='Print all the merged branches')
+flag.add_argument('-commits', default=False, help='Print all the normal commits')
 args = flag.parse_args()
 
 exit_status = os.system('hg log 1> hglog.txt')
@@ -95,13 +96,21 @@ if exit_status == 0:
                 results.append(commit)
         response = results;
 
-    # Search text in commit summary.
+    # Search commits for merges.
     if sys.argv[1] == '-merges':
         results = []
         for commit in commit_logs:
             position = commit['summary'].lower().find( 'merge' )
             in_position = position is not -1
             if commit['is_merge'] and in_position:
+                results.append(commit)
+        response = results;
+
+    # Search all normal commits.
+    if sys.argv[1] == '-commits':
+        results = []
+        for commit in commit_logs:
+            if not commit['is_merge']:
                 results.append(commit)
         response = results;
 
