@@ -29,9 +29,9 @@ import sys
 
 flag = argparse.ArgumentParser()
 flag.add_argument('-search', help='Search text in commit summary', action="store")
-flag.add_argument('-all', default=False, help='Print all the commit logs', action="store_true")
-flag.add_argument('-merges', default=False, help='Print all the merged branches', action="store_true")
 flag.add_argument('-commits', default=False, help='Print all the normal commits', action="store_true")
+flag.add_argument('-merges', default=False, help='Print all the merged branches', action="store_true")
+flag.add_argument('-all', default=False, help='Print all the commit logs', action="store_true")
 args = flag.parse_args()
 
 exit_status = os.system('hg log 1> hglog.txt')
@@ -83,16 +83,20 @@ if exit_status == 0:
     # Delete the repository log file.
     os.remove('hglog.txt')
 
-    # JSON-encode and print the commit logs.
-    if args.all is True:
-        response = commit_logs
-
     # Search text in commit summary.
     if args.search is not None:
         results = []
         for commit in commit_logs:
             position = commit['summary'].find( sys.argv[2] )
             if position is not -1:
+                results.append(commit)
+        response = results;
+
+    # Search all normal commits.
+    if args.commits is True:
+        results = []
+        for commit in commit_logs:
+            if not commit['is_merge']:
                 results.append(commit)
         response = results;
 
@@ -106,13 +110,9 @@ if exit_status == 0:
                 results.append(commit)
         response = results;
 
-    # Search all normal commits.
-    if args.commits is True:
-        results = []
-        for commit in commit_logs:
-            if not commit['is_merge']:
-                results.append(commit)
-        response = results;
+    # Print all the commits.
+    if args.all is True:
+        response = commit_logs
 
     # Exit to system safely.
     try:
