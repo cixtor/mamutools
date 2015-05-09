@@ -93,7 +93,7 @@ if exit_status == 0:
         response = results;
 
     # Search all normal commits.
-    if args.commits is True:
+    elif args.commits is True:
         results = []
         for commit in commit_logs:
             if not commit['is_merge']:
@@ -101,7 +101,7 @@ if exit_status == 0:
         response = results;
 
     # Search commits for merges.
-    if args.merges is True:
+    elif args.merges is True:
         results = []
         for commit in commit_logs:
             position = commit['summary'].lower().find( 'merge' )
@@ -111,7 +111,7 @@ if exit_status == 0:
         response = results;
 
     # Print all the commits.
-    if args.all is True:
+    elif args.all is True:
         response = commit_logs
 
     # Exit to system safely.
