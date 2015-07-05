@@ -73,7 +73,7 @@ if [[ -e "$app_directory" ]]; then
         read ANSWER
 
         if [[ "$ANSWER" == "y" ]]; then
-            rm -rf "${app_directory}/*" 2> /dev/null
+            rm -rf ${app_directory}/* 2> /dev/null
             num_files=$(ls -1 "${app_directory}/" | wc -l)
         fi
 
