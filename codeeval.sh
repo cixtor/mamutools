@@ -75,13 +75,14 @@ else
     echo 'function validate_solution( $text = "" ) {' >> $unit_test_file
     echo "    \$temp_input_file = '$temp_input_file';" >> $unit_test_file
     echo "    \$exec_command = sprintf( '$exec_command', \$temp_input_file );" >> $unit_test_file
+    echo '    $text = base64_decode( $text );' >> $unit_test_file
     echo '    file_put_contents( $temp_input_file, $text, LOCK_EX );' >> $unit_test_file
     echo "    return exec( \$exec_command );" >> $unit_test_file
     echo '}' >> $unit_test_file
 
     echo 'class CodeEvalTest extends PHPUnit_Framework_TestCase {' >> $unit_test_file
     for (( i=0; i<$total_cases; i++ )); do
-        inputstr=$(echo "${input_values[$i]}" | sed "s/'/\\\'/g")
+        inputstr=$(echo "${input_values[$i]}" | base64 | tr -d '\n')
         expected=$(echo "${output_values[$i]}" | sed "s/'/\\\'/g")
         echo "    public function test_codeeval_case_$i() {" >> $unit_test_file
         echo "        \$this->assertEquals( '$expected', validate_solution( '$inputstr' ) );" >> $unit_test_file
