@@ -93,6 +93,11 @@ func main() {
 				}
 
 				fmt.Printf(")\n")
+				fmt.Printf("rtmp_exists=$(which rtmpdump)\n")
+				fmt.Printf("if [[ \"$?\" != 0 ]]; then\n")
+				fmt.Printf("  echo 'The rtmpdump package is required'\n")
+				fmt.Printf("  exit 1\n")
+				fmt.Printf("fi\n")
 				fmt.Printf("for episode_url in \"${episodes[@]}\"; do\n")
 				fmt.Printf("  folder_name=$(echo \"$episode_url\" | rev | cut -d '/' -f 1 | rev)\n")
 				fmt.Printf("  mkdir \"$folder_name\"\n")
