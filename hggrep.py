@@ -32,6 +32,7 @@ flag.add_argument('-search', help='Search text in commit summary', action="store
 flag.add_argument('-commits', default=False, help='Print all the normal commits', action="store_true")
 flag.add_argument('-merges', default=False, help='Print all the merged branches', action="store_true")
 flag.add_argument('-all', default=False, help='Print all the commit logs', action="store_true")
+flag.add_argument('-latest', default=0, help='Print the latest commit logs', action="store")
 args = flag.parse_args()
 
 exit_status = os.system('hg log 1> hglog.txt')
@@ -108,6 +109,17 @@ if exit_status == 0:
             in_position = position is not -1
             if commit['is_merge'] and in_position:
                 results.append(commit)
+        response = results;
+
+    # Print the latest commits.
+    elif args.latest > 0:
+        counter, results, maximum = 0, [], int(args.latest)
+        for commit in commit_logs:
+            if counter < maximum:
+                results.append(commit)
+                counter += 1
+            else:
+                break
         response = results;
 
     # Print all the commits.
