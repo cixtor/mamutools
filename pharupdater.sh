@@ -68,7 +68,7 @@ function update_phpcs_and_phpcbf_tool() {
             log_path='php_codesniffer.log'
             curl --silent --location 'https://github.com/squizlabs/PHP_CodeSniffer/releases/latest' > $log_path
 
-            if [[ $(echo "$@" | grep -- '-phpcs') ]]; then
+            if [[ $(echo "$@" | grep -- '-all\|-phpcs') ]]; then
                 echo "- Updating PHPCodeSniffer"
                 phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcs_url" != "" ]]; then
@@ -82,7 +82,7 @@ function update_phpcs_and_phpcbf_tool() {
                 fi
             fi
 
-            if [[ $(echo "$@" | grep -- '-phpcbf') ]]; then
+            if [[ $(echo "$@" | grep -- '-all\|-phpcbf') ]]; then
                 echo "- Updating PHPCodeSniffer Fixer"
                 phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcbf_url" != "" ]]; then
