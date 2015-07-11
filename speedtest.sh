@@ -21,6 +21,7 @@
 
 domain_name="$1"
 action_name="$2"
+is_private="false"
 servers=(
     '8e84827#USA, Dallas'
     'f1506d2#UK, London'
@@ -36,6 +37,10 @@ servers=(
     'f22400e#Brazil/Sao Paulo'
     'u60o9aq#Germany/Frankfurt'
 )
+
+if [[ $(echo "$@" | grep -- '--private') ]]; then
+    is_private="true"
+fi
 
 if [[ "$domain_name" == "" ]]; then
     domain_name="-help"
@@ -54,11 +59,12 @@ if [[ "$domain_name" =~ "help" ]]; then
     echo "start processing the page."
     echo
     echo "Usage:"
-    echo "  $0 [domain] [-full]"
-    echo "  $0 -help              Print this message."
-    echo "  $0 example.com        Start the performance test with that domain."
-    echo "  $0 example.com -full  Start test and print all JSON responses"
-    echo "  $0 example.com -local Start test from local network"
+    echo "  $0 [domain] [options]"
+    echo "  $0 -help                Print this message."
+    echo "  $0 example.com          Start the performance test with that domain."
+    echo "  $0 example.com -full    Start test and print all JSON responses"
+    echo "  $0 example.com -local   Start test from local network"
+    echo "  $0 example.com -private Do not show the results on the boards"
     exit 2
 fi
 
@@ -94,7 +100,7 @@ if [[ "$action_name" == "-full" ]]; then
         --header 'origin: https://performance.sucuri.net' \
         --header 'cache-control: no-cache' \
         --data 'geo_location=1' \
-        --data 'is_private=false' \
+        --data "is_private=${is_private}" \
         --data "domain=${domain_name}" \
         --compressed
     )
@@ -131,7 +137,7 @@ else
             --header 'cache-control: no-cache' \
             --data 'form_action=test_load_time' \
             --data 'load_time_tester=1' \
-            --data 'is_private=false' \
+            --data "is_private=${is_private}" \
             --data "location=${server_unique}" \
             --data "domain=${domain_name}" \
             --compressed
@@ -140,10 +146,10 @@ else
         if [[ "$action_name" == "-full" ]]; then
             echo "$response" | jq '.'
         else
-            status=$(echo "$response" | jq '.status' | tr -d '"')
-            CN=$(echo "$response" | jq '.output.connect_time' | tr -d '"')
-            FB=$(echo "$response" | jq '.output.firstbyte_time' | tr -d '"')
-            TT=$(echo "$response" | jq '.output.total_time' | tr -d '"')
+            status=$(echo "$response" | jq -r '.status')
+            CN=$(echo "$response" | jq -r '.output.connect_time')
+            FB=$(echo "$response" | jq -r '.output.firstbyte_time')
+            TT=$(echo "$response" | jq -r '.output.total_time')
 
             if [[ "$status" == "1" ]]; then
                 echo -en "\e[0;42m ${status} \e[0m"
