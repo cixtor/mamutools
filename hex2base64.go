@@ -24,3 +24,37 @@
  * unlikely to be modified in transit through information systems, such as
  * email, that were traditionally not 8-bit clean.
  */
+
+package main
+
+import (
+	"encoding/base64"
+	"encoding/hex"
+	"fmt"
+	"os"
+)
+
+func main() {
+	if len(os.Args) > 0 {
+		var text string = os.Args[1]
+		var length int = len(text)
+
+		if length > 0 && length%2 == 0 {
+			var result []byte
+			var section []byte
+			var b64text string
+
+			for i := 0; i < length; i += 2 {
+				section = []byte{text[i], text[i+1]}
+				htext, _ := hex.DecodeString(string(section))
+				result = append(result, htext[0])
+			}
+
+			b64text = base64.StdEncoding.EncodeToString(result)
+			fmt.Println(b64text)
+			os.Exit(0)
+		}
+	}
+
+	os.Exit(1)
+}
