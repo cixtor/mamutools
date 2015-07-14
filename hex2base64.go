@@ -46,13 +46,18 @@ func main() {
 
 			for i := 0; i < length; i += 2 {
 				section = []byte{text[i], text[i+1]}
-				htext, _ := hex.DecodeString(string(section))
-				result = append(result, htext[0])
+				htext, err := hex.DecodeString(string(section))
+
+				if err == nil {
+					result = append(result, htext[0])
+				}
 			}
 
-			b64text = base64.StdEncoding.EncodeToString(result)
-			fmt.Println(b64text)
-			os.Exit(0)
+			if result != nil {
+				b64text = base64.StdEncoding.EncodeToString(result)
+				fmt.Println(b64text)
+				os.Exit(0)
+			}
 		}
 	}
 
