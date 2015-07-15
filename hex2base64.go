@@ -2,8 +2,8 @@
  * Hexadecimal to Base64
  * http://cixtor.com/
  * https://github.com/cixtor/mamutools
- * https://en.wikipedia.org/wiki/Hexadecimal
  * https://en.wikipedia.org/wiki/Base64
+ * https://en.wikipedia.org/wiki/Hexadecimal
  * http://cryptopals.com/sets/1/challenges/1/
  *
  * Hexadecimal (also base 16, or hex) is a positional numeral system with a
@@ -60,6 +60,16 @@ func main() {
 			}
 		}
 	}
+
+	fmt.Println("Hexadecimal to Base64")
+	fmt.Println("  http://cixtor.com/")
+	fmt.Println("  https://github.com/cixtor/mamutools")
+	fmt.Println("  https://en.wikipedia.org/wiki/Base64")
+	fmt.Println("  https://en.wikipedia.org/wiki/Hexadecimal")
+	fmt.Println("  http://cryptopals.com/sets/1/challenges/1/")
+	fmt.Println("Usage:")
+	fmt.Printf("  %s [string]\n", os.Args[0])
+	fmt.Printf("  %s [string] | base64 -d\n", os.Args[0])
 
 	os.Exit(1)
 }
