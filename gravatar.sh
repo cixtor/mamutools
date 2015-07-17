@@ -15,6 +15,16 @@
 # by Automattic.
 #
 
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+    echo "Gravatar Information Gatherer"
+    echo "  http://cixtor.com/"
+    echo "  https://github.com/cixtor/mamutools"
+    echo "Usage:"
+    echo "  $0 [username]"
+    echo "  $0 [eaddress]"
+    exit 2
+fi
+
 query="$1"
 isemail=$(echo "$query" | grep --quiet '@')
 
