@@ -45,10 +45,15 @@ response=$(
     --compressed
 )
 
-if [[ $(which jq) ]]; then
-    echo "$response" | jq '.'
-elif [[ $(which python) ]]; then
-    echo "$response" | python -m json.tool
+if [[ "$response" == '"User not found"' ]]; then
+    echo "{\"error\": ${response}}"
+    exit 1
 else
-    echo "$response"
+    if [[ $(which jq) ]]; then
+        echo "$response" | jq '.'
+    elif [[ $(which python) ]]; then
+        echo "$response" | python -m json.tool
+    else
+        echo "$response"
+    fi
 fi
