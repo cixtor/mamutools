@@ -19,3 +19,37 @@
  * - The commits were made in a standalone repository, not a fork.
  * - The commits were made in the repository's default branch.
  */
+
+package main
+
+import (
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+)
+
+type VcsChart struct{}
+
+func (chart VcsChart) GetDates() []string {
+	kommand := exec.Command("git", "log", "--pretty=format:%at")
+	response, err := kommand.CombinedOutput()
+
+	if err != nil {
+		os.Exit(1)
+	}
+
+	var dates []string
+	var output []string = strings.Split(string(response), "\n")
+	var length int = len(output) - 1
+	var timestamp int64
+
+	for line := length; line >= 0; line-- {
+		timestamp, err = strconv.ParseInt(output[line], 10, 64)
+		if err == nil {
+			dates = append(dates, chart.TimeToDate(timestamp))
+		}
+	}
+
+	return dates
+}
