@@ -23,10 +23,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type VcsChart struct{}
@@ -52,4 +54,56 @@ func (chart VcsChart) GetDates() []string {
 	}
 
 	return dates
+}
+
+func (chart VcsChart) GetBackTime(now time.Time) (time.Time, string) {
+	var one_year int64 = 31536000
+	var timeago int64 = now.Unix() - one_year
+	var pasttime time.Time = time.Unix(timeago, 0)
+	var weekday string = weekdays[pasttime.Weekday()]
+
+	return pasttime, weekday
+}
+
+func (chart VcsChart) GetCalendar() (map[string][]string, time.Time) {
+	var started bool
+	var dname string
+	var day_counter int
+	var date_time int64
+	var day int64
+	var cal_value string
+	var now time.Time = time.Now()
+	yearago, weekday := chart.GetBackTime(now)
+
+	var calendar = map[string][]string{
+		"Sun": {},
+		"Mon": {},
+		"Tue": {},
+		"Wed": {},
+		"Thu": {},
+		"Fri": {},
+		"Sat": {},
+	}
+
+	for day = 370; day >= 0; day-- {
+		dname = weekdays[day_counter]
+
+		if dname == weekday || started {
+			started = true
+			date_time = now.Unix() - (day * 86400)
+			cal_value = chart.TimeToDate(date_time)
+		} else {
+			cal_value = ""
+		}
+
+		calendar[dname] = append(calendar[dname], cal_value)
+
+		if day_counter < 6 {
+			day_counter += 1
+		} else {
+			day_counter = 0
+		}
+	}
+
+	return calendar, yearago
 }
