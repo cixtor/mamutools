@@ -33,6 +33,24 @@ import (
 
 type VcsChart struct{}
 
+func (chart VcsChart) TimeToDate(timestamp int64) string {
+	const dlayout = "2006-01-02"
+	var dtime time.Time = time.Unix(timestamp, 0)
+	var date string = dtime.Format(dlayout)
+
+	return date
+}
+
+func (chart VcsChart) IsCommitDate(needle string, haystack []string) bool {
+	for _, value := range haystack {
+		if value == needle {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (chart VcsChart) GetDates() []string {
 	kommand := exec.Command("git", "log", "--pretty=format:%at")
 	response, err := kommand.CombinedOutput()
