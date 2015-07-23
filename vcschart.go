@@ -125,3 +125,27 @@ func (chart VcsChart) GetCalendar() (map[string][]string, time.Time) {
 
 	return calendar, yearago
 }
+
+func (chart VcsChart) PrintCalendarHeader(calendar map[string][]string, yearago time.Time) {
+	var fix_month bool = false
+	var prev_month string = yearago.Month().String()
+	var short_format string = "2006-01-02"
+	var dtime time.Time
+	var month string
+
+	for _, dhead := range calendar["Sun"] {
+		dtime, _ = time.Parse(short_format, dhead)
+		month = dtime.Month().String()
+		if dhead != "" && month != prev_month {
+			fmt.Printf("%s", month[0:3])
+			prev_month = month
+			fix_month = true
+		} else if fix_month {
+			fmt.Printf("\x20")
+			fix_month = false
+		} else {
+			fmt.Printf("\x20\x20")
+		}
+	}
+	fmt.Println()
+}
