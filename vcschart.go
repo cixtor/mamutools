@@ -149,3 +149,18 @@ func (chart VcsChart) PrintCalendarHeader(calendar map[string][]string, yearago 
 	}
 	fmt.Println()
 }
+
+func (chart VcsChart) PrintCalendarDates(calendar map[string][]string, commits []string) {
+	for _, weekday := range weekdays {
+		for _, date := range calendar[weekday] {
+			if date == "" {
+				fmt.Printf("~\x20")
+			} else if chart.IsCommitDate(date, commits) {
+				fmt.Printf("\x1b[0;92m@\x1b[0m\x20")
+			} else {
+				fmt.Printf("\u00B7\x20")
+			}
+		}
+		fmt.Println()
+	}
+}
