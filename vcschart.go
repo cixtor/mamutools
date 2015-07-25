@@ -33,6 +33,8 @@ import (
 
 type VcsChart struct{}
 
+var weekdays = []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+
 func (chart VcsChart) TimeToDate(timestamp int64) string {
 	const dlayout = "2006-01-02"
 	var dtime time.Time = time.Unix(timestamp, 0)
@@ -163,4 +165,15 @@ func (chart VcsChart) PrintCalendarDates(calendar map[string][]string, commits [
 		}
 		fmt.Println()
 	}
+}
+
+func main() {
+	var chart VcsChart
+	commits := chart.GetDates()
+	calendar, yearago := chart.GetCalendar()
+
+	chart.PrintCalendarHeader(calendar, yearago)
+	chart.PrintCalendarDates(calendar, commits)
+
+	os.Exit(0)
 }
