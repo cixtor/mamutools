@@ -32,7 +32,7 @@ var results = flag.Int("results", 1, "Quantity of users to generate")
 var apikey = flag.String("key", "", "API key to remove limitations")
 var gender = flag.String("gender", "", "Either male or female users")
 var seed = flag.String("seed", "", "Use a specific user data set")
-var format = flag.String("format", "", "Either json, csv, sql, or yaml")
+var format = flag.String("format", "", "Either json, csv, sql, yaml, none")
 var nationality = flag.String("nat", "", "Nationality of the users")
 
 func main() {
@@ -78,6 +78,10 @@ func main() {
 		request_params.Add("format", *format)
 	}
 
+	if *format == "" || *format == "none" {
+		parse_json = false
+	}
+
 	if *nationality != "" && len(*nationality) == 2 {
 		request_params.Add("nat", *nationality)
 	}
@@ -110,8 +114,8 @@ func main() {
 				err := json.Unmarshal(body, &users)
 
 				if err == nil {
-					output, _ := json.MarshalIndent(users, "", "    ")
-					fmt.Printf("%s\n", output)
+					output, _ := json.MarshalIndent(users, "", "\x20\x20")
+					fmt.Println(output)
 					os.Exit(0)
 				} else {
 					fmt.Printf("JSON Decode: %s\n", err)
