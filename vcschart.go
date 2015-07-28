@@ -105,7 +105,7 @@ func (chart VcsChart) GetCalendar() (map[string][]string, time.Time) {
 		"Sat": {},
 	}
 
-	for day = 370; day >= 0; day-- {
+	for day = 366; day >= 0; day-- {
 		dname = weekdays[day_counter]
 
 		if dname == weekday || started {
