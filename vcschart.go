@@ -23,6 +23,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -34,6 +35,7 @@ import (
 type VcsChart struct{}
 
 var weekdays = []string{"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"}
+var repotype = flag.String("type", "git", "Repository type: git, mercurial, subversion, etc")
 
 func (chart VcsChart) TimeToDate(timestamp int64) string {
 	const dlayout = "2006-01-02"
@@ -53,23 +55,45 @@ func (chart VcsChart) IsCommitDate(needle string, haystack []string) bool {
 	return false
 }
 
-func (chart VcsChart) GetDates() []string {
+func (chart VcsChart) GetGitDates() (string, error) {
 	kommand := exec.Command("git", "log", "--pretty=format:%at")
 	response, err := kommand.CombinedOutput()
+	var output string = string(response)
+
+	return output, err
+}
+
+func (chart VcsChart) GetDates(repo string) []string {
+	var response string
+	var err error
+
+	if repo == "git" {
+		response, err = chart.GetGitDates()
+	} else {
+		fmt.Println("Repository type not supported")
+		os.Exit(1)
+	}
 
 	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	var dates []string
-	var output []string = strings.Split(string(response), "\n")
+	var output []string = strings.Split(response, "\n")
 	var length int = len(output) - 1
 	var timestamp int64
+	var parts []string
+	var line string
 
-	for line := length; line >= 0; line-- {
-		timestamp, err = strconv.ParseInt(output[line], 10, 64)
-		if err == nil {
-			dates = append(dates, chart.TimeToDate(timestamp))
+	for lnum := length; lnum >= 0; lnum-- {
+		line = output[lnum]
+		if line != "" {
+			parts = strings.Split(line, ".")
+			timestamp, err = strconv.ParseInt(parts[0], 10, 64)
+			if err == nil {
+				dates = append(dates, chart.TimeToDate(timestamp))
+			}
 		}
 	}
 
@@ -168,8 +192,19 @@ func (chart VcsChart) PrintCalendarDates(calendar map[string][]string, commits [
 }
 
 func main() {
+	flag.Usage = func() {
+		fmt.Println("VCS (Version Control System) Chart")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  https://en.wikipedia.org/wiki/Revision_control")
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+
 	var chart VcsChart
-	commits := chart.GetDates()
+	commits := chart.GetDates(*repotype)
 	calendar, yearago := chart.GetCalendar()
 
 	chart.PrintCalendarHeader(calendar, yearago)
