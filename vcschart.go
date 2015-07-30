@@ -63,12 +63,22 @@ func (chart VcsChart) GetGitDates() (string, error) {
 	return output, err
 }
 
+func (chart VcsChart) GetMercurialDates() (string, error) {
+	kommand := exec.Command("hg", "log", "--template={date}\n")
+	response, err := kommand.CombinedOutput()
+	var output string = string(response)
+
+	return output, err
+}
+
 func (chart VcsChart) GetDates(repo string) []string {
 	var response string
 	var err error
 
 	if repo == "git" {
 		response, err = chart.GetGitDates()
+	} else if repo == "mercurial" || repo == "hg" {
+		response, err = chart.GetMercurialDates()
 	} else {
 		fmt.Println("Repository type not supported")
 		os.Exit(1)
