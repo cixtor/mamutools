@@ -71,6 +71,14 @@ func (chart VcsChart) GetMercurialDates() (string, error) {
 	return output, err
 }
 
+func (chart VcsChart) GetSubversionDates() (string, error) {
+	kommand := exec.Command("sqlite3", ".svn/wc.db", "select changed_date from NODES")
+	response, err := kommand.CombinedOutput()
+	var output string = string(response)
+
+	return output, err
+}
+
 func (chart VcsChart) GetDates(repo string) []string {
 	var response string
 	var err error
@@ -79,6 +87,8 @@ func (chart VcsChart) GetDates(repo string) []string {
 		response, err = chart.GetGitDates()
 	} else if repo == "mercurial" || repo == "hg" {
 		response, err = chart.GetMercurialDates()
+	} else if repo == "subversion" || repo == "svn" {
+		response, err = chart.GetSubversionDates()
 	} else {
 		fmt.Println("Repository type not supported")
 		os.Exit(1)
@@ -100,6 +110,9 @@ func (chart VcsChart) GetDates(repo string) []string {
 		line = output[lnum]
 		if line != "" {
 			parts = strings.Split(line, ".")
+			if len(parts[0]) > 10 {
+				parts[0] = parts[0][0:10]
+			}
 			timestamp, err = strconv.ParseInt(parts[0], 10, 64)
 			if err == nil {
 				dates = append(dates, chart.TimeToDate(timestamp))
