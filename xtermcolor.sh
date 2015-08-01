@@ -114,62 +114,54 @@ elif [ "${action}" == "palette" ]; then
     echo "Palette (48;5;0..255):"
 
     for color in $(seq 0 255);do
-        if   [ $color -lt 10  ]; then color_pad="00${color}";
-        elif [ $color -lt 100 ]; then color_pad="0${color}";
-        else color_pad="${color}";
+        if [ $color -lt 10  ]; then
+            color_pad="00${color}"
+        elif [ $color -lt 100 ]; then
+            color_pad="0${color}"
+        else
+            color_pad="${color}"
         fi
 
-        echo -en "\e[0;48;5;${color}m${color_pad}\e[0m";
+        echo -en "\e[48;5;${color}m ${color_pad} \e[0m";
 
         if [ $color -gt 15 ] && [ $color -lt 232 ]; then
-            if [ $counter -eq 5 ]; then
-                counter=0; echo
-            else
-                counter=$(( $counter + 1 ))
-            fi
+            modulus=$(( $counter % 6 ))
+            limit=$(( $counter % 36 ))
+            if [[ $modulus -eq 5 ]]; then echo; fi
+            if [[ $limit -eq 35 ]]; then echo; fi
+            counter=$(( $counter + 1 ))
         elif [ $color -eq 7 ] || [ $color -eq 15 ] || [ $color -eq 255 ]; then
             echo
         fi
     done
 elif [ "${action}" == "verbose" ]; then
-    # System colors
     for fgbg in 38 48; do
+        if [[ "$fgbg" -eq 38 ]]; then content="@@"; else content="  "; fi
+
         echo "System colors (${fgbg};5;0..15):"
-
         for color in {0..15}; do
-            echo -en "\e[${fgbg};5;${color}m::\e[0m"
-
+            echo -en "\e[${fgbg};5;${color}m${content}\e[0m"
             if [ $color -eq 7 ] || [ $color -eq 15 ]; then echo; fi
         done
-
         echo
-    done
 
-    # Color cubes
-    for fgbg in 38 48; do
         echo "Color cube (6x6):"
         rgb_seq=$(seq 0 5)
-
         for g in $rgb_seq; do
             for r in $rgb_seq; do
                 for b in $rgb_seq; do
                     color=$(( 16 + $r * 36 + $g * 6 + $b ))
-                    echo -en "\e[${fgbg};5;${color}m::"
+                    echo -en "\e[${fgbg};5;${color}m${content}"
                 done
-                echo -en "\e[0m "
+                echo -en "\e[0m  "
             done
             echo
         done
-
         echo
-    done
 
-    # Grayscale ramp
-    echo "Grayscale ramp:"
-
-    for fgbg in 38 48; do
+        echo "Grayscale ramp:"
         for color in {232..255}; do
-            echo -en "\e[${fgbg};5;${color}m::\e[0m"
+            echo -en "\e[${fgbg};5;${color}m${content}\e[0m"
         done
         echo
     done
