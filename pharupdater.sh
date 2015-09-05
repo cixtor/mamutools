@@ -39,12 +39,12 @@ function update_phpunit_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phpunit') ]]; then
         echo "- Updating PHPUnit "
         echo -n "  Old version: "
-        phpunit.phar --version 2> /dev/null || echo '0.0.0'
-        rm phpunit.phar 2> /dev/null
-        wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit.phar
-        chmod 755 phpunit.phar
+        phpunit --version 2> /dev/null || echo '0.0.0'
+        rm phpunit 2> /dev/null
+        wget --quiet 'https://phar.phpunit.de/phpunit.phar' -O phpunit
+        chmod 755 phpunit
         echo -n "  New version: "
-        ./phpunit.phar --version 2> /dev/null || echo '0.0.0'
+        ./phpunit --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -52,13 +52,13 @@ function update_phpdoc_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phpdoc') ]]; then
         echo "- Updating PHPDocumentor"
         echo -n "  Old version: "
-        phpdoc.phar --version 2> /dev/null || echo '0.0.0'
+        phpdoc --version 2> /dev/null || echo '0.0.0'
         echo "  Average size ~33M (may take a while)"
-        rm phpdoc.phar 2> /dev/null
-        wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc.phar
-        chmod 755 phpdoc.phar
+        rm phpdoc 2> /dev/null
+        wget --quiet 'http://phpdoc.org/phpDocumentor.phar' -O phpdoc
+        chmod 755 phpdoc
         echo -n "  New version: "
-        ./phpdoc.phar --version 2> /dev/null || echo '0.0.0'
+        ./phpdoc --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -73,12 +73,12 @@ function update_phpcs_and_phpcbf_tool() {
                 phpcs_url=$(cat $log_path | grep 'phpcs\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcs_url" != "" ]]; then
                     echo -n "  Old version: "
-                    phpcs.phar --version 2> /dev/null || echo '0.0.0'
-                    rm phpcs.phar 2> /dev/null
-                    wget --quiet "https://github.com/${phpcs_url}" -O phpcs.phar
-                    chmod 755 phpcs.phar
+                    phpcs --version 2> /dev/null || echo '0.0.0'
+                    rm phpcs 2> /dev/null
+                    wget --quiet "https://github.com/${phpcs_url}" -O phpcs
+                    chmod 755 phpcs
                     echo -n "  New version: "
-                    ./phpcs.phar --version 2> /dev/null || echo '0.0.0'
+                    ./phpcs --version 2> /dev/null || echo '0.0.0'
                 fi
             fi
 
@@ -87,12 +87,12 @@ function update_phpcs_and_phpcbf_tool() {
                 phpcbf_url=$(cat $log_path | grep 'phpcbf\.phar" rel="nofollow"' | cut -d '"' -f 2)
                 if [[ "$phpcbf_url" != "" ]]; then
                     echo -n "  Old version: "
-                    phpcbf.phar --version 2> /dev/null || echo '0.0.0'
-                    rm phpcbf.phar 2> /dev/null
-                    wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf.phar
-                    chmod 755 phpcbf.phar
+                    phpcbf --version 2> /dev/null || echo '0.0.0'
+                    rm phpcbf 2> /dev/null
+                    wget --quiet "https://github.com/${phpcbf_url}" -O phpcbf
+                    chmod 755 phpcbf
                     echo -n "  New version: "
-                    ./phpcbf.phar --version 2> /dev/null || echo '0.0.0'
+                    ./phpcbf --version 2> /dev/null || echo '0.0.0'
                 fi
             fi
 
@@ -109,12 +109,12 @@ function update_phploc_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phploc') ]]; then
         echo "- Updating PHPLOC (Lines Of Code)"
         echo -n "  Old version: "
-        phploc.phar --version 2> /dev/null || echo '0.0.0'
-        rm phploc.phar 2> /dev/null
-        wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc.phar
-        chmod 755 phploc.phar
+        phploc --version 2> /dev/null || echo '0.0.0'
+        rm phploc 2> /dev/null
+        wget --quiet 'https://phar.phpunit.de/phploc.phar' -O phploc
+        chmod 755 phploc
         echo -n "  New version: "
-        ./phploc.phar --version 2> /dev/null || echo '0.0.0'
+        ./phploc --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -122,12 +122,12 @@ function update_phpcpd_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phpcpd') ]]; then
         echo "- Updating PHPCPD (Copy/Paste Detector)"
         echo -n "  Old version: "
-        phpcpd.phar --version 2> /dev/null || echo '0.0.0'
-        rm phpcpd.phar 2> /dev/null
-        wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd.phar
-        chmod 755 phpcpd.phar
+        phpcpd --version 2> /dev/null || echo '0.0.0'
+        rm phpcpd 2> /dev/null
+        wget --quiet 'https://phar.phpunit.de/phpcpd.phar' -O phpcpd
+        chmod 755 phpcpd
         echo -n "  New version: "
-        ./phpcpd.phar --version 2> /dev/null || echo '0.0.0'
+        ./phpcpd --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -135,12 +135,12 @@ function update_phpmd_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phpmd') ]]; then
         echo "- Updating PHPMD (Mess Detector)"
         echo -n "  Old version: "
-        phpmd.phar --version 2> /dev/null || echo '0.0.0'
-        rm phpmd.phar 2> /dev/null
-        wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd.phar
-        chmod 755 phpmd.phar
+        phpmd --version 2> /dev/null || echo '0.0.0'
+        rm phpmd 2> /dev/null
+        wget --quiet 'http://static.phpmd.org/php/latest/phpmd.phar' -O phpmd
+        chmod 755 phpmd
         echo -n "  New version: "
-        ./phpmd.phar --version 2> /dev/null || echo '0.0.0'
+        ./phpmd --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -148,12 +148,12 @@ function update_phpmetrics_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-phpmetrics') ]]; then
         echo "- Updating PHP Metrics"
         echo -n "  Old version: "
-        phpmetrics.phar --version 2> /dev/null || echo '0.0.0'
-        rm phpmetrics.phar 2> /dev/null
-        wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics.phar
-        chmod 755 phpmetrics.phar
+        phpmetrics --version 2> /dev/null || echo '0.0.0'
+        rm phpmetrics 2> /dev/null
+        wget --quiet 'https://raw.githubusercontent.com/Halleck45/PhpMetrics/master/build/phpmetrics.phar' -O phpmetrics
+        chmod 755 phpmetrics
         echo -n "  New version: "
-        ./phpmetrics.phar --version 2> /dev/null || echo '0.0.0'
+        ./phpmetrics --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
@@ -161,12 +161,12 @@ function update_wpcli_tool() {
     if [[ $(echo "$@" | grep -- '-all\|-wpcli') ]]; then
         echo "- Updating WordPress CLI"
         echo -n "  Old version: "
-        wpcli.phar --version 2> /dev/null || echo '0.0.0'
-        rm wpcli.phar 2> /dev/null
-        wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wpcli.phar
-        chmod 755 wpcli.phar
+        wp --version 2> /dev/null || echo '0.0.0'
+        rm wp 2> /dev/null
+        wget --quiet 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar' -O wp
+        chmod 755 wp
         echo -n "  New version: "
-        ./wpcli.phar --version 2> /dev/null || echo '0.0.0'
+        ./wp --version 2> /dev/null || echo '0.0.0'
     fi
 }
 
