@@ -78,7 +78,7 @@ func main() {
 		request_params.Add("format", *format)
 	}
 
-	if *format == "" || *format == "none" {
+	if *format == "" || *format == "none" || *format == "json" {
 		parse_json = false
 	}
 
