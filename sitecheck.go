@@ -20,3 +20,26 @@
  * to see, if you are not comfortable with this you may consider to use another
  * scanner.
  */
+
+type SiteCheck struct{}
+
+type Result struct {
+	Scan            map[string][]string
+	System          map[string][]string
+	Links           map[string][]string
+	Recommendations [][]string
+	OutdatedScan    [][]string
+	Malware         InfoWarning
+	Blacklist       InfoWarning
+	Webapp          struct {
+		Info    [][]string
+		Warn    []string
+		Version []string
+		Notice  []string
+	}
+}
+
+type InfoWarning struct {
+	Info [][]string
+	Warn [][]string
+}
