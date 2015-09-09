@@ -43,3 +43,37 @@ type InfoWarning struct {
 	Info [][]string
 	Warn [][]string
 }
+
+func (s *SiteCheck) Scan(domain string) []byte {
+	var url string = fmt.Sprintf("https://sitecheck.sucuri.net/?fromwp=2&clean=1&json=1&scan=%s", domain)
+	req, err := http.NewRequest("GET", url, nil)
+	client := &http.Client{}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
+	req.Header.Add("Accept-Language", "end-US,en")
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("DNT", "1")
+
+	if err != nil {
+		fmt.Printf("Error request initialization: %s\n", err)
+		os.Exit(1)
+	}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Printf("Error request execution: %s\n", err)
+		os.Exit(1)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Printf("Error response data: %s\n", err)
+		os.Exit(1)
+	}
+
+	return body
+}
