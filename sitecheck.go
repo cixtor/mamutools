@@ -77,3 +77,17 @@ func (s *SiteCheck) Scan(domain string) []byte {
 
 	return body
 }
+
+func (s *SiteCheck) Data(domain string) Result {
+	var result Result
+	var response []byte = s.Scan(domain)
+	err := json.Unmarshal(response, &result)
+
+	if err != nil {
+		fmt.Printf("JSON structure not supported: %s\n", err)
+		fmt.Println(string(response))
+		os.Exit(1)
+	}
+
+	return result
+}
