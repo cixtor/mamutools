@@ -91,3 +91,37 @@ func (s *SiteCheck) Data(domain string) Result {
 
 	return result
 }
+
+func (s *SiteCheck) Justify(text string) string {
+	var chunk int = 97
+	var lines int = 10
+	var limit int = lines * chunk
+	var final string
+	var counter int
+
+	text = strings.Replace(text, "\n", "", -1)
+	text = strings.Replace(text, "\t", "", -1)
+	text = strings.Replace(text, "\r", "", -1)
+
+	if len(text) > limit {
+		text = text[0:limit] + "..."
+	}
+
+	for _, char := range text {
+		if counter == 0 {
+			final += "\x20\x20\x20"
+		}
+
+		final += string(char)
+		counter++
+
+		if counter >= chunk {
+			final += "\n"
+			counter = 0
+		}
+	}
+
+	final += "\n"
+
+	return final
+}
