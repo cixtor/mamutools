@@ -21,6 +21,17 @@
  * scanner.
  */
 
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+)
+
 type SiteCheck struct{}
 
 type Result struct {
@@ -124,4 +135,119 @@ func (s *SiteCheck) Justify(text string) string {
 	final += "\n"
 
 	return final
+}
+
+func (s *SiteCheck) Print(result Result) {
+	fmt.Println("\033[48;5;008m >>> Website Information <<< \033[0m")
+	for key, value := range result.Scan {
+		fmt.Printf(" \033[1;95m%s:\033[0m %s\n", key, strings.Join(value, ",\x20"))
+	}
+	for _, values := range result.System {
+		for _, value := range values {
+			fmt.Printf(" \033[0;2m%s\033[0m\n", value)
+		}
+	}
+
+	if len(result.Webapp.Warn) > 0 ||
+		len(result.Webapp.Info) > 0 ||
+		len(result.Webapp.Version) > 0 ||
+		len(result.Webapp.Notice) > 0 {
+		fmt.Println()
+		fmt.Println("\033[48;5;008m >>> Application Details <<< \033[0m")
+		for _, value := range result.Webapp.Warn {
+			fmt.Printf(" %s\n", value)
+		}
+		for _, values := range result.Webapp.Info {
+			fmt.Printf(" %s \033[0;2m%s\033[0m\n", values[0], values[1])
+		}
+		for _, value := range result.Webapp.Version {
+			fmt.Printf(" %s\n", value)
+		}
+		for _, value := range result.Webapp.Notice {
+			fmt.Printf(" %s\n", value)
+		}
+	}
+
+	// Print security recommendations.
+	if len(result.Recommendations) > 0 {
+		fmt.Println()
+		fmt.Println("\033[48;5;068m >>> Recommendations <<< \033[0m")
+		for _, values := range result.Recommendations {
+			fmt.Printf(" \033[0;94m\u2022\033[0m %s\n", values[0])
+			fmt.Printf("   %s\n", values[1])
+			fmt.Printf("   %s\n", values[2])
+		}
+	}
+
+	// Print outdated software information.
+	if len(result.OutdatedScan) > 0 {
+		fmt.Println()
+		fmt.Println("\033[48;5;068m >>> OutdatedScan <<< \033[0m")
+		for _, values := range result.OutdatedScan {
+			fmt.Printf(" \033[0;94m\u2022\033[0m %s\n", values[0])
+			fmt.Printf("   %s\n", values[1])
+			fmt.Printf("   %s\n", values[2])
+		}
+	}
+
+	// Print links, iframes, and local/external javascript files.
+	for key, values := range result.Links {
+		fmt.Println()
+		fmt.Printf("\033[48;5;097m >>> Links %s <<< \033[0m\n", key)
+		for _, value := range values {
+			fmt.Printf(" %s\n", value)
+		}
+	}
+
+	// Print blacklist status information.
+	if len(result.Blacklist.Warn) > 0 || len(result.Blacklist.Info) > 0 {
+		fmt.Println()
+		var blacklist_color string = "034"
+		if len(result.Blacklist.Warn) > 0 {
+			blacklist_color = "161"
+		}
+		fmt.Printf("\033[48;5;%sm >>> Blacklist Status <<< \033[0m\n", blacklist_color)
+		for _, values := range result.Blacklist.Warn {
+			fmt.Printf(" \033[0;91m\u2718\033[0m %s\n", values[0])
+			fmt.Printf("   %s\n", values[1])
+		}
+		for _, values := range result.Blacklist.Info {
+			fmt.Printf(" \033[0;92m\u2714\033[0m %s\n", values[0])
+			fmt.Printf("   %s\n", values[1])
+		}
+	}
+
+	// Print malware payload information.
+	if len(result.Malware.Warn) > 0 {
+		fmt.Println()
+		fmt.Println("\033[48;5;161m >>> Malware Payloads <<< \033[0m")
+		for _, values := range result.Malware.Warn {
+			fmt.Printf(" \033[0;91m\u2022\033[0m %s\n", values[0])
+			fmt.Printf("%s", s.Justify(values[1]))
+		}
+	}
+}
+
+func main() {
+	if len(os.Args) <= 1 {
+		fmt.Println("Sucuri SiteCheck")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://sitecheck.sucuri.net/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  https://en.wikipedia.org/wiki/Web_application_security_scanner")
+		fmt.Println("Usage: sitecheck example.com")
+		os.Exit(2)
+	}
+
+	var domain string = os.Args[1]
+	var scanner SiteCheck
+	var result Result
+
+	fmt.Printf(" Sucuri SiteCheck\n")
+	fmt.Printf(" https://sitecheck.sucuri.net/\n")
+	fmt.Printf(" Scanning %s ...\n\n", domain)
+	result = scanner.Data(domain)
+	scanner.Print(result)
+
+	os.Exit(0)
 }
