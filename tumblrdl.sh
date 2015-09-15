@@ -13,3 +13,18 @@
 # interface, where the option to post content and posts of followed blogs
 # appear.
 #
+
+function checkPageExists() {
+    curl --url "${1}" \
+    --header 'DNT: 1' \
+    --header 'Accept-Encoding: gzip, deflate, sdch' \
+    --header 'Accept-Language: en-US,en;q=0.8' \
+    --header 'Upgrade-Insecure-Requests: 1' \
+    --header 'User-Agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
+    --header 'Accept: text/html,application/xhtml+xml,application/xml' \
+    --header 'Cache-Control: max-age=0' \
+    --header 'Connection: keep-alive' \
+    --write-out '%{http_code}' \
+    --output /dev/null \
+    --compressed --silent
+}
