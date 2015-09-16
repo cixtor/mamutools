@@ -28,3 +28,36 @@ function checkPageExists() {
     --output /dev/null \
     --compressed --silent
 }
+
+function downloadImages() {
+    if [[ "$1" != "" ]]; then
+        target="$1"
+        exists=$(checkPageExists "$target")
+        echo -en "@ \e[0;94m${target}\e[0m "
+
+        if [[ "$exists" == "200" ]]; then
+            response=($(remoteassets -url "$target" -resource images))
+            if [[ "$?" -eq 0 ]]; then
+                echo -e "\e[0;92m\u2714\e[0m"
+                for fileurl in "${response[@]}"; do
+                    echo "$fileurl" | grep --quiet '\.media\.tumblr\.com'
+                    if [[ "$?" -eq 0 ]]; then
+                        fileurl=$(echo "$fileurl" | sed 's/_[0-9]\{3\}\./_1280\./g')
+                        filename=$(echo "$fileurl" | rev | cut -d '/' -f 1 | rev)
+                        echo -n "  - ${fileurl} "
+                        wget -q "$fileurl" -O "$filename"
+                        if [[ -e "$filename" ]]; then
+                            echo -e "\e[0;92m\u2714\e[0m"
+                        else
+                            echo -e "\e[0;91m\u2718\e[0m"
+                        fi
+                    fi
+                done
+            else
+                echo -e "\e[0;91m\u2718\e[0m No resources"
+            fi
+        else
+            echo -e "\e[0;91m\u2718\e[0m HTTP/1.1 ${exists}"
+        fi
+    fi
+}
