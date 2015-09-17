@@ -61,3 +61,41 @@ function downloadImages() {
         fi
     fi
 }
+
+if [[ "$1" == "" ]]; then
+    echo "Tumblr Downloader"
+    echo "https://github.com/cixtor/mamutools"
+    echo "https://en.wikipedia.org/wiki/Tumblr"
+    echo
+    echo "Usage:"
+    echo "  $0 [username] [pages]"
+    echo "  $0 google.tumblr.com 100"
+    echo "  $0 google 100"
+    exit 2
+else
+    if [[ $(which remoteassets) ]]; then
+        website=$(echo "$1" | cut -d '.' -f 1)
+        if [[ "$2" == "" ]]; then pages="1"; else pages="$2"; fi
+        echo -e "Download \e[0;96m${website}/tumblr\e[0m"
+        mkdir -pv "$website"; cd "$website"
+
+        for ((key = 1; key <= $pages; key++)); do
+            directory="page-${key}"
+            echo -e "Creating page directory: \e[0;95m${website}/${directory}\e[0m"
+            mkdir "$directory"; cd "$directory"
+
+            if [[ "$key" -eq 1 ]]; then
+                downloadImages "http://${website}.tumblr.com/"
+            else
+                downloadImages "http://${website}.tumblr.com/page/${key}"
+            fi
+
+            echo -en "  \e[0;90mGoing to parent directory\e[0m"; cd ../; echo
+            echo -en "  \e[0;90mSleeping for 30 seconds...\e[0m"; sleep 30; echo
+        done
+    else
+        echo "RemoteAssets tool is required"
+        echo "https://github.com/cixtor/mamutools"
+        exit 1
+    fi
+fi
