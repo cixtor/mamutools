@@ -77,7 +77,11 @@ else
         website=$(echo "$1" | cut -d '.' -f 1)
         if [[ "$2" == "" ]]; then pages="1"; else pages="$2"; fi
         echo -e "Download \e[0;96m${website}/tumblr\e[0m"
-        mkdir -pv "$website"; cd "$website"
+        mkdir -pv -- "$website"
+
+        if [[ -e "$website" ]]; then
+            cd -- "$website"
+        fi
 
         for ((key = 1; key <= $pages; key++)); do
             directory="page-${key}"
