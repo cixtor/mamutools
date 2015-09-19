@@ -53,6 +53,7 @@ function downloadImages() {
                         fi
                     fi
                 done
+                return 0
             else
                 echo -e "\e[0;91m\u2718\e[0m No resources"
             fi
@@ -60,6 +61,7 @@ function downloadImages() {
             echo -e "\e[0;91m\u2718\e[0m HTTP/1.1 ${exists}"
         fi
     fi
+    return 1
 }
 
 if [[ "$1" == "" ]]; then
@@ -90,6 +92,12 @@ else
 
             if [[ "$key" -eq 1 ]]; then
                 downloadImages "http://${website}.tumblr.com/"
+                if [[ "$?" -eq 1 ]]; then
+                    echo "  Website does not seems to exists"
+                    echo "  Make sure your internet connection is working"
+                    echo "  Load the blue URL above in your web browser"
+                    exit 1
+                fi
             else
                 downloadImages "http://${website}.tumblr.com/page/${key}"
             fi
