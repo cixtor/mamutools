@@ -64,7 +64,7 @@ function downloadImages() {
     return 1
 }
 
-if [[ "$1" == "" ]]; then
+if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
     echo "Tumblr Downloader"
     echo "https://github.com/cixtor/mamutools"
     echo "https://en.wikipedia.org/wiki/Tumblr"
