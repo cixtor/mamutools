@@ -18,11 +18,11 @@ $ git clone https://github.com/cixtor/mamutools.git
 $ chmod 755 ./mamutools/*.{sh,php}
 $ for file in $(ls -1 /opt/mamutools/*.go); do \
     echo -n "Compiling '${file}'... "; \
-    fname=$(echo "$file" | sed 's/\.go$//'); \
+    fname=$(basename "$file" | sed 's/\.go$//'); \
     cp "$file" "/tmp/${fname}.go"; \
-    go build -o "$fname" "/tmp/${fname}.go"; \
-    rm "${fname}.go" 2> /dev/null; \
-    mv "$fname" /opt/mamutools/;
+    go build -o "/tmp/${fname}" "/tmp/${fname}.go"; \
+    rm "/tmp/${fname}.go" 2> /dev/null; \
+    mv "/tmp/${fname}" /opt/mamutools/; \
     echo 'Done'; \
   done
 $ echo 'export PATH="$PATH:/opt/mamutools"' >> ~/.bashrc
