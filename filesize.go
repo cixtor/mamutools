@@ -33,93 +33,110 @@
 
 package main
 
-import "fmt"
-import "net/http"
-import "regexp"
-import "math"
-import "flag"
-import "os"
-import "github.com/rakyll/magicmime"
+import (
+	"flag"
+	"fmt"
+	"github.com/rakyll/magicmime"
+	"math"
+	"net/http"
+	"os"
+	"regexp"
+)
 
-func main(){
-    flag.Parse()
-    location := flag.Arg(0)
+func main() {
+	flag.Parse()
+	location := flag.Arg(0)
 
-    if location == "" {
-        fmt.Println("File Size")
-        fmt.Println("  http://cixtor.com/")
-        fmt.Println("  https://github.com/cixtor/mamutools")
-        fmt.Println("  http://en.wikipedia.org/wiki/File_size")
-        fmt.Println()
-        fmt.Println("Usage:")
-        fmt.Println("  filesize /local/file/path.ext")
-        fmt.Println("  filesize http://domain.com/file_path.ext")
-    }else{
-        file_size(location)
-    }
+	if location == "" {
+		fmt.Println("File Size")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  http://en.wikipedia.org/wiki/File_size")
+		fmt.Println()
+		fmt.Println("Usage:")
+		fmt.Println("  filesize /local/file/path.ext")
+		fmt.Println("  filesize http://domain.com/file_path.ext")
+	} else {
+		file_size(location)
+	}
 }
 
-func file_size(location string){
-    finfo, err := os.Stat(location)
+func file_size(location string) {
+	finfo, err := os.Stat(location)
 
-    if err == nil {
-        fmt.Printf("Location: %s\n", location)
+	if err == nil {
+		fmt.Printf("Location: %s\n", location)
 
-        mm, err := magicmime.New( magicmime.MAGIC_MIME_TYPE | magicmime.MAGIC_SYMLINK | magicmime.MAGIC_ERROR )
-        if err != nil { fmt.Printf("Error ocurred") }
-        mimetype, err := mm.TypeByFile(location)
-        fmt.Printf("Mimetype: %s\n", mimetype)
+		if err := magicmime.Open(magicmime.MAGIC_MIME_TYPE | magicmime.MAGIC_SYMLINK | magicmime.MAGIC_ERROR); err != nil {
+			fmt.Printf("Error mimetype open: %s", err)
+			os.Exit(1)
+		}
 
-        fsize := finfo.Size()
-        fmt.Printf("Filesize: %d bytes\n", fsize)
-        fmt.Printf("Humanize: %s\n", readable_size(fsize))
-    }else{
-        remote_file_size(location)
-    }
+		defer magicmime.Close()
+
+		mimetype, err := magicmime.TypeByFile(location)
+
+		if err != nil {
+			fmt.Printf("Error mimetype lookup: %s", err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("Mimetype: %s\n", mimetype)
+
+		fsize := finfo.Size()
+		fmt.Printf("Filesize: %d bytes\n", fsize)
+		fmt.Printf("Humanize: %s\n", readable_size(fsize))
+	} else {
+		remote_file_size(location)
+	}
 }
 
-func remote_file_size(location string){
-    match_scheme, _ := regexp.MatchString("^(http|https)://", location)
-    if ! match_scheme { location = fmt.Sprintf("http://%s", location) }
+func remote_file_size(location string) {
+	match_scheme, _ := regexp.MatchString("^(http|https)://", location)
+	if !match_scheme {
+		location = fmt.Sprintf("http://%s", location)
+	}
 
-    client := &http.Client{}
-    req, err := http.NewRequest("HEAD", location, nil)
+	client := &http.Client{}
+	req, err := http.NewRequest("HEAD", location, nil)
 
-    if err == nil {
-        req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
-        resp, err := client.Do(req)
+	if err == nil {
+		req.Header.Set("User-Agent", "Mozilla/5.0 (KHTML, like Gecko)")
+		resp, err := client.Do(req)
 
-        if err == nil {
-            fmt.Printf("Location: %s\n", location)
-            fmt.Printf("Mimetype: %s\n", resp.Header.Get("Content-Type"))
-            fmt.Printf("Filesize: %d bytes\n", resp.ContentLength)
-            fmt.Printf("Humanize: %s\n", readable_size(resp.ContentLength))
-        }else{
-            fmt.Println("Error executing the HTTP request")
-            fmt.Printf("Error: %s\n", err)
-        }
-    }else{
-        fmt.Println("Error creating the HTTP request")
-    }
+		if err == nil {
+			fmt.Printf("Location: %s\n", location)
+			fmt.Printf("Mimetype: %s\n", resp.Header.Get("Content-Type"))
+			fmt.Printf("Filesize: %d bytes\n", resp.ContentLength)
+			fmt.Printf("Humanize: %s\n", readable_size(resp.ContentLength))
+		} else {
+			fmt.Println("Error executing the HTTP request")
+			fmt.Printf("Error: %s\n", err)
+		}
+	} else {
+		fmt.Println("Error creating the HTTP request")
+	}
 }
 
 func logn(n, b float64) float64 {
-    return math.Log(n) / math.Log(b)
+	return math.Log(n) / math.Log(b)
 }
 
 func readable_size(bytes int64) string {
-    var base float64 = 1000 // List command in UNIX use 1000 instead of 1024
-    sizes := []string{ "B", "KB", "MB", "GB", "TB", "PB", "EB" }
+	var base float64 = 1000 // List command in UNIX use 1000 instead of 1024
+	sizes := []string{"B", "KB", "MB", "GB", "TB", "PB", "EB"}
 
-    if bytes < 10 {
-        return fmt.Sprintf("%dB", bytes)
-    }
+	if bytes < 10 {
+		return fmt.Sprintf("%dB", bytes)
+	}
 
-    e := math.Floor(logn(float64(bytes), base))
-    suffix := sizes[int(e)]
-    val := float64(bytes) / math.Pow(base, math.Floor(e))
-    f := "%.0f"
-    if val < 10 { f = "%.1f" }
+	e := math.Floor(logn(float64(bytes), base))
+	suffix := sizes[int(e)]
+	val := float64(bytes) / math.Pow(base, math.Floor(e))
+	f := "%.0f"
+	if val < 10 {
+		f = "%.1f"
+	}
 
-    return fmt.Sprintf(f+"%s", val, suffix)
+	return fmt.Sprintf(f+"%s", val, suffix)
 }
