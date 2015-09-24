@@ -20,3 +20,31 @@
 # xDebug, Xcache, OpenLDAP, ModSecurity, Memcache, OAuth, PEAR, PECL, APC, GD,
 # cURL and other components
 #
+
+base="/opt/devstack"
+
+function out() {
+	echo "   $1"
+}
+
+function ok() {
+	echo -e " \e[0;92m\u2714\e[0m $1"
+}
+
+function err() {
+	echo -e " \e[0;91m\u2718\e[0m $1"
+}
+
+function info() {
+	echo -e "\n\x20\e[0;94m\u2022\e[0m $1"
+}
+
+function isInstalled() {
+	if [[ -e "$base" ]]; then
+		files=$(ls -1 "$base" | wc -l)
+		if [[ "$files" -gt 0 ]]; then
+			return 0
+		fi
+	fi
+	return 1
+}
