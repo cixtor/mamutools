@@ -48,3 +48,29 @@ function isInstalled() {
 	fi
 	return 1
 }
+
+function fixApacheHttpPort() {
+	info "Change HTTP port number"
+	files=(
+		"apache2/conf/bitnami/bitnami.conf"
+		"apache2/conf/httpd.conf"
+		"apache2/scripts/ctl.sh"
+		"apps/heroku/conf/httpd-vhosts.conf"
+		"apps/phpmyadmin/conf/httpd-vhosts.conf"
+		"docs/demo/conf/httpd-vhosts.conf"
+		"properties.ini"
+		"varnish/etc/varnish/default.vcl"
+	)
+
+	for file in "${files[@]}"; do
+		fpath="${base}/${file}"
+		sed -i 's/8080/80/g' "$fpath"
+		grep -q "8080" "$fpath"
+
+		if [[ "$?" -eq 0 ]]; then
+			err "$fpath"
+		else
+			ok "$fpath"
+		fi
+	done
+}
