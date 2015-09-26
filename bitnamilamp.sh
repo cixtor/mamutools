@@ -74,3 +74,26 @@ function fixApacheHttpPort() {
 		fi
 	done
 }
+
+function fixApacheHttpsPort() {
+	info "Change HTTPS port number"
+	files=(
+		"apache2/conf/bitnami/bitnami.conf"
+		"apache2/conf/extra/httpd-ssl.conf"
+		"apps/heroku/conf/httpd-vhosts.conf"
+		"apps/phpmyadmin/conf/httpd-vhosts.conf"
+		"properties.ini"
+	)
+
+	for file in "${files[@]}"; do
+		fpath="${base}/${file}"
+		sed -i 's/8443/443/g' "$fpath"
+		grep -q "8443" "$fpath"
+
+		if [[ "$?" -eq 0 ]]; then
+			err "$fpath"
+		else
+			ok "$fpath"
+		fi
+	done
+}
