@@ -97,3 +97,26 @@ function fixApacheHttpsPort() {
 		fi
 	done
 }
+
+function fixBootstrapScript() {
+	fpath="${base}/ctlscript.sh"
+	temp_fpath="/tmp/ctlscript.sh"
+	info "Bootstrap script Root restriction"
+	fline=$(head -n20 "$fpath" | grep -n "exit 1")
+
+	if [[ "$?" -eq 0 ]]; then
+		fline=$(echo "$fline" | cut -d: -f1)
+		header=$(( $fline - 1 ))
+		footer=$(( $fline + 1 ))
+
+		head -n"$header" "$fpath" 1> $temp_fpath
+		echo "    # exit 1" 1>> $temp_fpath
+		tail -n"+$footer" "$fpath" 1>> $temp_fpath
+		mv "$temp_fpath" "$fpath" 2> /dev/null
+		chmod 755 "$fpath" 2> /dev/null
+
+		ok "Root restriction was removed"
+	else
+		err "Root restriction does not exists"
+	fi
+}
