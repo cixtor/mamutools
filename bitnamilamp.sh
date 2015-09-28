@@ -120,3 +120,26 @@ function fixBootstrapScript() {
 		err "Root restriction does not exists"
 	fi
 }
+
+function changeDocumentRoot() {
+	info "Change document root"
+	projects="${HOME}/projects"
+	htdocs="${base}/apache2/htdocs"
+	file "$htdocs" | grep -q 'symbolic link'
+
+	if [[ "$?" -eq 0 ]]; then
+		ok "Projects folder is already linked to htdocs"
+	elif [[ -e "$projects" ]]; then
+		rm -rf "$htdocs" 2> /dev/null
+		ln -s "$projects" "$htdocs"
+		file "$htdocs" | grep -q 'symbolic link'
+
+		if [[ "$?" -eq 0 ]]; then
+			ok "Projects folder linked to htdocs"
+		else
+			err "Original htdocs folder was not removed"
+		fi
+	else
+		err "${projects} does not exists"
+	fi
+}
