@@ -49,6 +49,49 @@ function isInstalled() {
 	return 1
 }
 
+function fixApacheConfiguration() {
+	fpath="${base}/apache2/conf/httpd.conf"
+	temp_fpath="/tmp/httpd.conf"
+	info "Modify apache configuration"
+	cp "$fpath" "$temp_fpath" 2> /dev/null
+
+	ok "Change apache daemon information: User"
+	sed -i "s/^User .*/User $USER/g" "$temp_fpath"
+
+	ok "Change apache daemon information: Group"
+	sed -i "s/^Group .*/Group $USER/g" "$temp_fpath"
+
+	ok "Change server admin email"
+	sed -i "s/^ServerAdmin .*/ServerAdmin noreply@example.com/g" "$temp_fpath"
+
+	ok "Change server name association"
+	sed -i "s/^ServerName .*/ServerName 127.0.0.1/g" "$temp_fpath"
+
+	ok "Deactivate pagespeed module"
+	sed -i "s;^Include conf/pagespeed;#Include conf/pagespeed;g" "$temp_fpath"
+
+	ok "Turn server signature off"
+	sed -i "s/ServerSignature .*/ServerSignature Off/g" "$temp_fpath"
+
+	ok "Turn server tokens to production"
+	sed -i "s/ServerTokens .*/ServerTokens Prod/g" "$temp_fpath"
+
+	ok "Turn HTTP trace method off"
+	sed -i "s/TraceEnable .*/TraceEnable Off/g" "$temp_fpath"
+
+	vhosts="${HOME}/projects/virtualhosts.conf"
+	if [[ -e "$vhosts" ]]; then
+		ok "Adding custom virtual hosts"
+		grep -q "virtualhosts\.conf" "$temp_fpath"
+		if [[ "$?" -eq 1 ]]; then
+			echo "Include \"$vhosts\"" 1>> "$temp_fpath"
+		fi
+	fi
+
+	mv "$temp_fpath" "$fpath" 2> /dev/null
+	ok "Finished apache configuration"
+}
+
 function fixApacheHttpPort() {
 	info "Change HTTP port number"
 	files=(
