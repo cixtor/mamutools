@@ -186,3 +186,25 @@ function changeDocumentRoot() {
 		err "${projects} does not exists"
 	fi
 }
+
+function fixPhpConfiguration() {
+	fpath="${base}/php/etc/php.ini"
+	temp_fpath="/tmp/php.ini"
+	info "Modify PHP configuration"
+	cp "$fpath" "$temp_fpath" 2> /dev/null
+
+	ok "Turn PHP exposure and flags off"
+	sed -i "s/^expose_php.*/expose_php = Off/g" "$temp_fpath"
+
+	ok "Turn PHP error reporting to E_ALL"
+	sed -i "s/^error_reporting.*/error_reporting = E_ALL/g" "$temp_fpath"
+
+	ok "Turn PHP error displaying on"
+	sed -i "s/^display_errors.*/display_errors = On/g" "$temp_fpath"
+
+	ok "Turn PHP HTML error messages on"
+	sed -i "s/^html_errors.*/html_errors = On/g" "$temp_fpath"
+
+	mv "$temp_fpath" "$fpath" 2> /dev/null
+	ok "Finished PHP configuration"
+}
