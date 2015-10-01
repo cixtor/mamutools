@@ -208,3 +208,18 @@ function fixPhpConfiguration() {
 	mv "$temp_fpath" "$fpath" 2> /dev/null
 	ok "Finished PHP configuration"
 }
+
+function installMailCatcher() {
+	which mailcatcher 1> /dev/null
+	if [[ "$?" -eq 1 ]]; then
+		info "Install and configure MailCatcher"
+		$(which gem) install --no-rdoc --no-ri mailcatcher
+	fi
+
+	ok "Mailcatcher: $(which mailcatcher)"
+	ok "Catchmail: $(which catchmail)"
+	ok "Configure PHP sendmail path"
+	fpath="${base}/php/etc/php.ini"
+	catcher="/usr/bin/env catchmail -f noreply@example.com"
+	sed -i "s;.*sendmail_path.*;sendmail_path = \"$catcher\";g" "$fpath"
+}
