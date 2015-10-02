@@ -223,3 +223,15 @@ function installMailCatcher() {
 	catcher="/usr/bin/env catchmail -f noreply@example.com"
 	sed -i "s;.*sendmail_path.*;sendmail_path = \"$catcher\";g" "$fpath"
 }
+
+function installDeploymentTool() {
+	which dandelion 1> /dev/null
+	info "Dandelion deployment tool"
+	if [[ "$?" -eq 1 ]]; then
+		ok "Install main deployment package"
+		$(which gem) install --no-rdoc --no-ri dandelion
+		ok "Install additional SFTP package"
+		$(which gem) install --no-rdoc --no-ri net-sftp
+	fi
+	ok "Dandelion: $(which dandelion)"
+}
