@@ -235,3 +235,22 @@ function installDeploymentTool() {
 	fi
 	ok "Dandelion: $(which dandelion)"
 }
+
+if [[ $(isInstalled;echo $?) -eq 0 ]]; then
+	out "Bitnami LAMP (Linux + Apache + MySQL + PHP)"
+	ok "Development directory: ${base}"
+	fixApacheHttpPort
+	fixApacheHttpsPort
+	fixBootstrapScript
+	changeDocumentRoot
+	fixApacheConfiguration
+	fixPhpConfiguration
+	installMailCatcher
+	installDeploymentTool
+	echo "   Finished"
+	exit 0
+else
+	err "Execute the Bitnami installer first"
+	out "Development directory does not exists: ${base}"
+	exit 1
+fi
