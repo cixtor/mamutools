@@ -236,6 +236,11 @@ function installDeploymentTool() {
 	ok "Dandelion: $(which dandelion)"
 }
 
+if [[ "$@" =~ help ]]; then
+	grep '^#' "$0" | tail -n +2 | sed 's/#//g'
+	exit 2
+fi
+
 if [[ $(isInstalled;echo $?) -eq 0 ]]; then
 	out "Bitnami LAMP (Linux + Apache + MySQL + PHP)"
 	ok "Development directory: ${base}"
