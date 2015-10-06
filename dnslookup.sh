@@ -20,3 +20,33 @@
 # the determination of a domain name that is associated with a given IP address
 # using the Domain Name System (DNS) of the Internet.
 #
+
+domain="$1"
+log_path="dnsquery-$(date +%s).log"
+record_types=(
+    'A'
+    'CNAME'
+    'MX'
+    'NS'
+    'SOA'
+    'SRV'
+    'TXT'
+)
+
+echo "DNS Lookup for '${domain}'"
+nameserver=$(dig -t "NS" +nocmd +noall +answer "$domain" | head -n1 | awk '{print $5}')
+
+if [[ "$nameserver" == "" ]]; then
+    echo "dig: couldn't get nameserver for '${domain}': not found"
+    exit 1
+else
+    echo -n "Query for '${domain}' "
+    for type in "${record_types[@]}"; do
+        dig "@${nameserver}" -t "$type" +nocmd +noall +answer "$domain" 1>> $log_path
+        echo -n "."
+    done
+    echo " OK"
+    echo; cat -- "$log_path" | uniq
+    rm -- "$log_path" 2> /dev/null
+    exit 0
+fi
