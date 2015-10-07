@@ -32,6 +32,27 @@ record_types=(
     'SRV'
     'TXT'
 )
+common_subdomains=(
+    'blog'
+    'cdn'
+    'cpanel'
+    'email'
+    'forum'
+    'forums'
+    'ftp'
+    'login'
+    'm'
+    'mail'
+    'mx'
+    'portal'
+    'shop'
+    'smtp'
+    'store'
+    'support'
+    'webmail'
+    'wp'
+    'www'
+)
 
 echo "DNS Lookup for '${domain}'"
 nameserver=$(dig -t "NS" +nocmd +noall +answer "$domain" | head -n1 | awk '{print $5}')
@@ -46,6 +67,19 @@ else
         echo -n "."
     done
     echo " OK"
+    if [[ "$2" == "-full" ]]; then
+        for name in "${common_subdomains[@]}"; do
+            subdomain="${name}.${domain}"
+            echo -n "Query for '${subdomain}' "
+            for type in "${record_types[@]}"; do
+                dig -t $type +nocmd +noall +answer "${subdomain}" "@${nameserver}" \
+                | grep -vE '^;|SOA' | grep 'IN' \
+                | grep "^$subdomain" 1>> $log_path
+                echo -n "."
+            done
+            echo " OK"
+        done
+    fi
     echo; cat -- "$log_path" | uniq
     rm -- "$log_path" 2> /dev/null
     exit 0
