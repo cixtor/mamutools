@@ -54,14 +54,13 @@ common_subdomains=(
     'www'
 )
 
-if [[ "$@" =~ help ]]; then
+if [[ "$1" == "" ]] || [[ "$@" =~ help ]]; then
     echo "DNS Lookup"
-    echo "http://cixtor.com/"
-    echo "https://github.com/cixtor/mamutools"
-    echo "https://en.wikipedia.org/wiki/Domain_Name_System"
-    echo "https://en.wikipedia.org/wiki/Reverse_DNS_lookup"
-    echo "https://en.wikipedia.org/wiki/List_of_DNS_record_types"
-    echo
+    echo "  http://cixtor.com/"
+    echo "  https://github.com/cixtor/mamutools"
+    echo "  https://en.wikipedia.org/wiki/Domain_Name_System"
+    echo "  https://en.wikipedia.org/wiki/Reverse_DNS_lookup"
+    echo "  https://en.wikipedia.org/wiki/List_of_DNS_record_types"
     echo "Usage:"
     echo "  $0 -help"
     echo "  $0 example.com"
