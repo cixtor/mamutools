@@ -205,6 +205,9 @@ function fixPhpConfiguration() {
 	ok "Turn PHP HTML error messages on"
 	sed -i "s/^html_errors.*/html_errors = On/g" "$temp_fpath"
 
+	ok "Deactivate opcache extension"
+	sed -i "s/^opcache.enable.*/opcache.enable=0/g" "$temp_fpath"
+
 	mv "$temp_fpath" "$fpath" 2> /dev/null
 	ok "Finished PHP configuration"
 }
