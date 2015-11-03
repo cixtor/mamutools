@@ -107,8 +107,8 @@ function fixApacheHttpPort() {
 
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
-		sed -i 's/8080/80/g' "$fpath"
-		grep -q "8080" "$fpath"
+		sed -i 's/8080/80/g' "$fpath" 2> /dev/null
+		grep -q "8080" "$fpath" 2> /dev/null
 
 		if [[ "$?" -eq 0 ]]; then
 			err "$fpath"
@@ -273,9 +273,10 @@ function fixOpenSSLConfiguration() {
 }
 
 function installMailCatcher() {
+	info "MailCatcher SMTP server and debugger"
 	which mailcatcher 1> /dev/null
 	if [[ "$?" -eq 1 ]]; then
-		info "Install and configure MailCatcher"
+		ok "Install and configure MailCatcher"
 		$(which gem) install --no-rdoc --no-ri mailcatcher
 	fi
 
@@ -288,8 +289,8 @@ function installMailCatcher() {
 }
 
 function installDeploymentTool() {
-	which dandelion 1> /dev/null
 	info "Dandelion deployment tool"
+	which dandelion 1> /dev/null
 	if [[ "$?" -eq 1 ]]; then
 		ok "Install main deployment package"
 		$(which gem) install --no-rdoc --no-ri dandelion
