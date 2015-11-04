@@ -46,7 +46,7 @@ if [[ "$domain_name" == "" ]]; then
     domain_name="-help"
 fi
 
-if [[ "$domain_name" =~ "help" ]]; then
+if [[ "$domain_name" =~ "help$" ]]; then
     echo "Speed Test"
     echo "  http://cixtor.com/"
     echo "  https://github.com/cixtor/mamutools"
