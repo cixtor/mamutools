@@ -15,7 +15,7 @@
 # by Automattic.
 #
 
-if [[ "$1" == "" ]] || [[ "$1" =~ help ]]; then
+if [[ "$1" == "" ]] || [[ "$1" =~ "help$" ]]; then
     echo "Gravatar Information Gatherer"
     echo "  http://cixtor.com/"
     echo "  https://github.com/cixtor/mamutools"
@@ -35,14 +35,14 @@ else
 fi
 
 response=$(
-    curl --silent "https://secure.gravatar.com/${uniqueid}.json" \
+    curl "https://en.gravatar.com/${uniqueid}.json" \
     --header 'dnt: 1' \
     --header 'accept-language: en-US,en;q=0.8' \
     --header 'accept-encoding: gzip, deflate, sdch' \
     --header 'user-agent: Mozilla/5.0 (KHTML, like Gecko) Safari/537.36' \
     --header 'accept: text/html,application/xhtml+xml,application/xml' \
     --header 'cache-control: max-age=0' \
-    --compressed
+    --compressed --silent
 )
 
 if [[ "$response" == '"User not found"' ]]; then
