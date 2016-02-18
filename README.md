@@ -2,41 +2,34 @@
 
 [MamuTools](http://cixtor.com/mamutools) is a collection of custom scripts intended to be used through the command line and to offer more utilities on things like fetch remote content, format piped output, compress and package repositories, string manipulation, etc. These scripts were written in multiple languages to solve specific problems and to facilitate the execution of common actions.
 
-### Requirements
-
-Considering that these scripts are not correlated among them, you'll need to check individually to know what are the dependencies, but here is a list with the basic libraries and interpreters needed to execute most of the scripts.
-
-* Go >= 1.0 (tested on `go1.2rc3`)
-* Bash >= 3.0 (Change the [Shebang](http://en.wikipedia.org/wiki/Shebang_(Unix)) to use another shell)
-* PHP >= 5.2 (with `gd` and `curl` modules)
-
 ### Installation
 
+This script will create a directory at `/opt/mamutools` _(if it does not exists yet)_, then will make all the scripts in the repository runnable by granting executable privileges to all users, finally will compile the Go files. Notice that if you don't have a working installation of the Go programming language this step will fail, I DO NOT distribute binaries with this repository for security reasons.
+
 ```shell
-$ cd /opt/
-$ git clone https://github.com/cixtor/mamutools.git
-$ chmod 755 ./mamutools/*.{sh,php}
-$ for file in $(ls -1 /opt/mamutools/*.go); do \
-    echo -n "Compiling '${file}'... "; \
-    fname=$(basename "$file" | sed 's/\.go$//'); \
-    cp "$file" "/tmp/${fname}.go"; \
-    go build -o "/tmp/${fname}" "/tmp/${fname}.go"; \
-    rm "/tmp/${fname}.go" 2> /dev/null; \
-    mv "/tmp/${fname}" /opt/mamutools/; \
-    echo 'Done'; \
-  done
-$ echo 'export PATH="$PATH:/opt/mamutools"' >> ~/.bashrc
-$ source ~/.bashrc
+mkdir -p /opt/
+git clone https://github.com/cixtor/mamutools /opt/mamutools
+chmod -- 755 /opt/mamutools/*.{sh,py,php} 2> /dev/null
+for FILE in $(ls -1 /opt/mamutools/*.go); do \
+  CLEAN=$(echo "$FILE" | sed 's;\.go;;'); \
+  echo "${FILE} -> ${CLEAN}"; \
+  go build -o "$CLEAN" "$FILE"; \
+done
+echo 'export PATH="$PATH:/opt/mamutools"' 1>> ~/.profile
+source ~/.profile
 ```
+
+### Additional Tools
+
+There is a additional list of tools that were originally part of this repository but then were moved to independent projects for maintainability, easy distribution and reusability by 3rd-party programs.
+
+- [Sparkline](https://github.com/cixtor/sparkline) — `go get -u github.com/cixtor/sparkline`
+- [String Conversion](https://github.com/cixtor/strconv) — `go get -u github.com/cixtor/strconv`
+- [Wordpress Tickets](https://github.com/cixtor/wptickets) — `go get -u github.com/cixtor/wptickets`
 
 ### Uninstall
 
-```shell
-$ rm -rf /opt/mamutools/
-$ REMOVE_LINE=$(cat ~/.bashrc | grep -n mamutools | awk -F ':' '{print $1}')
-$ echo -e "Remove line \e[0;91m${REMOVE_LINE}\e[0m from $HOME/.bashrc"
-$ source ~/.bashrc
-```
+The uninstallation process is as simple as the deletion of the `/opt/mamutools` directory which contains all the scripts and binaries. Then you have to manually remove the _"export"_ line added to the `~/.profile` file during the installation process.
 
 ### License
 
