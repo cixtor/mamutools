@@ -31,15 +31,18 @@ function out() {
 }
 
 function ok() {
-	echo -e " \e[0;92m\u2714\e[0m $1"
+	HEAVY_CHECK_MARK="\xE2\x9C\x94"
+	echo -e " \033[0;92m${HEAVY_CHECK_MARK}\033[0m $1"
 }
 
 function err() {
-	echo -e " \e[0;91m\u2718\e[0m $1"
+	HEAVY_BALLOT_X="\xE2\x9C\x98"
+	echo -e " \033[0;91m${HEAVY_BALLOT_X}\033[0m $1"
 }
 
 function info() {
-	echo -e "\n\x20\e[0;94m\u2022\e[0m $1"
+	BULLET="\xE2\x80\xA2"
+	echo -e "\n\x20\033[0;94m${BULLET}\033[0m $1"
 }
 
 function isInstalled() {
