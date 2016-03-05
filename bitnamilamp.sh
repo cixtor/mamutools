@@ -46,11 +46,8 @@ function info() {
 }
 
 function isInstalled() {
-	if [[ -e "$base" ]]; then
-		files=$(ls -1 "$base" | wc -l)
-		if [[ "$files" -gt 0 ]]; then
-			return 0
-		fi
+	if [[ -e "$base" ]] && [[ -e "${base}/properties.ini" ]]; then
+		return 0
 	fi
 	return 1
 }
@@ -64,28 +61,28 @@ function fixApacheConfiguration() {
 	cp "$fpath" "$temp_fpath" 2> /dev/null
 
 	ok "Change apache daemon information: User"
-	sed -i "s/^User .*/User $USER/g" "$temp_fpath"
+	sed -i "" "s/^User .*/User $USER/g" "$temp_fpath"
 
 	ok "Change apache daemon information: Group"
-	sed -i "s/^Group .*/Group $USER/g" "$temp_fpath"
+	sed -i "" "s/^Group .*/Group $USER/g" "$temp_fpath"
 
 	ok "Change server admin email"
-	sed -i "s/^ServerAdmin .*/ServerAdmin noreply@example.com/g" "$temp_fpath"
+	sed -i "" "s/^ServerAdmin .*/ServerAdmin noreply@example.com/g" "$temp_fpath"
 
 	ok "Change server name association"
-	sed -i "s/^ServerName .*/ServerName 127.0.0.1/g" "$temp_fpath"
+	sed -i "" "s/^ServerName .*/ServerName 127.0.0.1/g" "$temp_fpath"
 
 	ok "Deactivate pagespeed module"
-	sed -i "s;^Include conf/pagespeed;#Include conf/pagespeed;g" "$temp_fpath"
+	sed -i "" "s;^Include conf/pagespeed;#Include conf/pagespeed;g" "$temp_fpath"
 
 	ok "Turn server signature off"
-	sed -i "s/ServerSignature .*/ServerSignature Off/g" "$temp_fpath"
+	sed -i "" "s/ServerSignature .*/ServerSignature Off/g" "$temp_fpath"
 
 	ok "Turn server tokens to production"
-	sed -i "s/ServerTokens .*/ServerTokens Prod/g" "$temp_fpath"
+	sed -i "" "s/ServerTokens .*/ServerTokens Prod/g" "$temp_fpath"
 
 	ok "Turn HTTP trace method off"
-	sed -i "s/TraceEnable .*/TraceEnable Off/g" "$temp_fpath"
+	sed -i "" "s/TraceEnable .*/TraceEnable Off/g" "$temp_fpath"
 
 	vhosts="${HOME}/projects/vhosts.apache.conf"
 	if [[ -e "$vhosts" ]]; then
@@ -130,8 +127,7 @@ function fixNginxConfiguration() {
 	bitconf="${base}/nginx/conf/bitnami/bitnami.conf"
 	if [[ -e "$bitconf" ]]; then
 		ok "Adding index to the default vhost"
-		grep -q 'index\.htm;' "$bitconf"
-		if [[ "$?" -eq 0 ]]; then
+		if grep -q 'index\.htm;' "$bitconf"; then
 			sed -i 's/index\.htm;/index\.htm index\.php;/g' "$bitconf"
 		fi
 	fi
@@ -150,19 +146,19 @@ function fixFastcgiConfiguration() {
 	cp "$fpath" "$temp_fpath" 2> /dev/null
 
 	ok "Change fast-cgi daemon information: User"
-	sed -i "s/^user=daemon/user=$USER/g" "$temp_fpath"
+	sed -i "" "s/^user=daemon/user=$USER/g" "$temp_fpath"
 
 	ok "Change fast-cgi daemon information: Group"
-	sed -i "s/^group=daemon/group=$USER/g" "$temp_fpath"
+	sed -i "" "s/^group=daemon/group=$USER/g" "$temp_fpath"
 
 	ok "Change fast-cgi daemon information: User (listen)"
-	sed -i "s/^;listen.owner = daemon/listen.owner = $USER/g" "$temp_fpath"
+	sed -i "" "s/^;listen.owner = daemon/listen.owner = $USER/g" "$temp_fpath"
 
 	ok "Change fast-cgi daemon information: Group (listen)"
-	sed -i "s/^;listen.group = daemon/listen.group = $USER/g" "$temp_fpath"
+	sed -i "" "s/^;listen.group = daemon/listen.group = $USER/g" "$temp_fpath"
 
 	ok "Change fast-cgi daemon information: Mode (listen)"
-	sed -i "s/^;listen.mode = 0660/listen.mode = 0660/g" "$temp_fpath"
+	sed -i "" "s/^;listen.mode = 0660/listen.mode = 0660/g" "$temp_fpath"
 
 	mv "$temp_fpath" "$fpath" 2> /dev/null
 	ok "Finished fast-cgi configuration"
@@ -200,10 +196,8 @@ function fixServerHttpPort() {
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
 		if [[ -e "$fpath" ]]; then
-			sed -i 's/8080/80/g' "$fpath" 2> /dev/null
-			grep -q "8080" "$fpath" 2> /dev/null
-
-			if [[ "$?" -eq 0 ]]; then
+			sed -i "" "s/8080/80/g" "$fpath" 2> /dev/null
+			if grep -q "8080" "$fpath" 2> /dev/null; then
 				err "$fpath"
 			else
 				ok "$fpath"
@@ -239,10 +233,8 @@ function fixServerHttpsPort() {
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
 		if [[ -e "$fpath" ]]; then
-			sed -i 's/8443/443/g' "$fpath"
-			grep -q "8443" "$fpath"
-
-			if [[ "$?" -eq 0 ]]; then
+			sed -i "" "s/8443/443/g" "$fpath" 2> /dev/null
+			if grep -q "8443" "$fpath" 2> /dev/null; then
 				err "$fpath"
 			else
 				ok "$fpath"
@@ -302,22 +294,22 @@ function changeDocumentRoot() {
 		exit 1
 	fi
 
-	file "$htdocs" | grep -q 'symbolic link'
-
-	if [[ "$?" -eq 0 ]]; then
+	if file "$htdocs" | grep -q "symbolic link"; then
 		ok "Projects folder is already linked to htdocs"
-	elif [[ -e "$projects" ]]; then
-		rm -rf "$htdocs" 2> /dev/null
-		ln -s "$projects" "$htdocs"
-		file "$htdocs" | grep -q 'symbolic link'
+		return
+	fi
 
-		if [[ "$?" -eq 0 ]]; then
-			ok "Projects folder linked to htdocs"
-		else
-			err "Original htdocs folder was not removed"
-		fi
-	else
+	if [[ ! -e "$projects" ]]; then
 		err "${projects} does not exists"
+		return
+	fi
+
+	rm -rf "$htdocs" 2> /dev/null
+	ln -s "$projects" "$htdocs" 2> /dev/null
+	if file "$htdocs" | grep -q "symbolic link"; then
+		ok "Projects folder linked to htdocs"
+	else
+		err "Original htdocs folder was not removed"
 	fi
 }
 
@@ -328,19 +320,19 @@ function fixPhpConfiguration() {
 	cp "$fpath" "$temp_fpath" 2> /dev/null
 
 	ok "Turn PHP exposure and flags off"
-	sed -i "s/^expose_php.*/expose_php = Off/g" "$temp_fpath"
+	sed -i "" "s/^expose_php.*/expose_php = Off/g" "$temp_fpath"
 
 	ok "Turn PHP error reporting to E_ALL"
-	sed -i "s/^error_reporting.*/error_reporting = E_ALL/g" "$temp_fpath"
+	sed -i "" "s/^error_reporting.*/error_reporting = E_ALL/g" "$temp_fpath"
 
 	ok "Turn PHP error displaying on"
-	sed -i "s/^display_errors.*/display_errors = On/g" "$temp_fpath"
+	sed -i "" "s/^display_errors.*/display_errors = On/g" "$temp_fpath"
 
 	ok "Turn PHP HTML error messages on"
-	sed -i "s/^html_errors.*/html_errors = On/g" "$temp_fpath"
+	sed -i "" "s/^html_errors.*/html_errors = On/g" "$temp_fpath"
 
 	ok "Deactivate opcache extension"
-	sed -i "s/^opcache.enable.*/opcache.enable=0/g" "$temp_fpath"
+	sed -i "" "s/^opcache.enable.*/opcache.enable=0/g" "$temp_fpath"
 
 	xdebuglib="${base}/php/lib/php/extensions/xdebug.so"
 	if [[ ! -e "$xdebuglib" ]]; then
@@ -367,14 +359,20 @@ function fixPhpConfiguration() {
 		newconfig+=$'\n'
 		newconfig+=$(tail -n"+$footer" "$temp_fpath")
 		echo "$newconfig" 1> "$temp_fpath"
-		sed -i 's/;xdebug\.profiler/xdebug\.profiler/g' "$temp_fpath"
+		sed -i "" "s/;xdebug\.profiler/xdebug\.profiler/g" "$temp_fpath"
 
 		ok "Activate xdebug command line colors"
 		grep -q "^xdebug\.cli_color" "$temp_fpath"
 		if [[ "$?" -eq 1 ]]; then
-			remotenum=$(grep -n "xdebug\.remote" "$temp_fpath" | head -n1 | cut -d ':' -f1)
+			remotenum=$(grep -n "xdebug\.remote" "$temp_fpath" | head -n1 | cut -d: -f1)
 			if [[ "$remotenum" != "" ]]; then
-				sed -i "${remotenum}ixdebug.cli_color=1" "$temp_fpath"
+				TEMPFILE=$(mktemp)
+				OFFSET=$((remotenum + 1))
+				head -n "$remotenum" "$temp_fpath" 1> "$TEMPFILE"
+				echo -e "xdebug.cli_color=1" 1>> "$TEMPFILE"
+				tail -n "+$OFFSET" "$temp_fpath" 1>> "$TEMPFILE"
+				cp -- "$TEMPFILE" "$temp_fpath" 2> /dev/null
+				rm -- "$TEMPFILE" 2> /dev/null
 			fi
 		fi
 	else
@@ -388,38 +386,39 @@ function fixPhpConfiguration() {
 function fixOpenSSLConfiguration() {
     # https://community.bitnami.com/t/libgost-openssl-issues/26929
 	version=$(php -r 'echo PHP_VERSION;')
-	echo "$version" | grep -q "^5\.3"
-	if [[ "$?" -eq 0 ]]; then
+	if echo "$version" | grep -q "^5\.3"; then
 		info "Fix OpenSSL LibGost issue"
 		openssl_path="/opt/devstack/common/bin/openssl"
 		setenv_path="/opt/devstack/scripts/setenv.sh"
 		openssl_temp="/tmp/openssl"
 		setenv_temp="/tmp/setenv.sh"
 
-		grep -q "OPENSSL_ENGINES" "$openssl_path"
-		if [[ "$?" -eq 0 ]]; then
+		if grep -q "OPENSSL_ENGINES" "$openssl_path"; then
 			err "OpenSSL engines is already in openssl script"
 		else
 			ok "OpenSSL engines was added to openssl script"
 			footer=$(grep -n "exec" "$openssl_path" | tail -n 1 | cut -d: -f1)
 			header=$(( footer - 1 ))
 			head -n "$header" "$openssl_path" 1> "$openssl_temp"
-			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$openssl_temp"
-			echo 'export OPENSSL_ENGINES' 1>> "$openssl_temp"
+			TEXT='' # Initialize as a blank string.
+			TEXT+='OPENSSL_ENGINES="/opt/devstack/common/lib/engines"'
+			TEXT+='export OPENSSL_ENGINES'
+			echo "$TEXT" 1>> "$openssl_temp"
 			tail -n "+$footer" "$openssl_path" 1>> "$openssl_temp"
 			mv "$openssl_temp" "$openssl_path" 2> /dev/null
 		fi
 
-		grep -q "OPENSSL_ENGINES" "$setenv_path"
-		if [[ "$?" -eq 0 ]]; then
+		if grep -q "OPENSSL_ENGINES" "$setenv_path"; then
 			err "OpenSSL engines is already in setenv script"
 		else
 			ok "OpenSSL engines was added to setenv script"
 			footer=$(grep -n "^\. .*build-setenv\.sh" "$setenv_path" | tail -n 1 | cut -d: -f1)
 			header=$(( footer - 1 ))
 			head -n "$header" "$setenv_path" 1> "$setenv_temp"
-			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$setenv_temp"
-			echo 'export OPENSSL_ENGINES' 1>> "$setenv_temp"
+			TEXT='' # Initialize as a blank string.
+			TEXT+='OPENSSL_ENGINES="/opt/devstack/common/lib/engines"'
+			TEXT+='export OPENSSL_ENGINES'
+			echo "$TEXT" 1>> "$openssl_temp"
 			tail -n "+$footer" "$setenv_path" 1>> "$setenv_temp"
 			mv "$setenv_temp" "$setenv_path" 2> /dev/null
 		fi
@@ -443,7 +442,7 @@ function installMailCatcher() {
 	ok "Configure PHP sendmail path"
 	fpath="${base}/php/etc/php.ini"
 	catcher="/usr/bin/env catchmail -f noreply@example.com"
-	sed -i "s;.*sendmail_path.*;sendmail_path = \"$catcher\";g" "$fpath"
+	sed -i "" "s;.*sendmail_path.*;sendmail_path = \"$catcher\";g" "$fpath"
 }
 
 function installDeploymentTool() {
