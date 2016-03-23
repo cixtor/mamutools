@@ -119,12 +119,12 @@ if [[ "$action_name" == "-local" ]]; then
     statistics+="  Redirection: %{time_redirect} secs\n"
     curl --silent "$domain_name" --location --write-out "$statistics" -o /dev/null
 else
-    echo -e "\e[0;2m  Status: Connection Time, First Byte Time, Total Time\e[0m"
+    echo -e "\033[0;2m  Status: Connection Time, First Byte Time, Total Time\033[0m"
     for server in "${servers[@]}"; do
         server_unique=$(echo "$server" | cut -d '#' -f 1)
         server_name=$(echo "$server" | cut -d '#' -f 2)
 
-        echo -en "- Testing server '\e[0;33m${server_unique}\e[0m' -> "
+        echo -en "- Testing server '\033[0;33m${server_unique}\033[0m' -> "
         response=$(
             curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
             --header 'dnt: 1' \
@@ -155,13 +155,13 @@ else
             TT=$(echo "$response" | jq -r '.output.total_time')
 
             if [[ "$status" == "1" ]]; then
-                echo -en "\e[0;42m ${status} \e[0m"
+                echo -en "\033[0;42m ${status} \033[0m"
             else
-                echo -en "\e[0;41m ${status} \e[0m"
+                echo -en "\033[0;41m ${status} \033[0m"
             fi
 
             echo -en " ${CN}, ${FB}, ${TT}"
-            echo -en " \e[0;2m${server_name}\e[0m"
+            echo -en " \033[0;2m${server_name}\033[0m"
             echo
         fi
     done
