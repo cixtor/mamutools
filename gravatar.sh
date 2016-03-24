@@ -29,9 +29,9 @@ query="$1"
 isemail=$(echo "$query" | grep --quiet '@')
 
 if [[ "$?" -eq 0 ]]; then
-    uniqueid=$(strconv -md5 -text "$query")
+    uniqueid=$(echo "$query" | strconv md5)
 else
-    uniqueid=$(strconv -urlenc -text "$query")
+    uniqueid=$(echo "$query" | strconv urlenc)
 fi
 
 response=$(
