@@ -13,28 +13,29 @@
 # each byte is written to standard output without buffering as it is read. Many
 # operating systems do this by default and ignore the flag.
 #
-FILEPATH=$1
-if [ "${FILEPATH}" != "" ]; then
-    LINE=$2
-    if [ "${LINE}" != "" ]; then
-        if [[ "${LINE}" =~ ^[0-9]+$ ]]; then
-            LENGTH=$3
-            if ! [[ "${LENGTH}" =~ ^[0-9]+$ ]]; then
-                LENGTH="";
-                echo -e "\e[0;91mError.\e[0m The number of lines to show is not valid, you will see only one:"
-            fi
-            if [ "${LENGTH}" != "" ]; then
-                head -n $(( $LINE + $LENGTH - 1 )) $FILEPATH | tail -n $LENGTH
-            else
-                head -n $LINE $FILEPATH | tail -n 1
-            fi
-        else
-            echo -e "\e[0;91mError.\e[0m The line number specified is not numeric."
-        fi
-    else
-        echo -e "\e[0;91mError.\e[0m You should specify a valid line number as the first parameter."
-    fi
-else
-    echo -e "\e[0;91mError.\e[0m You should specify a valid file path."
+
+FILEPATH="$1"
+LINERANGE="$2"
+
+if [[ "$FILEPATH" == "" ]] || [[ "$LINERANGE" == "" ]]; then
+    echo "Print line number and ranges"
+    echo "Usage: $0 [file] [x-y]"
+    echo "  $0 /path/to/file.txt 10 # Prints only line #10 in file.txt"
+    echo "  $0 /path/to/file.txt 3-10 # Prints lines 3 to 10 (inclusive)"
+    exit 2
 fi
-#
+
+RANGEA=$(echo "$LINERANGE" | cut -d '-' -f1)
+RANGEB=$(echo "$LINERANGE" | cut -d '-' -f2)
+ISRANGE=$([[ "$RANGEB" == "$RANGEA" ]] && echo "false" || echo "true")
+
+# Print only the requested line.
+if [[ "$ISRANGE" == "false" ]]; then
+    head -n "$RANGEA" -- "$FILEPATH" | tail -n1
+    exit $?
+fi
+
+# Print all lines between range A and B (inclusive).
+OFFSET=$((RANGEB - RANGEA + 1)) # Spaces from file's tail.
+head -n "$RANGEB" -- "$FILEPATH" | tail -n "$OFFSET"
+exit $?
