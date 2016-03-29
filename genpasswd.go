@@ -39,9 +39,9 @@ import (
 
 var length = flag.Int("length", 10, "Length of each password (default: 10)")
 var count = flag.Int("count", 1, "Quantity of passwords to generate (default: 1)")
-var type_dict = flag.String("type", "", "Group of characters to use (one of more): a, A, 1, @")
-var all_types = flag.Bool("all", false, "Use all character groups, same as: -type '1a@A'")
-var custom_types = flag.String("custom", "", "Custom list of characters for the dictionary")
+var typeDict = flag.String("type", "", "Group of characters to use (one of more): a, A, 1, @")
+var allTypes = flag.Bool("all", false, "Use all character groups, same as: -type '1a@A'")
+var customTypes = flag.String("custom", "", "Custom list of characters for the dictionary")
 
 var dictionary = map[string]string{
 	"alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
@@ -51,44 +51,44 @@ var dictionary = map[string]string{
 }
 
 func genUserDictionary() string {
-	var user_dict string
+	var userDict string
 
-	if *all_types {
-		for _, key_values := range dictionary {
-			user_dict += key_values
+	if *allTypes {
+		for _, values := range dictionary {
+			userDict += values
 		}
 	}
 
-	if *type_dict != "" && user_dict == "" {
-		if len(*type_dict) == 1 {
-			for _, key_values := range dictionary {
-				if strings.Contains(key_values, *type_dict) {
-					user_dict = key_values
+	if *typeDict != "" && userDict == "" {
+		if len(*typeDict) == 1 {
+			for _, values := range dictionary {
+				if strings.Contains(values, *typeDict) {
+					userDict = values
 					break
 				}
 			}
 		} else {
-			for _, c := range *type_dict {
-				for _, key_values := range dictionary {
-					if strings.Contains(key_values, string(c)) {
-						user_dict += key_values
+			for _, c := range *typeDict {
+				for _, values := range dictionary {
+					if strings.Contains(values, string(c)) {
+						userDict += values
 					}
 				}
 			}
 		}
 	}
 
-	if *custom_types != "" {
-		user_dict += *custom_types
+	if *customTypes != "" {
+		userDict += *customTypes
 	}
 
-	return user_dict
+	return userDict
 }
 
-func genRandomString(wg *sync.WaitGroup, user_dict string, length int) {
+func genRandomString(wg *sync.WaitGroup, userDict string, length int) {
 	var password []byte
 
-	dictlen := int64(len(user_dict))
+	dictlen := int64(len(userDict))
 
 	for j := 0; j < length; j++ {
 		pos, err := rand.Int(rand.Reader, big.NewInt(dictlen))
@@ -97,7 +97,7 @@ func genRandomString(wg *sync.WaitGroup, user_dict string, length int) {
 			panic(err)
 		}
 
-		password = append(password, user_dict[pos.Int64()])
+		password = append(password, userDict[pos.Int64()])
 	}
 
 	fmt.Printf("%s\n", password)
@@ -120,9 +120,10 @@ func main() {
 
 	if *count > 0 && *length > 0 {
 		var wg sync.WaitGroup
-		var user_dict string = genUserDictionary()
 
-		if user_dict == "" {
+		userDict := genUserDictionary()
+
+		if userDict == "" {
 			fmt.Println("Dictionary is empty, use -type to populate it")
 			flag.Usage()
 			os.Exit(1)
@@ -131,7 +132,7 @@ func main() {
 		wg.Add(*count) /* Number of passwords */
 
 		for i := 0; i < *count; i++ {
-			go genRandomString(&wg, user_dict, *length)
+			go genRandomString(&wg, userDict, *length)
 		}
 
 		wg.Wait()
