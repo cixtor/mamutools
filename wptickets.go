@@ -20,3 +20,45 @@
  * responsiveness and promptness, other use this as one of the main reasons to
  * install or not a plugin.
  */
+
+package main
+
+import (
+	"io/ioutil"
+	"log"
+	"net/http"
+)
+
+func httpRequest(urlStr string) []byte {
+	req, err := http.NewRequest("GET", urlStr, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	req.Header.Set("dnt", "1")
+	req.Header.Set("pragma", "no-cache")
+	req.Header.Set("cache-control", "no-cache")
+	req.Header.Set("authority", "wordpress.org")
+	req.Header.Set("accept-language", "en-US,en")
+	req.Header.Set("upgrade-insecure-requests", "1")
+	req.Header.Set("user-agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
+	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return body
+}
