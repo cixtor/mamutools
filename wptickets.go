@@ -24,9 +24,11 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 func httpRequest(urlStr string) []byte {
@@ -61,4 +63,17 @@ func httpRequest(urlStr string) []byte {
 	}
 
 	return body
+}
+
+func analyzeMonthStats(plugin string) {
+	var urlStr string = fmt.Sprintf("https://wordpress.org/plugins/%s/", plugin)
+	var response []byte = httpRequest(urlStr)
+	var output string = string(response)
+	re := regexp.MustCompile(`(\d+) of (\d+) support threads .+ have been resolved`)
+
+	var matches []string = re.FindAllString(output, -1)
+
+	if len(matches) > 0 {
+		fmt.Printf("\n%s\n", matches[0])
+	}
 }
