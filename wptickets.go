@@ -29,6 +29,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 func httpRequest(urlStr string) []byte {
@@ -75,5 +76,42 @@ func analyzeMonthStats(plugin string) {
 
 	if len(matches) > 0 {
 		fmt.Printf("\n%s\n", matches[0])
+	}
+}
+
+func analyzePageTickets(plugin string, page int) {
+	var urlStr string = fmt.Sprintf("https://wordpress.org/support/plugin/%s/page/%d", plugin, page)
+	var response []byte = httpRequest(urlStr)
+
+	var maximumPerPage int = 30
+	var output string = string(response)
+
+	if strings.Contains(output, "<table") {
+		var resolved int = strings.Count(output, "[resolved]")
+		var resolvedWithPadding string = fmt.Sprintf("%2d", resolved)
+		var pageWithPadding string = fmt.Sprintf("%2d", page)
+		var status string
+
+		if resolved == maximumPerPage {
+			status = "Ok"
+		} else {
+			var missing int = maximumPerPage - resolved
+
+			if missing > 5 {
+				status = "Error"
+			} else if missing > 2 {
+				status = "Warning"
+			} else {
+				status = "Notice"
+			}
+
+			status += fmt.Sprintf(" (%d missing) %s", missing, urlStr)
+		}
+
+		fmt.Printf("- Page %s %s/%d %s\n",
+			pageWithPadding,
+			resolvedWithPadding,
+			maximumPerPage,
+			status)
 	}
 }
