@@ -24,10 +24,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 )
@@ -114,4 +116,34 @@ func analyzePageTickets(plugin string, page int) {
 			maximumPerPage,
 			status)
 	}
+}
+
+func main() {
+	flag.Parse()
+
+	var plugin string = flag.Arg(0)
+
+	fmt.Println("WordPress Tickets")
+	fmt.Println("  http://cixtor.com/")
+	fmt.Println("  https://github.com/cixtor/mamutools")
+	fmt.Println("  https://wordpress.org/support/")
+
+	if plugin == "" {
+		fmt.Println("Usage: wptickets [plugin]\n")
+		os.Exit(2)
+	}
+
+	fmt.Printf("Plugin.: %s\n", plugin)
+	fmt.Printf("Website: https://wordpress.org/plugins/%s/\n", plugin)
+	fmt.Printf("Support: https://wordpress.org/support/plugin/%s/\n", plugin)
+	fmt.Printf("\n")
+	fmt.Printf("Resolved threads:\n")
+
+	for key := 1; key <= 20; key++ {
+		analyzePageTickets(plugin, key)
+	}
+
+	analyzeMonthStats(plugin)
+
+	os.Exit(0)
 }
