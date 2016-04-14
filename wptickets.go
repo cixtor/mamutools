@@ -140,7 +140,7 @@ func main() {
 	fmt.Printf("Resolved threads:\n")
 
 	for key := 1; key <= 20; key++ {
-		analyzePageTickets(plugin, key)
+		go analyzePageTickets(plugin, key)
 	}
 
 	analyzeMonthStats(plugin)
