@@ -32,6 +32,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 func httpRequest(urlStr string) []byte {
@@ -139,9 +140,17 @@ func main() {
 	fmt.Printf("\n")
 	fmt.Printf("Resolved threads:\n")
 
+	var wg sync.WaitGroup
+
 	for key := 1; key <= 20; key++ {
-		go analyzePageTickets(plugin, key)
+		wg.Add(1)
+		go func(plugin string, key int) {
+			defer wg.Done()
+			analyzePageTickets(plugin, key)
+		}(plugin, key)
 	}
+
+	wg.Wait()
 
 	analyzeMonthStats(plugin)
 
