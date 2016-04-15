@@ -128,6 +128,34 @@ function fixNginxConfiguration() {
 	ok "Finished nginx configuration"
 }
 
+function fixFastcgiConfiguration() {
+	fpath="${base}/php/etc/php-fpm.conf"
+
+	if [[ ! -e "$fpath" ]]; then return; fi
+
+	info "Modify fast-cgi configuration"
+	temp_fpath="/tmp/php-fpm.conf"
+	cp "$fpath" "$temp_fpath" 2> /dev/null
+
+	ok "Change fast-cgi daemon information: User"
+	sed -i "s/^user=daemon/user=$USER/g" "$temp_fpath"
+
+	ok "Change fast-cgi daemon information: Group"
+	sed -i "s/^group=daemon/group=$USER/g" "$temp_fpath"
+
+	ok "Change fast-cgi daemon information: User (listen)"
+	sed -i "s/^;listen.owner = daemon/listen.owner = $USER/g" "$temp_fpath"
+
+	ok "Change fast-cgi daemon information: Group (listen)"
+	sed -i "s/^;listen.group = daemon/listen.group = $USER/g" "$temp_fpath"
+
+	ok "Change fast-cgi daemon information: Mode (listen)"
+	sed -i "s/^;listen.mode = 0660/listen.mode = 0660/g" "$temp_fpath"
+
+	mv "$temp_fpath" "$fpath" 2> /dev/null
+	ok "Finished fast-cgi configuration"
+}
+
 function fixServerHttpPort() {
 	info "Change HTTP port number"
 	files=()
@@ -436,6 +464,7 @@ if [[ $(isInstalled;echo $?) -eq 0 ]]; then
 	changeDocumentRoot
 	fixApacheConfiguration
 	fixNginxConfiguration
+	fixFastcgiConfiguration
 	fixPhpConfiguration
 	fixOpenSSLConfiguration
 	installMailCatcher
