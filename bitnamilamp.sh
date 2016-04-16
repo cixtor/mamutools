@@ -124,6 +124,15 @@ function fixNginxConfiguration() {
 		fi
 	fi
 
+	bitconf="${base}/nginx/conf/bitnami/bitnami.conf"
+	if [[ -e "$bitconf" ]]; then
+		ok "Adding index to the default vhost"
+		grep -q 'index\.htm;' "$bitconf"
+		if [[ "$?" -eq 0 ]]; then
+			sed -i 's/index\.htm;/index\.htm index\.php;/g' "$bitconf"
+		fi
+	fi
+
 	mv "$temp_fpath" "$fpath" 2> /dev/null
 	ok "Finished nginx configuration"
 }
