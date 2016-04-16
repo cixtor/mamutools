@@ -96,16 +96,16 @@ func analyzePageTickets(plugin string, page int) {
 		var status string
 
 		if resolved == maximumPerPage {
-			status = "Ok"
+			status = fmt.Sprintf("\033[0;92m%s\033[0m", "Ok")
 		} else {
 			var missing int = maximumPerPage - resolved
 
 			if missing > 5 {
-				status = "Error"
+				status = fmt.Sprintf("\033[0;91m%s\033[0m", "Error\x20\x20")
 			} else if missing > 2 {
-				status = "Warning"
+				status = fmt.Sprintf("\033[0;93m%s\033[0m", "Warning")
 			} else {
-				status = "Notice"
+				status = fmt.Sprintf("\033[0;94m%s\033[0m", "Notice\x20")
 			}
 
 			status += fmt.Sprintf(" (%d missing) %s", missing, urlStr)
