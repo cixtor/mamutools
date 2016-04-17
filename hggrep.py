@@ -134,3 +134,4 @@ if exit_status == 0:
         pass
 else:
     print 'Failure: exporting mercurial logs'
+    sys.exit(1)
