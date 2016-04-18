@@ -85,14 +85,14 @@ func analyzeMonthStats(plugin string) {
 func analyzePageTickets(plugin string, page int) {
 	var urlStr string = fmt.Sprintf("https://wordpress.org/support/plugin/%s/page/%d", plugin, page)
 	var response []byte = httpRequest(urlStr)
-
-	var maximumPerPage int = 30
 	var output string = string(response)
 
 	if strings.Contains(output, "<table") {
 		var resolved int = strings.Count(output, "[resolved]")
 		var resolvedWithPadding string = fmt.Sprintf("%2d", resolved)
 		var pageWithPadding string = fmt.Sprintf("%2d", page)
+		var tdata int = strings.Count(output, "<td class=\"num\">")
+		var maximumPerPage int = tdata / 3
 		var status string
 
 		if resolved == maximumPerPage {
