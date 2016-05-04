@@ -3,6 +3,7 @@ var account;
 var category;
 var pagenum = 1;
 var system = require('system');
+var page = require('webpage').create();
 
 if (system.args.length) {
     var parts;
@@ -45,3 +46,40 @@ if (pagenum > 1) {
 }
 
 console.log('Target: ' + fullurl);
+
+page.settings.userAgent = 'Mozilla/5.0 (KHTML, like Gecko) Safari/537.36';
+
+page.onConsoleMessage = function (message) {
+    console.log('CONSOLE: ' + message);
+};
+
+page.open(fullurl, function () {
+    page.evaluate(function () {
+        var label;
+        var nonce;
+        var button;
+        var username;
+        var counter = 0;
+        var buttons = document.querySelectorAll('.follow button');
+        var tokens = document.querySelectorAll('.follow input[name=authenticity_token]');
+
+        for (var key in buttons) {
+            if (buttons.hasOwnProperty(key) && typeof buttons[key] === 'object') {
+                button = buttons[key];
+                nonce = tokens[key] ? tokens[key].value : 'foobar';
+                label = button.getAttribute('aria-label');
+                counter = (parseInt(key) + 101).toString().substring(1);
+
+                if (label === 'Follow this person') {
+                    username = button.getAttribute('title').replace(/Follow\s/, '');
+
+                    console.log('Counter: ' + counter);
+                    console.log('Username: ' + username);
+                    console.log('Nonce: ' + nonce);
+                }
+            }
+        }
+    });
+
+    phantom.exit();
+});
