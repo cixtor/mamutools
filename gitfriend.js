@@ -63,6 +63,28 @@ page.open(fullurl, function () {
         var buttons = document.querySelectorAll('.follow button');
         var tokens = document.querySelectorAll('.follow input[name=authenticity_token]');
 
+        var httpRequest = function (counter, username, nonce) {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState === XMLHttpRequest.DONE) {
+                    if (xmlhttp.status === 200) {
+                        console.log('[' + counter + '] Following ' + username + ' -> OK' + xmlhttp.responseText);
+                    } else {
+                        console.log('[' + counter + '] {' + xmlhttp.status + '} POST /users/follow?target=' + username + '&authenticity_token=' + nonce);
+                    }
+                }
+            };
+
+            xmlhttp.open('POST', '/users/follow?target=' + username, false);
+
+            xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+            xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xmlhttp.setRequestHeader('Origin', 'https://github.com');
+
+            xmlhttp.send('authenticity_token=' + encodeURIComponent(nonce));
+        };
+
         for (var key in buttons) {
             if (buttons.hasOwnProperty(key) && typeof buttons[key] === 'object') {
                 button = buttons[key];
@@ -73,9 +95,7 @@ page.open(fullurl, function () {
                 if (label === 'Follow this person') {
                     username = button.getAttribute('title').replace(/Follow\s/, '');
 
-                    console.log('Counter: ' + counter);
-                    console.log('Username: ' + username);
-                    console.log('Nonce: ' + nonce);
+                    httpRequest(counter, username, nonce);
                 }
             }
         }
