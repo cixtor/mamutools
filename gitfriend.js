@@ -76,11 +76,14 @@ page.open(fullurl, function () {
                 }
             };
 
+            xmlhttp.withCredentials = true; /* Allow cookie setting */
+
             xmlhttp.open('POST', '/users/follow?target=' + username, false);
 
             xmlhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
             xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xmlhttp.setRequestHeader('Origin', 'https://github.com');
+            xmlhttp.setRequestHeader('Cookie', document.cookie);
 
             xmlhttp.send('authenticity_token=' + encodeURIComponent(nonce));
         };
