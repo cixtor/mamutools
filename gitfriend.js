@@ -2,6 +2,8 @@
 var account;
 var category;
 var pagenum = 1;
+
+var fs = require('fs');
 var system = require('system');
 var page = require('webpage').create();
 
@@ -39,6 +41,19 @@ if (!account) {
     phantom.exit(1);
 }
 
+var cookiejar = fs.workingDirectory + '/gitfriend.ini'
+
+if (!fs.exists(cookiejar)) {
+    console.log('GitHub Session is not available');
+    console.log('Create this file with these cookies:');
+    console.log('File Path: ' + cookiejar);
+    console.log('- logged_in=yes');
+    console.log('- _gh_sess=900150983c[...]0d6963f7d28e17f72');
+    console.log('- user_session=44b157[...]80a9a11df009f46b2');
+    console.log('- tz=America%2FNew_York');
+    phantom.exit(1);
+}
+
 var fullurl = 'https://github.com/' + account + '/' + category;
 
 if (pagenum > 1) {
@@ -52,6 +67,24 @@ page.settings.userAgent = 'Mozilla/5.0 (KHTML, like Gecko) Safari/537.36';
 page.onConsoleMessage = function (message) {
     console.log('CONSOLE: ' + message);
 };
+
+var cookieContent = fs.read(cookiejar);
+var cookieLines = cookieContent.split('\n');
+var cookieParts;
+
+for (var z in cookieLines) {
+    if (cookieLines.hasOwnProperty(z)) {
+        cookieParts = cookieLines[z].split('=');
+
+        if (cookieParts.length === 2) {
+            phantom.addCookie({
+                'domain': 'github.com',
+                'name': cookieParts[0],
+                'value': cookieParts[1],
+            });
+        }
+    }
+}
 
 page.open(fullurl, function () {
     page.evaluate(function () {
