@@ -57,7 +57,7 @@ if (!fs.exists(cookiejar)) {
 var fullurl = 'https://github.com/' + account + '/' + category;
 
 if (pagenum > 1) {
-    fullurl += '?page=2';
+    fullurl += '?page=' + pagenum;
 }
 
 console.log('Target: ' + fullurl);
