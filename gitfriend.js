@@ -121,6 +121,8 @@ page.open(fullurl, function () {
             xmlhttp.send('authenticity_token=' + encodeURIComponent(nonce));
         };
 
+        console.log('---- Found "' + (buttons.length) + '" possible accounts');
+
         for (var key in buttons) {
             if (buttons.hasOwnProperty(key) && typeof buttons[key] === 'object') {
                 button = buttons[key];
