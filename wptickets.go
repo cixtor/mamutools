@@ -88,12 +88,11 @@ func analyzePageTickets(wg *sync.WaitGroup, plugin string, page int) {
 	var response []byte = httpRequest(urlStr)
 	var output string = string(response)
 
-	if strings.Contains(output, "<table") {
-		var resolved int = strings.Count(output, "[resolved]")
+	if strings.Contains(output, "bbp-topics") {
+		var resolved int = strings.Count(output, ">[Resolved]")
 		var resolvedWithPadding string = fmt.Sprintf("%2d", resolved)
 		var pageWithPadding string = fmt.Sprintf("%2d", page)
-		var tdata int = strings.Count(output, "<td class=\"num\">")
-		var maximumPerPage int = tdata / 3
+		var maximumPerPage int = strings.Count(output, "<ul id=\"bbp-topic-")
 		var status string
 
 		if resolved == maximumPerPage {
@@ -101,9 +100,9 @@ func analyzePageTickets(wg *sync.WaitGroup, plugin string, page int) {
 		} else {
 			var missing int = maximumPerPage - resolved
 
-			if missing > 5 {
+			if missing > 6 {
 				status = fmt.Sprintf("\033[0;91m%s\033[0m", "\u2718")
-			} else if missing > 2 {
+			} else if missing > 3 {
 				status = fmt.Sprintf("\033[0;93m%s\033[0m", "\u2622")
 			} else {
 				status = fmt.Sprintf("\033[0;94m%s\033[0m", "\u2022")
