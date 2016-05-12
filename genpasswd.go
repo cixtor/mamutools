@@ -28,13 +28,13 @@
 package main
 
 import (
+	"crypto/rand"
 	"flag"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"os"
 	"strings"
 	"sync"
-	"time"
 )
 
 var length = flag.Int("length", 10, "Length of each password (default: 10)")
@@ -86,16 +86,21 @@ func genUserDictionary() string {
 }
 
 func genRandomString(wg *sync.WaitGroup, user_dict string, length int) {
-	var char_pos int
-	var password string
-	var dict_length int = len(user_dict)
+	var password []byte
+
+	dictlen := int64(len(user_dict))
 
 	for j := 0; j < length; j++ {
-		char_pos = rand.Intn(dict_length)
-		password += string(user_dict[char_pos])
+		pos, err := rand.Int(rand.Reader, big.NewInt(dictlen))
+
+		if err != nil {
+			panic(err)
+		}
+
+		password = append(password, user_dict[pos.Int64()])
 	}
 
-	fmt.Println(password)
+	fmt.Printf("%s\n", password)
 
 	defer wg.Done()
 }
@@ -107,7 +112,6 @@ func main() {
 		fmt.Println("  https://github.com/cixtor/mamutools")
 		fmt.Println("  https://en.wikipedia.org/wiki/Password")
 		fmt.Println("  https://www.youtube.com/watch?v=BIKV3fYmzRQ")
-		fmt.Println()
 		fmt.Println("Usage:")
 		flag.PrintDefaults()
 	}
@@ -125,7 +129,6 @@ func main() {
 		}
 
 		wg.Add(*count) /* Number of passwords */
-		rand.Seed(time.Now().UnixNano())
 
 		for i := 0; i < *count; i++ {
 			go genRandomString(&wg, user_dict, *length)
