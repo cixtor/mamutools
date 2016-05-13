@@ -36,6 +36,7 @@ flag.add_argument('-latest', default=0, help='Print the latest commit logs', act
 args = flag.parse_args()
 
 exit_status = os.system('hg log 1> hglog.txt')
+
 if exit_status == 0:
     data_set = {}
     response = []
@@ -88,10 +89,10 @@ if exit_status == 0:
     if args.search is not None:
         results = []
         for commit in commit_logs:
-            position = commit['summary'].find( sys.argv[2] )
+            position = commit['summary'].find(sys.argv[2])
             if position is not -1:
                 results.append(commit)
-        response = results;
+        response = results
 
     # Search all normal commits.
     elif args.commits is True:
@@ -99,17 +100,17 @@ if exit_status == 0:
         for commit in commit_logs:
             if not commit['is_merge']:
                 results.append(commit)
-        response = results;
+        response = results
 
     # Search commits for merges.
     elif args.merges is True:
         results = []
         for commit in commit_logs:
-            position = commit['summary'].lower().find( 'merge' )
+            position = commit['summary'].lower().find('merge')
             in_position = position is not -1
             if commit['is_merge'] and in_position:
                 results.append(commit)
-        response = results;
+        response = results
 
     # Print the latest commits.
     elif args.latest > 0:
@@ -120,7 +121,7 @@ if exit_status == 0:
                 counter += 1
             else:
                 break
-        response = results;
+        response = results
 
     # Print all the commits.
     elif args.all is True:
