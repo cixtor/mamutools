@@ -25,6 +25,7 @@ domain="$1"
 log_path="dnsquery-$(date +%s).log"
 record_types=(
     'A'
+    'AAAA'
     'CNAME'
     'MX'
     'NS'
