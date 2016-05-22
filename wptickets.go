@@ -31,6 +31,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 )
@@ -73,7 +74,7 @@ func analyzeMonthStats(plugin string) {
 	var urlStr string = fmt.Sprintf("https://wordpress.org/plugins/%s/", plugin)
 	var response []byte = httpRequest(urlStr)
 	var output string = string(response)
-	re := regexp.MustCompile(`(\d+) of (\d+) support threads .+ have been resolved`)
+	re := regexp.MustCompile(`(\d+) of (\d+) support threads .+ have been marked resolved`)
 
 	var matches []string = re.FindAllString(output, -1)
 
@@ -82,7 +83,7 @@ func analyzeMonthStats(plugin string) {
 	}
 }
 
-func analyzePageTickets(plugin string, page int) {
+func analyzePageTickets(wg *sync.WaitGroup, plugin string, page int) {
 	var urlStr string = fmt.Sprintf("https://wordpress.org/support/plugin/%s/page/%d", plugin, page)
 	var response []byte = httpRequest(urlStr)
 	var output string = string(response)
@@ -117,19 +118,23 @@ func analyzePageTickets(plugin string, page int) {
 			maximumPerPage,
 			status)
 	}
+
+	defer wg.Done()
 }
 
 func main() {
 	flag.Parse()
 
 	var plugin string = flag.Arg(0)
+	var pages string = flag.Arg(1)
+	var limit int = 10
 
 	if plugin == "" {
 		fmt.Println("WordPress Tickets")
 		fmt.Println("  http://cixtor.com/")
 		fmt.Println("  https://github.com/cixtor/mamutools")
 		fmt.Println("  https://wordpress.org/support/")
-		fmt.Println("Usage: wptickets [plugin]\n")
+		fmt.Println("Usage: wptickets [plugin] [pages]\n")
 		os.Exit(2)
 	}
 
@@ -139,14 +144,20 @@ func main() {
 	fmt.Printf("\n")
 	fmt.Printf("Resolved threads:\n")
 
+	if pages != "" {
+		number, err := strconv.Atoi(pages)
+
+		if err == nil {
+			limit = number
+		}
+	}
+
 	var wg sync.WaitGroup
 
-	for key := 1; key <= 20; key++ {
-		wg.Add(1)
-		go func(plugin string, key int) {
-			defer wg.Done()
-			analyzePageTickets(plugin, key)
-		}(plugin, key)
+	wg.Add(limit)
+
+	for key := 1; key <= limit; key++ {
+		go analyzePageTickets(&wg, plugin, key)
 	}
 
 	wg.Wait()
