@@ -32,10 +32,13 @@ servers=(
     '51bd240#Singapore'
     'b688898#USA, Atlanta'
     'b688899#USA, New York'
+    'b688897#USA, San Francisco'
     '78c55bd#NL, Amsterdam'
     '198baae#Australia, Sydney'
-    'f22400e#Brazil/Sao Paulo'
-    'u60o9aq#Germany/Frankfurt'
+    'f22400e#Brazil, Sao Paulo'
+    'u60o9aq#Germany, Frankfurt'
+    'w60o1aw#Canada, Toronto'
+    'w60o1zz#India, Bangalore'
 )
 
 if echo "$@" | grep -q -- '-private'; then
