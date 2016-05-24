@@ -38,7 +38,7 @@ servers=(
     'u60o9aq#Germany/Frankfurt'
 )
 
-if [[ $(echo "$@" | grep -- '--private') ]]; then
+if echo "$@" | grep -q -- '-private'; then
     is_private="true"
 fi
 
@@ -46,7 +46,7 @@ if [[ "$domain_name" == "" ]]; then
     domain_name="-help"
 fi
 
-if [[ "$domain_name" =~ "help$" ]]; then
+if [[ "$domain_name" =~ help$ ]]; then
     echo "Speed Test"
     echo "  http://cixtor.com/"
     echo "  https://github.com/cixtor/mamutools"
@@ -70,14 +70,14 @@ fi
 
 echo "@ Testing domain '${domain_name}'"
 
-curl_version=$(curl --version 2> /dev/null)
+curl --version &> /dev/null
 if [[ "$?" -ne 0 ]]; then
     echo "error: This tool requires CURL to work"
     echo "download: http://curl.haxx.se/"
     exit 1
 fi
 
-jq_version=$(jq --version 2> /dev/null)
+jq --version &> /dev/null
 if [[ "$?" -ne 0 ]]; then
     echo "error: This tool requires JQ to work"
     echo "download: http://stedolan.github.io/jq/"
@@ -87,7 +87,7 @@ fi
 if [[ "$action_name" == "-full" ]]; then
     echo "- Geo-locating domain ..."
     geo_location=$(
-        curl --silent 'https://performance.sucuri.net/index.php?ajaxcall' \
+        curl 'https://performance.sucuri.net/index.php?ajaxcall' \
         --header 'dnt: 1' \
         --header 'pragma: no-cache' \
         --header 'accept-encoding: gzip, deflate' \
@@ -102,7 +102,7 @@ if [[ "$action_name" == "-full" ]]; then
         --data 'geo_location=1' \
         --data "is_private=${is_private}" \
         --data "domain=${domain_name}" \
-        --compressed
+        --compressed --silent
     )
     echo "$geo_location" | jq '.'
 fi
@@ -189,7 +189,7 @@ if [[ "$action_name" == "-full" ]]; then
         message: .message, status: .status, total_tests: .total_tests}'
 fi
 
-if [[ $(which notify-send) ]]; then
+if command -v notify-send &> /dev/null; then
     notify-send 'Sucuri Performance Test' \
     "Finished testing '$domain_name'" \
     -i 'dialog-information'
