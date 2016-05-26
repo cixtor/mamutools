@@ -24,54 +24,60 @@
 # 4. Print the URL of the repository located generally in the file 'repository/.git/config'
 # 5. Execute the command 'git pull' for each repository found.
 #
-clear
-SEPARATOR=$(for(( i=0; i<50; i++ )); do echo -n '-'; done; echo)
-echo "[+] Massive Repository Pull"
-echo "    @desc.: Search for GIT repositories in a specific location and try to update them."
-echo "    @usage: Usage: ${0} ./folder/path"
+
+echo "@ Massive Repository Pull"
+echo "  Update Git repositories in given directory"
+echo "  Usage: $0 /path/to/sources/"
 echo
-#
+
 IFS=$'\n'
 CURRENT_PATH=$(pwd)
 FOLDER=$1
-if [ "${FOLDER}" != "" ]; then
-    if [ ${FOLDER:0:1} == "/" ]; then
+
+if [[ "${FOLDER}" != "" ]]; then
+    if [ "${FOLDER:0:1}" == "/" ]; then
         BASEPATH="${FOLDER%/}/"
     else
         BASEPATH="${CURRENT_PATH}/${FOLDER%/}/"
     fi
-    BASEPATH=$(echo $BASEPATH | sed 's/\/\.\//\//g')
+
+    BASEPATH=$(echo "$BASEPATH" | sed 's/\/\.\//\//g')
     BASEPATH_LENGTH=${#BASEPATH}
-    echo -e "[+] Search repositories in \e[1;33m${BASEPATH}\e[0m"
+
+    echo -e "@ Search repositories in \e[1;33m${BASEPATH}\e[0m"
+
     if [ -e "${BASEPATH}" ]; then
         QUANTITY=0
         PACKAGES=()
         PACKAGES_FULLPATH=$(find "${BASEPATH}" -type d -iname ".git" | sed 's/\/\.git//g')
+
         for PACKAGE_FULLPATH in $PACKAGES_FULLPATH; do
             PACKAGE=${PACKAGE_FULLPATH:$BASEPATH_LENGTH}
-            QUANTITY=$(($QUANTITY + 1))
+            QUANTITY=$(( QUANTITY + 1 ))
             PACKAGES+=($PACKAGE)
         done
-        echo -e "    \e[0;32m${QUANTITY} repositories were found.\e[0m"
-        echo
-        if [ $(which git) ]; then
+
+        echo -e "  \e[0;32m${QUANTITY} repositories were found.\e[0m"
+
+        if command -v git 1> /dev/null; then
             for package in "${PACKAGES[@]}"; do
                 FULLPATH="${BASEPATH%/}/${package}"
                 GIT_CONFIG="${FULLPATH}/.git/config"
-                IS_GITHUB=$(if [ -e "${GIT_CONFIG}" ]; then echo 1; else echo 0; fi )
-                if [ $IS_GITHUB == 1 ]; then
-                    REPOSITORY=$(grep 'url =' "${GIT_CONFIG}" | tr -d ' ' | cut -d '=' -f 2)
+
+                if [[ -e "$GIT_CONFIG" ]]; then
+                    REPOSITORY=$(grep 'url =' "$GIT_CONFIG" | tr -d ' ' | cut -d= -f2)
                 fi
+
+                echo
                 echo -e "\e[0;33mChecking version for:\e[0m \e[1;34m${package}\e[0m"
                 echo -e "\e[0;33mFullpath:\e[0m ${FULLPATH}"
-                if [ $IS_GITHUB == 1 ]; then
+
+                if [[ -e "$GIT_CONFIG" ]]; then
                     echo -e "\e[0;33mRepository:\e[0m ${REPOSITORY}"
                 fi
-                if [ -e $FULLPATH ]; then
-                    cd $FULLPATH
-                    git pull
-                    echo -e "\e[0;32mFinished.\e[0m"
-                    echo
+
+                if [[ -e "$FULLPATH" ]]; then
+                    cd "$FULLPATH" && git pull && echo "Finished."
                 else
                     echo -e "\e[0;31mThe package\e[0m \e[1;31m${package}\e[0m \e[0;31mdoesn't exists.\e[0m"
                 fi
@@ -85,4 +91,3 @@ if [ "${FOLDER}" != "" ]; then
 else
     echo -e "\e[1;31mError:\e[0m You should specify a path to search, use '\e[1;31m./\e[0m' to search in this location."
 fi
-#
