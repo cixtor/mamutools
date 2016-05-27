@@ -69,7 +69,7 @@ if [[ "$1" == "" ]] || [[ "$@" =~ help ]]; then
 fi
 
 echo "DNS Lookup for '${domain}'"
-nameserver=$(dig -t "NS" +nocmd +noall +answer "$domain" | head -n1 | awk '{print $5}')
+nameserver=$(dig -t "NS" +nocmd +noall +answer "$domain" | sort | tail -n1 | awk '{print $5}')
 
 if [[ "$nameserver" == "" ]]; then
     echo "dig: couldn't get nameserver for '${domain}': not found"
@@ -86,7 +86,7 @@ else
             subdomain="${name}.${domain}"
             echo -n "Query for '${subdomain}' "
             for type in "${record_types[@]}"; do
-                dig -t $type +nocmd +noall +answer "${subdomain}" "@${nameserver}" \
+                dig "@${nameserver}" -t "$type" +nocmd +noall +answer "$subdomain" \
                 | grep -vE '^;|SOA' | grep 'IN' \
                 | grep "^$subdomain" 1>> $log_path
                 echo -n "."
