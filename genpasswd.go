@@ -28,12 +28,12 @@
 package main
 
 import (
-    "os"
-    "fmt"
-    "flag"
-    "strings"
-    "math/rand"
-    "time"
+	"flag"
+	"fmt"
+	"math/rand"
+	"os"
+	"strings"
+	"time"
 )
 
 var length = flag.Int("length", 10, "Length of each password (default: 10)")
@@ -43,76 +43,76 @@ var all_types = flag.Bool("all", false, "Use all character groups, same as: -typ
 var custom_types = flag.String("custom", "", "Custom list of characters for the dictionary")
 
 var user_dict string
-var dictionary = map[string]string {
-    "alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
-    "alphabet_mayus": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "numbers":        "0123456789",
-    "specials":       "!@$%&*_+=-_?/.,:;#",
+var dictionary = map[string]string{
+	"alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
+	"alphabet_mayus": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	"numbers":        "0123456789",
+	"specials":       "!@$%&*_+=-_?/.,:;#",
 }
 
 func main() {
-    flag.Usage = func() {
-        fmt.Println("Password Generator")
-        fmt.Println("  http://cixtor.com/")
-        fmt.Println("  https://github.com/cixtor/mamutools")
-        fmt.Println("  http://www.youtube.com/watch?v=BIKV3fYmzRQ")
-        fmt.Println()
-        fmt.Println("Usage:")
-        flag.PrintDefaults()
-    }
+	flag.Usage = func() {
+		fmt.Println("Password Generator")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  http://www.youtube.com/watch?v=BIKV3fYmzRQ")
+		fmt.Println()
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+	}
 
-    flag.Parse()
+	flag.Parse()
 
-    if *count > 0 && *length > 0 {
-        if *all_types {
-            for _, key_values := range dictionary {
-                user_dict += key_values
-            }
-        }
+	if *count > 0 && *length > 0 {
+		if *all_types {
+			for _, key_values := range dictionary {
+				user_dict += key_values
+			}
+		}
 
-        if *type_dict != "" && user_dict == "" {
-            if len(*type_dict) == 1 {
-                for _, key_values := range dictionary {
-                    if strings.Contains(key_values, *type_dict) {
-                        user_dict = key_values
-                        break
-                    }
-                }
-            } else {
-                for _, c := range *type_dict {
-                    for _, key_values := range dictionary {
-                        if strings.Contains(key_values, string(c)) {
-                            user_dict += key_values
-                        }
-                    }
-                }
-            }
-        }
+		if *type_dict != "" && user_dict == "" {
+			if len(*type_dict) == 1 {
+				for _, key_values := range dictionary {
+					if strings.Contains(key_values, *type_dict) {
+						user_dict = key_values
+						break
+					}
+				}
+			} else {
+				for _, c := range *type_dict {
+					for _, key_values := range dictionary {
+						if strings.Contains(key_values, string(c)) {
+							user_dict += key_values
+						}
+					}
+				}
+			}
+		}
 
-        if *custom_types != "" {
-            user_dict += *custom_types
-        }
+		if *custom_types != "" {
+			user_dict += *custom_types
+		}
 
-        if user_dict == "" {
-            flag.Usage()
-            fmt.Printf( "\nCan not generate password with empty dictionary.\n" )
-            os.Exit(1)
-        }
+		if user_dict == "" {
+			flag.Usage()
+			fmt.Printf("\nCan not generate password with empty dictionary.\n")
+			os.Exit(1)
+		}
 
-        rand.Seed( time.Now().UnixNano())
+		rand.Seed(time.Now().UnixNano())
 
-        for i := 0; i < *count; i++ {
-            var password string
-            var dict_length int = len(user_dict)
+		for i := 0; i < *count; i++ {
+			var password string
+			var dict_length int = len(user_dict)
 
-            for j := 0; j < *length; j++ {
-                var char_pos int = rand.Intn(dict_length)
-                password += string(user_dict[char_pos])
-            }
+			for j := 0; j < *length; j++ {
+				var char_pos int = rand.Intn(dict_length)
+				password += string(user_dict[char_pos])
+			}
 
-            fmt.Printf("%s\n", password)
-        }
-    } else {
-        flag.Usage()
-    }
+			fmt.Printf("%s\n", password)
+		}
+	} else {
+		flag.Usage()
+	}
 }
