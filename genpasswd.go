@@ -42,12 +42,59 @@ var type_dict = flag.String("type", "", "Group of characters to use (one of more
 var all_types = flag.Bool("all", false, "Use all character groups, same as: -type '1a@A'")
 var custom_types = flag.String("custom", "", "Custom list of characters for the dictionary")
 
-var user_dict string
 var dictionary = map[string]string{
 	"alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
 	"alphabet_mayus": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 	"numbers":        "0123456789",
 	"specials":       "!@$%&*_+=-_?/.,:;#",
+}
+
+func genUserDictionary() string {
+	var user_dict string
+
+	if *all_types {
+		for _, key_values := range dictionary {
+			user_dict += key_values
+		}
+	}
+
+	if *type_dict != "" && user_dict == "" {
+		if len(*type_dict) == 1 {
+			for _, key_values := range dictionary {
+				if strings.Contains(key_values, *type_dict) {
+					user_dict = key_values
+					break
+				}
+			}
+		} else {
+			for _, c := range *type_dict {
+				for _, key_values := range dictionary {
+					if strings.Contains(key_values, string(c)) {
+						user_dict += key_values
+					}
+				}
+			}
+		}
+	}
+
+	if *custom_types != "" {
+		user_dict += *custom_types
+	}
+
+	return user_dict
+}
+
+func genRandomString(user_dict string, length int) {
+	var char_pos int
+	var password string
+	var dict_length int = len(user_dict)
+
+	for j := 0; j < length; j++ {
+		char_pos = rand.Intn(dict_length)
+		password += string(user_dict[char_pos])
+	}
+
+	fmt.Println(password)
 }
 
 func main() {
@@ -64,34 +111,7 @@ func main() {
 	flag.Parse()
 
 	if *count > 0 && *length > 0 {
-		if *all_types {
-			for _, key_values := range dictionary {
-				user_dict += key_values
-			}
-		}
-
-		if *type_dict != "" && user_dict == "" {
-			if len(*type_dict) == 1 {
-				for _, key_values := range dictionary {
-					if strings.Contains(key_values, *type_dict) {
-						user_dict = key_values
-						break
-					}
-				}
-			} else {
-				for _, c := range *type_dict {
-					for _, key_values := range dictionary {
-						if strings.Contains(key_values, string(c)) {
-							user_dict += key_values
-						}
-					}
-				}
-			}
-		}
-
-		if *custom_types != "" {
-			user_dict += *custom_types
-		}
+		var user_dict string = genUserDictionary()
 
 		if user_dict == "" {
 			flag.Usage()
@@ -102,15 +122,7 @@ func main() {
 		rand.Seed(time.Now().UnixNano())
 
 		for i := 0; i < *count; i++ {
-			var password string
-			var dict_length int = len(user_dict)
-
-			for j := 0; j < *length; j++ {
-				var char_pos int = rand.Intn(dict_length)
-				password += string(user_dict[char_pos])
-			}
-
-			fmt.Printf("%s\n", password)
+			genRandomString(user_dict, *length)
 		}
 	} else {
 		flag.Usage()
