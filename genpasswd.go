@@ -33,6 +33,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -84,7 +85,7 @@ func genUserDictionary() string {
 	return user_dict
 }
 
-func genRandomString(user_dict string, length int) {
+func genRandomString(wg *sync.WaitGroup, user_dict string, length int) {
 	var char_pos int
 	var password string
 	var dict_length int = len(user_dict)
@@ -95,6 +96,8 @@ func genRandomString(user_dict string, length int) {
 	}
 
 	fmt.Println(password)
+
+	defer wg.Done()
 }
 
 func main() {
@@ -111,6 +114,7 @@ func main() {
 	flag.Parse()
 
 	if *count > 0 && *length > 0 {
+		var wg sync.WaitGroup
 		var user_dict string = genUserDictionary()
 
 		if user_dict == "" {
@@ -119,11 +123,14 @@ func main() {
 			os.Exit(1)
 		}
 
+		wg.Add(*count) /* Number of passwords */
 		rand.Seed(time.Now().UnixNano())
 
 		for i := 0; i < *count; i++ {
-			genRandomString(user_dict, *length)
+			go genRandomString(&wg, user_dict, *length)
 		}
+
+		wg.Wait()
 	} else {
 		flag.Usage()
 	}
