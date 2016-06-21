@@ -105,7 +105,8 @@ func main() {
 		fmt.Println("Password Generator")
 		fmt.Println("  http://cixtor.com/")
 		fmt.Println("  https://github.com/cixtor/mamutools")
-		fmt.Println("  http://www.youtube.com/watch?v=BIKV3fYmzRQ")
+		fmt.Println("  https://en.wikipedia.org/wiki/Password")
+		fmt.Println("  https://www.youtube.com/watch?v=BIKV3fYmzRQ")
 		fmt.Println()
 		fmt.Println("Usage:")
 		flag.PrintDefaults()
@@ -118,8 +119,8 @@ func main() {
 		var user_dict string = genUserDictionary()
 
 		if user_dict == "" {
+			fmt.Println("Dictionary is empty, use -type to populate it")
 			flag.Usage()
-			fmt.Printf("\nCan not generate password with empty dictionary.\n")
 			os.Exit(1)
 		}
 
