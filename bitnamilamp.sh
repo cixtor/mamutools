@@ -50,6 +50,8 @@ function isInstalled() {
 }
 
 function fixApacheConfiguration() {
+	if [[ ! -e "${base}/apache2" ]]; then return; fi
+
 	fpath="${base}/apache2/conf/httpd.conf"
 	temp_fpath="/tmp/httpd.conf"
 	info "Modify apache configuration"
@@ -79,10 +81,11 @@ function fixApacheConfiguration() {
 	ok "Turn HTTP trace method off"
 	sed -i "s/TraceEnable .*/TraceEnable Off/g" "$temp_fpath"
 
-	vhosts="${HOME}/projects/virtualhosts.conf"
+	vhosts="${HOME}/projects/vhosts.apache.conf"
 	if [[ -e "$vhosts" ]]; then
 		ok "Adding custom virtual hosts"
-		grep -q "virtualhosts\.conf" "$temp_fpath"
+		fname=$(basename "$vhosts")
+		grep -q "$fname" "$temp_fpath"
 		if [[ "$?" -eq 1 ]]; then
 			echo "Include \"$vhosts\"" 1>> "$temp_fpath"
 		fi
@@ -92,18 +95,64 @@ function fixApacheConfiguration() {
 	ok "Finished apache configuration"
 }
 
-function fixApacheHttpPort() {
+function fixNginxConfiguration() {
+	if [[ ! -e "${base}/nginx" ]]; then return; fi
+
+	fpath="${base}/nginx/conf/nginx.conf"
+	temp_fpath="/tmp/nginx.conf"
+	info "Modify nginx configuration"
+	cp "$fpath" "$temp_fpath" 2> /dev/null
+
+	ok "Change nginx daemon information: User"
+	sed -i "s/.*user .*;/user $USER $USER;/g" "$temp_fpath"
+
+	vhosts="${HOME}/projects/vhosts.nginx.conf"
+	if [[ -e "$vhosts" ]]; then
+		ok "Adding custom virtual hosts"
+		fname=$(basename "$vhosts")
+		grep -q "$fname" "$temp_fpath"
+		if [[ "$?" -eq 1 ]]; then
+			bracenum=$(grep -n "}" "$temp_fpath" | tail -n1 | cut -d ':' -f1)
+
+			if [[ "$bracenum" != "" ]]; then
+				offset=$(( bracenum - 1 )) # Insert before this line
+				sed -i "${offset}iinclude \"$vhosts\";" "$temp_fpath"
+			fi
+		fi
+	fi
+
+	mv "$temp_fpath" "$fpath" 2> /dev/null
+	ok "Finished nginx configuration"
+}
+
+function fixServerHttpPort() {
 	info "Change HTTP port number"
-	files=(
-		"apache2/conf/bitnami/bitnami.conf"
-		"apache2/conf/httpd.conf"
-		"apache2/scripts/ctl.sh"
-		"apps/heroku/conf/httpd-vhosts.conf"
-		"apps/phpmyadmin/conf/httpd-vhosts.conf"
-		"docs/demo/conf/httpd-vhosts.conf"
-		"properties.ini"
-		"varnish/etc/varnish/default.vcl"
-	)
+	files=()
+
+	# Change file list if web server is Apache
+	if [[ -e "${base}/apache2" ]]; then
+		files=(
+			"apache2/conf/bitnami/bitnami.conf"
+			"apache2/conf/httpd.conf"
+			"apache2/scripts/ctl.sh"
+			"apps/heroku/conf/httpd-vhosts.conf"
+			"apps/phpmyadmin/conf/httpd-vhosts.conf"
+			"docs/demo/conf/httpd-vhosts.conf"
+			"properties.ini"
+			"varnish/etc/varnish/default.vcl"
+		)
+	fi
+
+	# Change file list if web server is Nginx
+	if [[ -e "${base}/nginx" ]]; then
+		files=(
+			"apps/phpmyadmin/conf/nginx-vhosts.conf"
+			"docs/demo/conf/nginx-vhosts.conf"
+			"nginx/conf/bitnami/bitnami.conf"
+			"properties.ini"
+			"varnish/etc/varnish/default.vcl"
+		)
+	fi
 
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
@@ -120,15 +169,29 @@ function fixApacheHttpPort() {
 	done
 }
 
-function fixApacheHttpsPort() {
+function fixServerHttpsPort() {
 	info "Change HTTPS port number"
-	files=(
-		"apache2/conf/bitnami/bitnami.conf"
-		"apache2/conf/extra/httpd-ssl.conf"
-		"apps/heroku/conf/httpd-vhosts.conf"
-		"apps/phpmyadmin/conf/httpd-vhosts.conf"
-		"properties.ini"
-	)
+	files=()
+
+	# Change file list if web server is Apache
+	if [[ -e "${base}/apache2" ]]; then
+		files=(
+			"apache2/conf/bitnami/bitnami.conf"
+			"apache2/conf/extra/httpd-ssl.conf"
+			"apps/heroku/conf/httpd-vhosts.conf"
+			"apps/phpmyadmin/conf/httpd-vhosts.conf"
+			"properties.ini"
+		)
+	fi
+
+	# Change file list if web server is Nginx
+	if [[ -e "${base}/nginx" ]]; then
+		files=(
+			"docs/demo/conf/nginx-vhosts.conf"
+			"apps/phpmyadmin/conf/nginx-vhosts.conf"
+			"nginx/conf/bitnami/bitnami.conf"
+		)
+	fi
 
 	for file in "${files[@]}"; do
 		fpath="${base}/${file}"
@@ -171,7 +234,23 @@ function fixBootstrapScript() {
 function changeDocumentRoot() {
 	info "Change document root"
 	projects="${HOME}/projects"
-	htdocs="${base}/apache2/htdocs"
+	htdocs=""
+
+	# Change file list if web server is Apache
+	if [[ -e "${base}/apache2" ]]; then
+		htdocs="${base}/apache2/htdocs"
+	fi
+
+	# Change file list if web server is Nginx
+	if [[ -e "${base}/nginx" ]]; then
+		htdocs="${base}/nginx/html"
+	fi
+
+	if [[ "$htdocs" == "" ]]; then
+		err "There is no document root"
+		exit 1
+	fi
+
 	file "$htdocs" | grep -q 'symbolic link'
 
 	if [[ "$?" -eq 0 ]]; then
@@ -320,11 +399,12 @@ fi
 if [[ $(isInstalled;echo $?) -eq 0 ]]; then
 	out "Bitnami LAMP (Linux + Apache + MySQL + PHP)"
 	ok "Development directory: ${base}"
-	fixApacheHttpPort
-	fixApacheHttpsPort
+	fixServerHttpPort
+	fixServerHttpsPort
 	fixBootstrapScript
 	changeDocumentRoot
 	fixApacheConfiguration
+	fixNginxConfiguration
 	fixPhpConfiguration
 	fixOpenSSLConfiguration
 	installMailCatcher
