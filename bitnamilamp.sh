@@ -291,14 +291,25 @@ function fixPhpConfiguration() {
 	ok "Deactivate opcache extension"
 	sed -i "s/^opcache.enable.*/opcache.enable=0/g" "$temp_fpath"
 
+	xdebuglib="${base}/php/lib/php/extensions/xdebug.so"
+	if [[ ! -e "$xdebuglib" ]]; then
+		out "Install xdebug module (might take a while)"
+		if command -v pecl &> /dev/null; then
+			pecl install xdebug 1> /dev/null
+			ok "xdebug module was successfully installed"
+		else
+			err "PECL is not available (aborting)"
+		fi
+	fi
+
 	pline=$(grep -n 'xdebug\.so' "$temp_fpath")
 	if [[ "$?" -eq 0 ]]; then
 		ok "Activate xdebug and its profiler"
 		newconfig=""
 		lnum=$(echo "$pline" | cut -d: -f1)
 		extension=$(head -n"$lnum" "$temp_fpath" | tail -n 1)
-		header=$(( $lnum - 1 ))
-		footer=$(( $lnum + 1 ))
+		header=$(( lnum - 1 ))
+		footer=$(( lnum + 1 ))
 		newconfig+=$(head -n"$header" "$temp_fpath")
 		newconfig+=$'\n'
 		newconfig+=$(echo "$extension" | sed 's/;zend/zend/')
@@ -307,7 +318,7 @@ function fixPhpConfiguration() {
 		echo "$newconfig" 1> "$temp_fpath"
 		sed -i 's/;xdebug\.profiler/xdebug\.profiler/g' "$temp_fpath"
 	else
-		err "Turn XDebug and profiler on"
+		err "Turn xdebug and profiler on"
 	fi
 
 	mv "$temp_fpath" "$fpath" 2> /dev/null
