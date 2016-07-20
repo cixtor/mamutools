@@ -5,6 +5,7 @@
 # https://github.com/cixtor/mamutools
 # https://en.wikipedia.org/wiki/LAMP_(software_bundle)
 # https://bitnami.com/stack/lamp
+# https://bitnami.com/stack/nginx
 #
 # LAMP is an archetypal model of web service solution stacks, named as an
 # acronym of the names of its original four open-source components: the Linux
@@ -19,6 +20,8 @@
 # FastCGI, OpenSSL, phpMyAdmin, ModSecurity, SQLite, Varnish, ImageMagick,
 # xDebug, Xcache, OpenLDAP, ModSecurity, Memcache, OAuth, PEAR, PECL, APC, GD,
 # cURL and other components
+#
+# Note: Limited support for the Nginx stack is also available.
 #
 
 base="/opt/devstack"
@@ -209,25 +212,33 @@ function fixServerHttpsPort() {
 }
 
 function fixBootstrapScript() {
+	info "Bootstrap script Root restriction"
+
 	fpath="${base}/ctlscript.sh"
 	temp_fpath="/tmp/ctlscript.sh"
-	info "Bootstrap script Root restriction"
-	fline=$(head -n20 "$fpath" | grep -n "exit 1")
+	linenum=$(grep -n "root not allowed" "$fpath" | cut -d ':' -f1)
 
-	if [[ "$?" -eq 0 ]]; then
-		fline=$(echo "$fline" | cut -d: -f1)
-		header=$(( $fline - 1 ))
-		footer=$(( $fline + 1 ))
-
-		head -n"$header" "$fpath" 1> $temp_fpath
-		echo "    # exit 1" 1>> $temp_fpath
-		tail -n"+$footer" "$fpath" 1>> $temp_fpath
-		mv "$temp_fpath" "$fpath" 2> /dev/null
-		chmod 755 "$fpath" 2> /dev/null
-
-		ok "Root restriction was removed"
+	if [[ "$linenum"  == "" ]]; then
+		out "No root restriction in place"
 	else
-		err "Root restriction does not exists"
+		offset=$(( linenum + 2 )) # Number of lines to search exit
+		fline=$(head -n "$offset" "$fpath" | grep -n "exit 1")
+
+		if [[ "$?" -eq 0 ]]; then
+			fline=$(echo "$fline" | cut -d: -f1)
+			header=$(( fline - 1 ))
+			footer=$(( fline + 1 ))
+
+			head -n "$header" "$fpath" 1> $temp_fpath
+			echo "    # exit 1" 1>> $temp_fpath
+			tail -n "+$footer" "$fpath" 1>> $temp_fpath
+			mv "$temp_fpath" "$fpath" 2> /dev/null
+			chmod 755 "$fpath" 2> /dev/null
+
+			ok "Root restriction was removed"
+		else
+			err "Root restriction does not exists"
+		fi
 	fi
 }
 
@@ -351,7 +362,7 @@ function fixOpenSSLConfiguration() {
 		else
 			ok "OpenSSL engines was added to openssl script"
 			footer=$(grep -n "exec" "$openssl_path" | tail -n 1 | cut -d: -f1)
-			header=$(( $footer - 1 ))
+			header=$(( footer - 1 ))
 			head -n "$header" "$openssl_path" 1> "$openssl_temp"
 			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$openssl_temp"
 			echo 'export OPENSSL_ENGINES' 1>> "$openssl_temp"
@@ -365,7 +376,7 @@ function fixOpenSSLConfiguration() {
 		else
 			ok "OpenSSL engines was added to setenv script"
 			footer=$(grep -n "^\. .*build-setenv\.sh" "$setenv_path" | tail -n 1 | cut -d: -f1)
-			header=$(( $footer - 1 ))
+			header=$(( footer - 1 ))
 			head -n "$header" "$setenv_path" 1> "$setenv_temp"
 			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$setenv_temp"
 			echo 'export OPENSSL_ENGINES' 1>> "$setenv_temp"
@@ -377,18 +388,18 @@ function fixOpenSSLConfiguration() {
 
 function installMailCatcher() {
 	info "MailCatcher SMTP server and debugger"
-	which mailcatcher 1> /dev/null
+	command -v mailcatcher &> /dev/null
 	if [[ "$?" -eq 1 ]]; then
-		if $(command -v gem 1> /dev/null); then
+		if command -v gem &> /dev/null; then
 			ok "Install and configure MailCatcher"
-			$(which gem) install --no-rdoc --no-ri mailcatcher
+			gem install --no-rdoc --no-ri mailcatcher
 		else
 			err "RubyGems is not installed"
 		fi
 	fi
 
-	ok "Mailcatcher: $(which mailcatcher)"
-	ok "Catchmail: $(which catchmail)"
+	ok "Mailcatcher: $(command -v mailcatcher)"
+	ok "Catchmail: $(command -v catchmail)"
 	ok "Configure PHP sendmail path"
 	fpath="${base}/php/etc/php.ini"
 	catcher="/usr/bin/env catchmail -f noreply@example.com"
@@ -397,18 +408,18 @@ function installMailCatcher() {
 
 function installDeploymentTool() {
 	info "Dandelion deployment tool"
-	which dandelion 1> /dev/null
+	command -v dandelion &> /dev/null
 	if [[ "$?" -eq 1 ]]; then
-		if $(command -v gem 1> /dev/null); then
+		if command -v gem &> /dev/null; then
 			ok "Install main deployment package"
-			$(which gem) install --no-rdoc --no-ri dandelion
+			gem install --no-rdoc --no-ri dandelion
 			ok "Install additional SFTP package"
-			$(which gem) install --no-rdoc --no-ri net-sftp
+			gem install --no-rdoc --no-ri net-sftp
 		else
 			err "RubyGems is not installed"
 		fi
 	fi
-	ok "Dandelion: $(which dandelion)"
+	ok "Dandelion: $(command -v dandelion)"
 }
 
 if [[ "$@" =~ help ]]; then
