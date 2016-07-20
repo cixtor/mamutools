@@ -317,6 +317,15 @@ function fixPhpConfiguration() {
 		newconfig+=$(tail -n"+$footer" "$temp_fpath")
 		echo "$newconfig" 1> "$temp_fpath"
 		sed -i 's/;xdebug\.profiler/xdebug\.profiler/g' "$temp_fpath"
+
+		ok "Activate xdebug command line colors"
+		grep -q "^xdebug\.cli_color" "$temp_fpath"
+		if [[ "$?" -eq 1 ]]; then
+			remotenum=$(grep -n "xdebug\.remote" "$temp_fpath" | head -n1 | cut -d ':' -f1)
+			if [[ "$remotenum" != "" ]]; then
+				sed -i "${remotenum}ixdebug.cli_color=1" "$temp_fpath"
+			fi
+		fi
 	else
 		err "Turn xdebug and profiler on"
 	fi
