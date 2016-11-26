@@ -24,6 +24,7 @@ source ~/.profile
 There is a additional list of tools that were originally part of this repository but then were moved to independent projects for maintainability, easy distribution and reusability by 3rd-party programs.
 
 - [Sparkline](https://github.com/cixtor/sparkline) — `go get -u github.com/cixtor/sparkline`
+- [Website TTFB](https://github.com/cixtor/webttfb) — `go get -u github.com/cixtor/webttfb`
 - [String Conversion](https://github.com/cixtor/strconv) — `go get -u github.com/cixtor/strconv`
 - [Wordpress Tickets](https://github.com/cixtor/wptickets) — `go get -u github.com/cixtor/wptickets`
 
