@@ -28,103 +28,109 @@
  * - MAIL - used to indicate where a user's mail is to be found.
  * - TEMP - location where processes can store temporary files
  */
-
 package main
 
-import "os"
-import "fmt"
-import "flag"
-import "regexp"
-import "strings"
+import (
+	"flag"
+	"fmt"
+	"os"
+	"regexp"
+	"strings"
+)
 
-var display_all = flag.Bool("list", false, "Display all the environment variables as a list")
-var filter_var = flag.String("search", "", "Display the value for a specific environment variable")
+var displayAll = flag.Bool("list", false, "Display all the environment variables as a list")
+var filterVar = flag.String("search", "", "Display the value for a specific environment variable")
 var verbose = flag.Bool("verbose", false, "Display extra information")
-var append_path = flag.String("newpath", "", "Add a new binary path to the global environment variable")
+var appendPath = flag.String("newpath", "", "Add a new binary path to the global environment variable")
 
 func main() {
-    flag.Usage = func(){
-        fmt.Println("Environment")
-        fmt.Println("  http://cixtor.com/")
-        fmt.Println("  https://github.com/cixtor/mamutools")
-        fmt.Println("  http://en.wikipedia.org/wiki/Environment_variable")
-        fmt.Println("Usage:")
-        flag.PrintDefaults()
-    }
+	flag.Usage = func() {
+		fmt.Println("Environment")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  http://en.wikipedia.org/wiki/Environment_variable")
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+	}
 
-    flag.Parse()
+	flag.Parse()
 
-    r := regexp.MustCompile(`^([a-zA-Z_]+)=(.*)`)
-    var envvars []string = os.Environ();
-    var envvar_array = make(map[string]string)
-    var longest_name int = 0
+	r := regexp.MustCompile(`^([a-zA-Z_]+)=(.*)`)
+	envvarArr := make(map[string]string)
+	envvars := os.Environ()
+	var longestName int
 
-    for _, envvar_str := range envvars {
-        var envvar_parts []string = r.FindStringSubmatch(envvar_str)
+	for _, envvarStr := range envvars {
+		envvarParts := r.FindStringSubmatch(envvarStr)
 
-        if envvar_parts != nil {
-            var envvar_name string = envvar_parts[1]
-            var envvar_value string = envvar_parts[2]
-            var envvar_length int = len(envvar_parts[1])
+		if envvarParts != nil {
+			envvarName := envvarParts[1]
+			envvarValue := envvarParts[2]
+			envvarLength := len(envvarParts[1])
 
-            envvar_array[envvar_name] = envvar_value
-            if envvar_length > longest_name {
-                longest_name = envvar_length
-            }
-        }
-    }
+			envvarArr[envvarName] = envvarValue
+			if envvarLength > longestName {
+				longestName = envvarLength
+			}
+		}
+	}
 
-    if *display_all {
-        for envvar_name, envvar_value := range envvar_array {
-            if envvar_name == "PATH" {
-                var bin_paths []string = strings.Split(envvar_value, ":")
-                var indent_spaces string = ""
-                for i:=0; i<longest_name; i++ { indent_spaces += " " }
+	if *displayAll {
+		for envvarName, envvarValue := range envvarArr {
+			if envvarName == "PATH" {
+				var indentSpaces string
+				binPaths := strings.Split(envvarValue, ":")
+				for i := 0; i < longestName; i++ {
+					indentSpaces += " "
+				}
 
-                fmt.Printf( "%*s = %s\n", longest_name, envvar_name, bin_paths[0] )
-                for j, bin_path := range bin_paths {
-                    if j == 0 { continue }
-                    fmt.Printf( "%s   %s\n", indent_spaces, bin_path )
-                }
-            } else {
-                fmt.Printf( "%*s = %s\n", longest_name, envvar_name, envvar_value )
-            }
-        }
-    } else if *filter_var != "" {
-        var envvar_name string = strings.ToUpper(*filter_var)
-        if envvar_value, ok := envvar_array[envvar_name]; ok {
-            if *verbose {
-                if envvar_name == "PATH" || envvar_name == "LS_COLORS" {
-                    var bin_paths []string = strings.Split(envvar_value, ":")
-                    for _, bin_path := range bin_paths {
-                        if bin_path != "" {
-                            fmt.Printf( "%s\n", bin_path )
-                        }
-                    }
-                } else {
-                    fmt.Printf("%s=%s\n", envvar_name, envvar_value)
-                }
-            } else {
-                fmt.Printf("%s\n", envvar_value)
-            }
-        }
-    } else if *append_path != "" {
-        var bashrc_path string = os.Getenv("HOME") + "/.bashrc"
-        var new_path string = fmt.Sprintf("export PATH=\"$PATH:%s\"\n", *append_path)
+				fmt.Printf("%*s = %s\n", longestName, envvarName, binPaths[0])
+				for j, binPath := range binPaths {
+					if j == 0 {
+						continue
+					}
+					fmt.Printf("%s   %s\n", indentSpaces, binPath)
+				}
+			} else {
+				fmt.Printf("%*s = %s\n", longestName, envvarName, envvarValue)
+			}
+		}
+	} else if *filterVar != "" {
+		envvarName := strings.ToUpper(*filterVar)
 
-        f, err := os.OpenFile(bashrc_path, os.O_APPEND|os.O_WRONLY, 0600)
-        if err != nil {
-            panic(err)
-        }
+		if envvarValue, ok := envvarArr[envvarName]; ok {
+			if *verbose {
+				if envvarName == "PATH" || envvarName == "LS_COLORS" {
+					binPaths := strings.Split(envvarValue, ":")
+					for _, binPath := range binPaths {
+						if binPath != "" {
+							fmt.Printf("%s\n", binPath)
+						}
+					}
+				} else {
+					fmt.Printf("%s=%s\n", envvarName, envvarValue)
+				}
+			} else {
+				fmt.Printf("%s\n", envvarValue)
+			}
+		}
+	} else if *appendPath != "" {
+		bashrcPath := os.Getenv("HOME") + "/.bashrc"
+		newPath := fmt.Sprintf("export PATH=\"$PATH:%s\"\n", *appendPath)
 
-        defer f.Close()
-        if _, err = f.WriteString(new_path); err == nil {
-            fmt.Printf("Path added: %s\n", *append_path)
-            fmt.Printf("Update session: source ~/.bashrc\n")
-        } else {
-            panic(err)
-        }
-    } else {
-        flag.Usage()
-    }
+		f, err := os.OpenFile(bashrcPath, os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			panic(err)
+		}
+
+		defer f.Close()
+		if _, err = f.WriteString(newPath); err == nil {
+			fmt.Printf("Path added: %s\n", *appendPath)
+			fmt.Printf("Update session: source ~/.bashrc\n")
+		} else {
+			panic(err)
+		}
+	} else {
+		flag.Usage()
+	}
 }
