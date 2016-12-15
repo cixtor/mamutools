@@ -208,6 +208,25 @@ function fixPhpConfiguration() {
 	ok "Deactivate opcache extension"
 	sed -i "s/^opcache.enable.*/opcache.enable=0/g" "$temp_fpath"
 
+	pline=$(grep -n 'xdebug\.so' "$temp_fpath")
+	if [[ "$?" -eq 0 ]]; then
+		ok "Activate xdebug and its profiler"
+		newconfig=""
+		lnum=$(echo "$pline" | cut -d: -f1)
+		extension=$(head -n"$lnum" "$temp_fpath" | tail -n 1)
+		header=$(( $lnum - 1 ))
+		footer=$(( $lnum + 1 ))
+		newconfig+=$(head -n"$header" "$temp_fpath")
+		newconfig+=$'\n'
+		newconfig+=$(echo "$extension" | sed 's/;zend/zend/')
+		newconfig+=$'\n'
+		newconfig+=$(tail -n"+$footer" "$temp_fpath")
+		echo "$newconfig" 1> "$temp_fpath"
+		sed -i 's/;xdebug\.profiler/xdebug\.profiler/g' "$temp_fpath"
+	else
+		err "Turn XDebug and profiler on"
+	fi
+
 	mv "$temp_fpath" "$fpath" 2> /dev/null
 	ok "Finished PHP configuration"
 }
