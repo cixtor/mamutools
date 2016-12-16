@@ -231,6 +231,47 @@ function fixPhpConfiguration() {
 	ok "Finished PHP configuration"
 }
 
+function fixOpenSSLConfiguration() {
+    # https://community.bitnami.com/t/libgost-openssl-issues/26929
+	version=$(php -r 'echo PHP_VERSION;')
+	echo "$version" | grep -q "^5\.3"
+	if [[ "$?" -eq 0 ]]; then
+		info "Fix OpenSSL LibGost issue"
+		openssl_path="/opt/devstack/common/bin/openssl"
+		setenv_path="/opt/devstack/scripts/setenv.sh"
+		openssl_temp="/tmp/openssl"
+		setenv_temp="/tmp/setenv.sh"
+
+		grep -q "OPENSSL_ENGINES" "$openssl_path"
+		if [[ "$?" -eq 0 ]]; then
+			err "OpenSSL engines is already in openssl script"
+		else
+			ok "OpenSSL engines was added to openssl script"
+			footer=$(grep -n "exec" "$openssl_path" | tail -n 1 | cut -d: -f1)
+			header=$(( $footer - 1 ))
+			head -n "$header" "$openssl_path" 1> "$openssl_temp"
+			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$openssl_temp"
+			echo 'export OPENSSL_ENGINES' 1>> "$openssl_temp"
+			tail -n "+$footer" "$openssl_path" 1>> "$openssl_temp"
+			mv "$openssl_temp" "$openssl_path" 2> /dev/null
+		fi
+
+		grep -q "OPENSSL_ENGINES" "$setenv_path"
+		if [[ "$?" -eq 0 ]]; then
+			err "OpenSSL engines is already in setenv script"
+		else
+			ok "OpenSSL engines was added to setenv script"
+			footer=$(grep -n "^\. .*build-setenv\.sh" "$setenv_path" | tail -n 1 | cut -d: -f1)
+			header=$(( $footer - 1 ))
+			head -n "$header" "$setenv_path" 1> "$setenv_temp"
+			echo 'OPENSSL_ENGINES="/opt/devstack/common/lib/engines"' 1>> "$setenv_temp"
+			echo 'export OPENSSL_ENGINES' 1>> "$setenv_temp"
+			tail -n "+$footer" "$setenv_path" 1>> "$setenv_temp"
+			mv "$setenv_temp" "$setenv_path" 2> /dev/null
+		fi
+	fi
+}
+
 function installMailCatcher() {
 	which mailcatcher 1> /dev/null
 	if [[ "$?" -eq 1 ]]; then
@@ -272,6 +313,7 @@ if [[ $(isInstalled;echo $?) -eq 0 ]]; then
 	changeDocumentRoot
 	fixApacheConfiguration
 	fixPhpConfiguration
+	fixOpenSSLConfiguration
 	installMailCatcher
 	installDeploymentTool
 	echo "   Finished"
