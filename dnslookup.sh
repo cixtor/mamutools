@@ -70,7 +70,18 @@ if [[ "$1" == "" ]] || [[ "$@" =~ help ]]; then
 fi
 
 echo "DNS Lookup for '${domain}'"
+
+LASTCHAR=$(echo "$domain" | rev | cut -c1)
+if [[ "$LASTCHAR" == "." ]]; then
+    # Remove the last dot to simplify the queries.
+    domain=$(echo "$domain" | rev | cut -c2-255 | rev)
+fi
+
+domain="${domain}." # Add a final dot to finalize the hostname.
 nameserver=$(dig -t "NS" +nocmd +noall +answer "$domain" | sort | tail -n1 | awk '{print $5}')
+
+# Check if name server can be used to execute the queries, otherwise use Google's.
+if ! dig -t A "$domain" "@${nameserver}" &> /dev/null; then nameserver="8.8.8.8"; fi
 
 if [[ "$nameserver" == "" ]]; then
     echo "dig: couldn't get nameserver for '${domain}': not found"
