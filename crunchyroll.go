@@ -14,13 +14,15 @@
 
 package main
 
-import "flag"
-import "fmt"
-import "io/ioutil"
-import "net/http"
-import "os"
-import "regexp"
-import "strings"
+import (
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"regexp"
+	"strings"
+)
 
 var anime = flag.String("anime", "", "Friendly URL of the show")
 var format = flag.String("format", "480p", "Force video resolution")
@@ -44,87 +46,86 @@ func main() {
 	}
 
 	client := http.Client{}
-	var request_url string = fmt.Sprintf("http://www.crunchyroll.com/%s", *anime)
-	var pattern = regexp.MustCompile(`<a href="/` + *anime + `/([^"\/]+)"`)
+	requestURL := fmt.Sprintf("http://www.crunchyroll.com/%s", *anime)
+	pattern := regexp.MustCompile(`<a href="/` + *anime + `/([^"\/]+)"`)
 
 	if *debug != "" {
-		request_url = fmt.Sprintf("%s/%s", *debug, *anime)
+		requestURL = fmt.Sprintf("%s/%s", *debug, *anime)
 	}
 
-	request, err := http.NewRequest("GET", request_url, nil)
+	request, err := http.NewRequest("GET", requestURL, nil)
 
-	if err == nil {
-		request.Header.Add("DNT", "1")
-		request.Header.Add("Origin", "http://www.crunchyroll.com")
-		request.Header.Add("Referer", "http://www.crunchyroll.com/")
-		request.Header.Add("Accept-Language", "en-US,en;q=0.8")
-		request.Header.Add("User-Agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
-		request.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml")
-		request.Header.Add("Cache-Control", "max-age=0")
-		request.Header.Add("Connection", "keep-alive")
-
-		response, err := client.Do(request)
-
-		if err == nil {
-			defer response.Body.Close()
-			body, _ := ioutil.ReadAll(response.Body)
-			var episode_matches [][]string = pattern.FindAllStringSubmatch(string(body), -1)
-			var total_episodes int = len(episode_matches)
-
-			if total_episodes > 1 {
-				var episode_list = make([]string, 0)
-				var anime_clean string = strings.Replace(*anime, "-", "\x20", -1)
-				var anime_title string = strings.Title(anime_clean)
-
-				for _, episode := range episode_matches {
-					var episode_url string = episode[1]
-					var entry string = fmt.Sprintf("http://www.crunchyroll.com/%s/%s", *anime, episode_url)
-
-					episode_list = append(episode_list, entry)
-				}
-
-				fmt.Printf("#!/bin/bash\n")
-				fmt.Printf("episodes=(\n")
-
-				var total_entries int = len(episode_list)
-				var it_start int = total_entries - 1
-				for i := it_start; i >= 0; i-- {
-					fmt.Printf("  '%s'\n", episode_list[i])
-				}
-
-				fmt.Printf(")\n")
-				fmt.Printf("rtmp_exists=$(which rtmpdump)\n")
-				fmt.Printf("if [[ \"$?\" != 0 ]]; then\n")
-				fmt.Printf("  echo 'The rtmpdump package is required'\n")
-				fmt.Printf("  exit 1\n")
-				fmt.Printf("fi\n")
-				fmt.Printf("for episode_url in \"${episodes[@]}\"; do\n")
-				fmt.Printf("  folder_name=$(echo \"$episode_url\" | rev | cut -d '/' -f 1 | rev)\n")
-				fmt.Printf("  mkdir \"$folder_name\"\n")
-				fmt.Printf("  if [[ -e \"$folder_name\" ]]; then\n")
-				fmt.Printf("    cd \"$folder_name\"\n")
-				fmt.Printf("    echo \"${folder_name}: ${episode_url}\"\n")
-				fmt.Printf("    youtube-dl --all-subs --format %s \"$episode_url\"\n", *format)
-				fmt.Printf("    if [[ \"$?\" -eq 0 ]]; then icon='information'; else icon='error'; fi\n")
-				fmt.Printf("    notify-send '%s' \"Downloaded ${folder_name}\\n${episode_url}\" -i \"dialog-${icon}\"\n", anime_title)
-				fmt.Printf("    if [[ \"$icon\" == \"error\" ]]; then exit 1; fi\n")
-				fmt.Printf("    cd ../ && echo\n")
-				fmt.Printf("  fi\n")
-				fmt.Printf("done\n")
-
-				os.Exit(0)
-			} else {
-				fmt.Printf("[x] No episodes were found.\n")
-				os.Exit(1)
-			}
-		} else {
-			fmt.Printf("Request execution: %s\n", err)
-			os.Exit(1)
-		}
-	} else {
-		fmt.Printf("HTTP request: %s\n", err)
+	if err != nil {
+		fmt.Println("HTTP request:", err)
 		os.Exit(1)
 	}
 
-	os.Exit(1)
+	request.Header.Add("DNT", "1")
+	request.Header.Add("Origin", "http://www.crunchyroll.com")
+	request.Header.Add("Referer", "http://www.crunchyroll.com/")
+	request.Header.Add("Accept-Language", "en-US,en;q=0.8")
+	request.Header.Add("User-Agent", "Mozilla/5.0 (KHTML, like Gecko) Safari/537.36")
+	request.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml")
+	request.Header.Add("Cache-Control", "max-age=0")
+	request.Header.Add("Connection", "keep-alive")
+
+	response, err := client.Do(request)
+
+	if err != nil {
+		fmt.Println("Request execution:", err)
+		os.Exit(1)
+	}
+
+	defer response.Body.Close()
+
+	body, _ := ioutil.ReadAll(response.Body)
+
+	episodeMatches := pattern.FindAllStringSubmatch(string(body), -1)
+	totalEpisodes := len(episodeMatches)
+
+	if totalEpisodes < 2 {
+		fmt.Println("[x] No episodes were found.")
+		os.Exit(1)
+	}
+
+	episodeList := make([]string, 0)
+	animeClean := strings.Replace(*anime, "-", "\x20", -1)
+	animeTitle := strings.Title(animeClean)
+
+	for _, episode := range episodeMatches {
+		episodeURL := episode[1]
+		entry := fmt.Sprintf("http://www.crunchyroll.com/%s/%s", *anime, episodeURL)
+
+		episodeList = append(episodeList, entry)
+	}
+
+	fmt.Printf("#!/bin/bash\n")
+	fmt.Printf("episodes=(\n")
+
+	totalEntries := len(episodeList)
+	itStart := totalEntries - 1
+
+	for i := itStart; i >= 0; i-- {
+		fmt.Printf("  '%s'\n", episodeList[i])
+	}
+
+	fmt.Printf(")\n")
+	fmt.Printf("rtmp_exists=$(which rtmpdump)\n")
+	fmt.Printf("if [[ \"$?\" != 0 ]]; then\n")
+	fmt.Printf("  echo 'The rtmpdump package is required'\n")
+	fmt.Printf("  exit 1\n")
+	fmt.Printf("fi\n")
+	fmt.Printf("for episode_url in \"${episodes[@]}\"; do\n")
+	fmt.Printf("  folder_name=$(echo \"$episode_url\" | rev | cut -d '/' -f 1 | rev)\n")
+	fmt.Printf("  mkdir \"$folder_name\"\n")
+	fmt.Printf("  if [[ -e \"$folder_name\" ]]; then\n")
+	fmt.Printf("    cd \"$folder_name\"\n")
+	fmt.Printf("    echo \"${folder_name}: ${episode_url}\"\n")
+	fmt.Printf("    youtube-dl --all-subs --format %s \"$episode_url\"\n", *format)
+	fmt.Printf("    if [[ \"$?\" -eq 0 ]]; then icon='information'; else icon='error'; fi\n")
+	fmt.Printf("    notify-send '%s' \"Downloaded ${folder_name}\\n${episode_url}\" -i \"dialog-${icon}\"\n", anime_title)
+	fmt.Printf("    if [[ \"$icon\" == \"error\" ]]; then exit 1; fi\n")
+	fmt.Printf("    cd ../ && echo\n")
+	fmt.Printf("  fi\n")
+	fmt.Printf("done\n")
 }
