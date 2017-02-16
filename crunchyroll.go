@@ -100,7 +100,7 @@ func main() {
 	}
 
 	fmt.Printf("#!/bin/bash\n")
-	fmt.Printf("episodes=(\n")
+	fmt.Printf("EPISODES=(\n")
 
 	totalEntries := len(episodeList)
 	itStart := totalEntries - 1
@@ -110,22 +110,26 @@ func main() {
 	}
 
 	fmt.Printf(")\n")
-	fmt.Printf("rtmp_exists=$(which rtmpdump)\n")
-	fmt.Printf("if [[ \"$?\" != 0 ]]; then\n")
+	fmt.Printf("CURRENT_DIR=$(pwd)\n")
+	fmt.Printf("VIDEO_FORMAT=\"%s\"\n", *format)
+	fmt.Printf("if ! command -v rtmpdump &> /dev/null; then\n")
 	fmt.Printf("  echo 'The rtmpdump package is required'\n")
 	fmt.Printf("  exit 1\n")
 	fmt.Printf("fi\n")
-	fmt.Printf("for episode_url in \"${episodes[@]}\"; do\n")
-	fmt.Printf("  folder_name=$(echo \"$episode_url\" | rev | cut -d '/' -f 1 | rev)\n")
-	fmt.Printf("  mkdir \"$folder_name\"\n")
-	fmt.Printf("  if [[ -e \"$folder_name\" ]]; then\n")
-	fmt.Printf("    cd \"$folder_name\"\n")
-	fmt.Printf("    echo \"${folder_name}: ${episode_url}\"\n")
-	fmt.Printf("    youtube-dl --all-subs --format %s \"$episode_url\"\n", *format)
-	fmt.Printf("    if [[ \"$?\" -eq 0 ]]; then icon='information'; else icon='error'; fi\n")
-	fmt.Printf("    notify-send '%s' \"Downloaded ${folder_name}\\n${episode_url}\" -i \"dialog-${icon}\"\n", anime_title)
-	fmt.Printf("    if [[ \"$icon\" == \"error\" ]]; then exit 1; fi\n")
-	fmt.Printf("    cd ../ && echo\n")
+	fmt.Printf("for EPISODE_URL in \"${EPISODES[@]}\"; do\n")
+	fmt.Printf("  FOLDER_NAME=$(echo \"$EPISODE_URL\" | rev | cut -d '/' -f 1 | rev)\n")
+	fmt.Printf("  mkdir -pv \"${CURRENT_DIR}/${FOLDER_NAME}\" 2> /dev/null\n")
+	fmt.Printf("  cd \"${CURRENT_DIR}/${FOLDER_NAME}\" || exit\n")
+	fmt.Printf("  echo \"Anime: %s\"\n", animeTitle)
+	fmt.Printf("  echo \"Episode: ${EPISODE_URL}\"\n")
+	fmt.Printf("  echo \"Directory: ${FOLDER_NAME}\"\n")
+	fmt.Printf("  if [[ \"$VIDEO_FORMAT\" == \"best\" ]]; then\n")
+	fmt.Printf("    FORMAT=$(youtube-dl -F \"$EPISODE_URL\" 2> /dev/null | grep best | awk '{print $1}')\n")
+	fmt.Printf("  else\n")
+	fmt.Printf("    FORMAT=\"$VIDEO_FORMAT\"\n")
 	fmt.Printf("  fi\n")
+	fmt.Printf("  echo \"Video Format: ${FORMAT}\"\n")
+	fmt.Printf("  if ! youtube-dl --all-subs --format \"$FORMAT\" \"$EPISODE_URL\"; then exit; fi\n")
+	fmt.Printf("  echo\n")
 	fmt.Printf("done\n")
 }
