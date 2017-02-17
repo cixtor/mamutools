@@ -25,6 +25,7 @@ There is a additional list of tools that were originally part of this repository
 
 - [Sparkline](https://github.com/cixtor/sparkline) — `go get -u github.com/cixtor/sparkline`
 - [Website TTFB](https://github.com/cixtor/webttfb) — `go get -u github.com/cixtor/webttfb`
+- [SiteCheck CLI](https://github.com/cixtor/sitecheck) — `go get -u github.com/cixtor/sitecheck`
 - [String Conversion](https://github.com/cixtor/strconv) — `go get -u github.com/cixtor/strconv`
 - [Wordpress Tickets](https://github.com/cixtor/wptickets) — `go get -u github.com/cixtor/wptickets`
 
