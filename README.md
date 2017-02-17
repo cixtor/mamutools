@@ -23,6 +23,7 @@ source ~/.profile
 
 There is a additional list of tools that were originally part of this repository but then were moved to independent projects for maintainability, easy distribution and reusability by 3rd-party programs.
 
+- [$HOME/.bin](https://github.com/cixtor/dotfiles) — _(miscellaneous scripts)_
 - [Sparkline](https://github.com/cixtor/sparkline) — `go get -u github.com/cixtor/sparkline`
 - [Website TTFB](https://github.com/cixtor/webttfb) — `go get -u github.com/cixtor/webttfb`
 - [SiteCheck CLI](https://github.com/cixtor/sitecheck) — `go get -u github.com/cixtor/sitecheck`
