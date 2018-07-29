@@ -37,38 +37,85 @@ import (
 	"sync"
 )
 
-var length = flag.Int("length", 10, "Length of each password (default: 10)")
-var count = flag.Int("count", 1, "Quantity of passwords to generate (default: 1)")
-var typeDict = flag.String("type", "", "Group of characters to use (one of more): a, A, 1, @")
-var allTypes = flag.Bool("all", false, "Use all character groups, same as: -type '1a@A'")
-var customTypes = flag.String("custom", "", "Custom list of characters for the dictionary")
+var (
+	length      int
+	howmany     int
+	typeDict    string
+	allTypes    bool
+	customTypes string
+	dictionary  map[string]string
+)
 
-var dictionary = map[string]string{
-	"alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
-	"alphabet_mayus": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	"numbers":        "0123456789",
-	"specials":       "!@$%&*_+=-_?/.,:;#",
+func init() {
+	flag.IntVar(&length, "length", 10, "Length of each password (default: 10)")
+	flag.IntVar(&howmany, "count", 1, "Quantity of passwords to generate (default: 1)")
+	flag.StringVar(&typeDict, "type", "", "Group of characters to use (one of more): a, A, 1, @")
+	flag.BoolVar(&allTypes, "all", false, "Use all character groups, same as: -type '1a@A'")
+	flag.StringVar(&customTypes, "custom", "", "Custom list of characters for the dictionary")
+
+	dictionary = map[string]string{
+		"alphabet_minus": "abcdefghijklmnopqrstuvwxyz",
+		"alphabet_mayus": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		"numbers":        "0123456789",
+		"specials":       "!@$%&*_+=-_?/.,:;#",
+	}
+
+	flag.Usage = func() {
+		fmt.Println("Password Generator")
+		fmt.Println("  http://cixtor.com/")
+		fmt.Println("  https://github.com/cixtor/mamutools")
+		fmt.Println("  https://en.wikipedia.org/wiki/Password")
+		fmt.Println("  https://www.youtube.com/watch?v=BIKV3fYmzRQ")
+		fmt.Println("Usage:")
+		flag.PrintDefaults()
+	}
+
+	flag.Parse()
+}
+
+func main() {
+	if howmany == 0 || length == 0 {
+		return
+	}
+
+	var wg sync.WaitGroup
+
+	userDict := genUserDictionary()
+
+	if userDict == "" {
+		fmt.Println("Dictionary is empty, use -type to populate it")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	wg.Add(howmany)
+
+	for i := 0; i < howmany; i++ {
+		go genRandomString(&wg, userDict, length)
+	}
+
+	wg.Wait()
 }
 
 func genUserDictionary() string {
 	var userDict string
 
-	if *allTypes {
+	if allTypes {
 		for _, values := range dictionary {
 			userDict += values
 		}
 	}
 
-	if *typeDict != "" && userDict == "" {
-		if len(*typeDict) == 1 {
+	if typeDict != "" && userDict == "" {
+		if len(typeDict) == 1 {
 			for _, values := range dictionary {
-				if strings.Contains(values, *typeDict) {
+				if strings.Contains(values, typeDict) {
 					userDict = values
 					break
 				}
 			}
 		} else {
-			for _, c := range *typeDict {
+			for _, c := range typeDict {
 				for _, values := range dictionary {
 					if strings.Contains(values, string(c)) {
 						userDict += values
@@ -78,8 +125,8 @@ func genUserDictionary() string {
 		}
 	}
 
-	if *customTypes != "" {
-		userDict += *customTypes
+	if customTypes != "" {
+		userDict += customTypes
 	}
 
 	return userDict
@@ -103,40 +150,4 @@ func genRandomString(wg *sync.WaitGroup, userDict string, length int) {
 	fmt.Printf("%s\n", password)
 
 	defer wg.Done()
-}
-
-func main() {
-	flag.Usage = func() {
-		fmt.Println("Password Generator")
-		fmt.Println("  http://cixtor.com/")
-		fmt.Println("  https://github.com/cixtor/mamutools")
-		fmt.Println("  https://en.wikipedia.org/wiki/Password")
-		fmt.Println("  https://www.youtube.com/watch?v=BIKV3fYmzRQ")
-		fmt.Println("Usage:")
-		flag.PrintDefaults()
-	}
-
-	flag.Parse()
-
-	if *count > 0 && *length > 0 {
-		var wg sync.WaitGroup
-
-		userDict := genUserDictionary()
-
-		if userDict == "" {
-			fmt.Println("Dictionary is empty, use -type to populate it")
-			flag.Usage()
-			os.Exit(1)
-		}
-
-		wg.Add(*count) /* Number of passwords */
-
-		for i := 0; i < *count; i++ {
-			go genRandomString(&wg, userDict, *length)
-		}
-
-		wg.Wait()
-	} else {
-		flag.Usage()
-	}
 }
